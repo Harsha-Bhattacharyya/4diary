@@ -1,42 +1,113 @@
-import Image from "next/image";
 import Link from "next/link";
+import FruityBackground from "@/components/ui/FruityBackground";
+import GlassCard from "@/components/ui/GlassCard";
+import FruityButton from "@/components/ui/FruityButton";
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            Welcome to 4diary
+    <div className="min-h-screen relative">
+      <FruityBackground />
+      
+      <main className="relative z-10 flex min-h-screen flex-col items-center justify-center px-6 py-12">
+        {/* Hero Section */}
+        <div className="max-w-6xl mx-auto text-center mb-16">
+          <h1 className="text-6xl md:text-8xl font-bold mb-6 bg-gradient-to-r from-aqua-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+            4diary
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            A privacy focused solution for the modern world. Built with Next.js and Tailwind CSS.
+          <p className="text-2xl md:text-3xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
+            Privacy-First Note-Taking
           </p>
+          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-8">
+            Your thoughts, encrypted end-to-end. A beautiful, Notion-like editor with military-grade encryption. 
+            Your data never leaves your device unencrypted.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Link href="/workspace">
+              <FruityButton variant="gradient" size="lg">
+                🚀 Get Started
+              </FruityButton>
+            </Link>
+            <Link href="/templates">
+              <FruityButton variant="glass" size="lg">
+                📄 Browse Templates
+              </FruityButton>
+            </Link>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <Link
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="/about"
-          >
-            About
-          </Link>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* Features Grid */}
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+          <GlassCard hover>
+            <div className="text-4xl mb-4">🔒</div>
+            <h3 className="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-200">
+              End-to-End Encrypted
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400">
+              AES-256-GCM encryption. Master keys never leave your device. Server sees only encrypted data.
+            </p>
+          </GlassCard>
+
+          <GlassCard hover>
+            <div className="text-4xl mb-4">✍️</div>
+            <h3 className="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-200">
+              Notion-like Editor
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400">
+              Rich text editing with markdown support. Headings, lists, code blocks, and more.
+            </p>
+          </GlassCard>
+
+          <GlassCard hover>
+            <div className="text-4xl mb-4">📦</div>
+            <h3 className="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-200">
+              Self-Hostable
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400">
+              Own your data completely. Docker-ready deployment with MongoDB and Redis.
+            </p>
+          </GlassCard>
+
+          <GlassCard hover>
+            <div className="text-4xl mb-4">📁</div>
+            <h3 className="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-200">
+              Smart Organization
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400">
+              Folders, tags, favorites, and archives. Search on unencrypted metadata.
+            </p>
+          </GlassCard>
+
+          <GlassCard hover>
+            <div className="text-4xl mb-4">📥</div>
+            <h3 className="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-200">
+              Export Freedom
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400">
+              Export as Markdown or ZIP. Your data is always portable and accessible.
+            </p>
+          </GlassCard>
+
+          <GlassCard hover>
+            <div className="text-4xl mb-4">🎨</div>
+            <h3 className="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-200">
+              Beautiful Design
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400">
+              Frutiger Aero aesthetics with glass morphism and smooth animations.
+            </p>
+          </GlassCard>
         </div>
+
+        {/* Footer */}
+        <footer className="text-center text-gray-600 dark:text-gray-400 text-sm">
+          <p>Built with privacy, security, and beauty in mind.</p>
+          <p className="mt-2">
+            <Link href="/about" className="hover:text-aqua-600 transition-colors">
+              Learn More
+            </Link>
+          </p>
+        </footer>
       </main>
     </div>
   );
