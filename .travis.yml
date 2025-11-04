@@ -1,6 +1,8 @@
 language: node_js
+os: linux
+dist: questing
 node_js:
-  - '20'
+  - '24'
 cache:
   directories:
     - node_modules
