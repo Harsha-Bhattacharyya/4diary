@@ -35,9 +35,15 @@ export default function TemplatesPage() {
             const categoryTemplates = builtInTemplates.filter(
               (t) => t.category === category
             );
+            
+            // Determine fade-in class based on index
+            let fadeClass = 'fade-in';
+            if (idx === 1) fadeClass = 'fade-in-delay-1';
+            else if (idx === 2) fadeClass = 'fade-in-delay-2';
+            else if (idx >= 3) fadeClass = 'fade-in-delay-3';
 
             return (
-              <div key={category} className={`mb-12 fade-in-delay-${Math.min(idx + 1, 3)}`}>
+              <div key={category} className={`mb-12 ${fadeClass}`}>
                 <h2 className="text-2xl font-bold mb-6 capitalize text-leather-100">
                   {category}
                 </h2>

@@ -11,7 +11,7 @@ export default function Home() {
       <main className="relative z-10 flex min-h-screen flex-col items-center justify-center px-6 py-12">
         {/* Hero Section */}
         <div className="max-w-6xl mx-auto text-center mb-16 fade-in">
-          <h1 className="text-6xl md:text-8xl font-bold mb-6 gradient-leather" style={{ WebkitTextFillColor: 'var(--leather-100)' }}>
+          <h1 className="text-6xl md:text-8xl font-bold mb-6 text-leather-100">
             4diary
           </h1>
           <p className="text-2xl md:text-3xl font-bold text-leather-200 mb-4 fade-in-delay-1">
