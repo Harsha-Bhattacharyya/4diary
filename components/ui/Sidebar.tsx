@@ -26,13 +26,13 @@ export default function Sidebar({ workspaceId, documents = [] }: SidebarProps) {
   ];
 
   return (
-    <aside className="glass-card w-64 h-screen p-4 flex flex-col gap-4 sticky top-0">
+    <aside className="leather-card w-64 h-screen p-4 flex flex-col gap-4 sticky top-0 fade-in">
       {/* Logo */}
       <div className="mb-4">
-        <h1 className="text-2xl font-bold bg-gradient-to-r from-aqua-500 to-purple-600 bg-clip-text text-transparent">
+        <h1 className="text-2xl font-bold text-leather-100">
           4diary
         </h1>
-        <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+        <p className="text-xs text-leather-300 mt-1">
           Privacy-first notes
         </p>
       </div>
@@ -45,10 +45,10 @@ export default function Sidebar({ workspaceId, documents = [] }: SidebarProps) {
             <Link
               key={item.href}
               href={item.href}
-              className={`px-4 py-2 rounded-lg transition-all duration-200 ${
+              className={`px-4 py-2 transition-all duration-200 ${
                 isActive
-                  ? "bg-aqua-500/20 text-aqua-700 dark:text-aqua-300 font-semibold"
-                  : "hover:bg-white/10 text-gray-700 dark:text-gray-300"
+                  ? "bg-leather-600 text-leather-100 font-bold border-l-4 border-leather-400"
+                  : "hover:bg-leather-700 text-leather-200 border-l-4 border-transparent"
               }`}
             >
               {item.label}
@@ -60,7 +60,7 @@ export default function Sidebar({ workspaceId, documents = [] }: SidebarProps) {
       {/* Documents list (if in workspace) */}
       {workspaceId && documents.length > 0 && (
         <div className="flex-1 overflow-y-auto mt-4">
-          <h3 className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">
+          <h3 className="text-sm font-bold text-leather-200 mb-2">
             Recent Documents
           </h3>
           <div className="flex flex-col gap-1">
@@ -68,7 +68,7 @@ export default function Sidebar({ workspaceId, documents = [] }: SidebarProps) {
               <Link
                 key={doc.id}
                 href={`/workspace/${workspaceId}?doc=${doc.id}`}
-                className="px-3 py-2 text-sm rounded-lg hover:bg-white/10 text-gray-700 dark:text-gray-300 truncate"
+                className="px-3 py-2 text-sm hover:bg-leather-700 text-leather-300 truncate transition-all duration-200"
                 title={doc.title}
               >
                 📄 {doc.title}
@@ -79,8 +79,8 @@ export default function Sidebar({ workspaceId, documents = [] }: SidebarProps) {
       )}
 
       {/* Footer */}
-      <div className="mt-auto pt-4 border-t border-white/20">
-        <p className="text-xs text-center text-gray-500 dark:text-gray-500">
+      <div className="mt-auto pt-4 border-t border-leather-700">
+        <p className="text-xs text-center text-leather-400">
           End-to-end encrypted
         </p>
       </div>

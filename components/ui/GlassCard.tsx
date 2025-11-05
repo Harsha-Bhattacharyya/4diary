@@ -15,8 +15,8 @@ export default function GlassCard({
 }: GlassCardProps) {
   return (
     <div
-      className={`glass-card p-6 ${
-        hover ? "transition-all duration-300 hover:scale-105 hover:shadow-2xl" : ""
+      className={`leather-card p-6 ${
+        hover ? "transition-all duration-300 hover:-translate-y-2 hover:shadow-deep" : ""
       } ${className}`}
     >
       {children}

@@ -14,31 +14,31 @@ export default function TemplatesPage() {
 
       <main className="relative z-10 px-6 py-12">
         {/* Header */}
-        <div className="max-w-6xl mx-auto mb-12">
+        <div className="max-w-6xl mx-auto mb-12 fade-in">
           <Link href="/">
-            <FruityButton variant="glass" size="sm">
+            <FruityButton variant="parchment" size="sm">
               ← Back to Home
             </FruityButton>
           </Link>
 
-          <h1 className="text-5xl font-bold mt-8 mb-4 bg-gradient-to-r from-aqua-600 to-purple-600 bg-clip-text text-transparent">
+          <h1 className="text-5xl font-bold mt-8 mb-4 text-leather-100">
             Document Templates
           </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-400">
+          <p className="text-lg text-leather-300">
             Start quickly with pre-built templates for your notes, journals, and projects.
           </p>
         </div>
 
         {/* Categories */}
         <div className="max-w-6xl mx-auto">
-          {categories.map((category) => {
+          {categories.map((category, idx) => {
             const categoryTemplates = builtInTemplates.filter(
               (t) => t.category === category
             );
 
             return (
-              <div key={category} className="mb-12">
-                <h2 className="text-2xl font-semibold mb-6 capitalize text-gray-800 dark:text-gray-200">
+              <div key={category} className={`mb-12 fade-in-delay-${Math.min(idx + 1, 3)}`}>
+                <h2 className="text-2xl font-bold mb-6 capitalize text-leather-100">
                   {category}
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -47,14 +47,14 @@ export default function TemplatesPage() {
                       <div className="flex items-start gap-4">
                         <div className="text-4xl">{template.icon}</div>
                         <div className="flex-1">
-                          <h3 className="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-200">
+                          <h3 className="text-xl font-bold mb-2 text-leather-100">
                             {template.name}
                           </h3>
-                          <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                          <p className="text-leather-300 text-sm mb-4">
                             {template.description}
                           </p>
                           <Link href={`/workspace?template=${template.id}`}>
-                            <FruityButton variant="aqua" size="sm">
+                            <FruityButton variant="leather" size="sm">
                               Use Template
                             </FruityButton>
                           </Link>
@@ -69,17 +69,17 @@ export default function TemplatesPage() {
         </div>
 
         {/* Custom Template CTA */}
-        <div className="max-w-6xl mx-auto mt-16">
+        <div className="max-w-6xl mx-auto mt-16 fade-in-delay-2">
           <GlassCard>
             <div className="text-center py-8">
-              <h3 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-gray-200">
+              <h3 className="text-2xl font-bold mb-4 text-leather-100">
                 Create Your Own Template
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-6">
+              <p className="text-leather-300 mb-6">
                 Design custom templates that fit your unique workflow
               </p>
               <Link href="/workspace">
-                <FruityButton variant="gradient" size="md">
+                <FruityButton variant="leather" size="md">
                   Create Custom Template
                 </FruityButton>
               </Link>

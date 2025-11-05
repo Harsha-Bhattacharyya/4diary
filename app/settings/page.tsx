@@ -25,65 +25,65 @@ export default function SettingsPage() {
       <main className="relative z-10 px-6 py-12">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
-          <div className="mb-12">
+          <div className="mb-12 fade-in">
             <Link href="/">
-              <FruityButton variant="glass" size="sm">
+              <FruityButton variant="parchment" size="sm">
                 ← Back to Home
               </FruityButton>
             </Link>
 
-            <h1 className="text-5xl font-bold mt-8 mb-4 bg-gradient-to-r from-aqua-600 to-purple-600 bg-clip-text text-transparent">
+            <h1 className="text-5xl font-bold mt-8 mb-4 text-leather-100">
               Settings
             </h1>
-            <p className="text-lg text-gray-600 dark:text-gray-400">
+            <p className="text-lg text-leather-300">
               Manage your preferences, security, and data export options
             </p>
           </div>
 
           {/* Security Settings */}
-          <GlassCard className="mb-6">
-            <h2 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-gray-200">
+          <GlassCard className="mb-6 fade-in-delay-1">
+            <h2 className="text-2xl font-bold mb-4 text-leather-100">
               🔒 Security
             </h2>
             <div className="space-y-4">
-              <div className="flex items-center justify-between py-3 border-b border-white/10">
+              <div className="flex items-center justify-between py-3 border-b border-leather-700">
                 <div>
-                  <h3 className="font-semibold text-gray-800 dark:text-gray-200">
+                  <h3 className="font-bold text-leather-100">
                     End-to-End Encryption
                   </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-leather-300">
                     All documents are encrypted with AES-256-GCM
                   </p>
                 </div>
-                <div className="px-4 py-2 rounded-full bg-green-500/20 text-green-700 dark:text-green-300 text-sm font-semibold">
+                <div className="px-4 py-2 bg-green-700/40 text-green-200 text-sm font-bold border-2 border-green-600">
                   Enabled
                 </div>
               </div>
 
-              <div className="flex items-center justify-between py-3 border-b border-white/10">
+              <div className="flex items-center justify-between py-3 border-b border-leather-700">
                 <div>
-                  <h3 className="font-semibold text-gray-800 dark:text-gray-200">
+                  <h3 className="font-bold text-leather-100">
                     Master Key Storage
                   </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-leather-300">
                     Keys stored locally in IndexedDB
                   </p>
                 </div>
-                <div className="px-4 py-2 rounded-full bg-green-500/20 text-green-700 dark:text-green-300 text-sm font-semibold">
+                <div className="px-4 py-2 bg-green-700/40 text-green-200 text-sm font-bold border-2 border-green-600">
                   Local
                 </div>
               </div>
 
               <div className="flex items-center justify-between py-3">
                 <div>
-                  <h3 className="font-semibold text-gray-800 dark:text-gray-200">
+                  <h3 className="font-bold text-leather-100">
                     Server Knowledge
                   </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-leather-300">
                     Server only sees encrypted data
                   </p>
                 </div>
-                <div className="px-4 py-2 rounded-full bg-green-500/20 text-green-700 dark:text-green-300 text-sm font-semibold">
+                <div className="px-4 py-2 bg-green-700/40 text-green-200 text-sm font-bold border-2 border-green-600">
                   Zero Knowledge
                 </div>
               </div>
@@ -91,20 +91,20 @@ export default function SettingsPage() {
           </GlassCard>
 
           {/* Export Settings */}
-          <GlassCard className="mb-6">
-            <h2 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-gray-200">
+          <GlassCard className="mb-6 fade-in-delay-2">
+            <h2 className="text-2xl font-bold mb-4 text-leather-100">
               📥 Export & Backup
             </h2>
             <div className="space-y-4">
               <div>
-                <h3 className="font-semibold mb-2 text-gray-800 dark:text-gray-200">
+                <h3 className="font-bold mb-2 text-leather-100">
                   Export All Documents
                 </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                <p className="text-sm text-leather-300 mb-4">
                   Download all your documents as Markdown files in a ZIP archive
                 </p>
                 <FruityButton
-                  variant="aqua"
+                  variant="leather"
                   size="md"
                   onClick={handleExportWorkspace}
                   disabled={exportInProgress}
@@ -113,11 +113,11 @@ export default function SettingsPage() {
                 </FruityButton>
               </div>
 
-              <div className="pt-4 border-t border-white/10">
-                <h3 className="font-semibold mb-2 text-gray-800 dark:text-gray-200">
+              <div className="pt-4 border-t border-leather-700">
+                <h3 className="font-bold mb-2 text-leather-100">
                   Export Format
                 </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-leather-300">
                   Documents are exported as standard Markdown (.md) files with metadata
                 </p>
               </div>
@@ -125,35 +125,35 @@ export default function SettingsPage() {
           </GlassCard>
 
           {/* Privacy Settings */}
-          <GlassCard className="mb-6">
-            <h2 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-gray-200">
+          <GlassCard className="mb-6 fade-in-delay-3">
+            <h2 className="text-2xl font-bold mb-4 text-leather-100">
               🕵️ Privacy
             </h2>
             <div className="space-y-4">
-              <div className="flex items-center justify-between py-3 border-b border-white/10">
+              <div className="flex items-center justify-between py-3 border-b border-leather-700">
                 <div>
-                  <h3 className="font-semibold text-gray-800 dark:text-gray-200">
+                  <h3 className="font-bold text-leather-100">
                     Analytics
                   </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-leather-300">
                     Privacy-respecting analytics without PII
                   </p>
                 </div>
-                <div className="px-4 py-2 rounded-full bg-blue-500/20 text-blue-700 dark:text-blue-300 text-sm font-semibold">
+                <div className="px-4 py-2 bg-blue-700/40 text-blue-200 text-sm font-bold border-2 border-blue-600">
                   Anonymous
                 </div>
               </div>
 
               <div className="flex items-center justify-between py-3">
                 <div>
-                  <h3 className="font-semibold text-gray-800 dark:text-gray-200">
+                  <h3 className="font-bold text-leather-100">
                     Data Collection
                   </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-leather-300">
                     Only event types and counts, no content or PII
                   </p>
                 </div>
-                <div className="px-4 py-2 rounded-full bg-green-500/20 text-green-700 dark:text-green-300 text-sm font-semibold">
+                <div className="px-4 py-2 bg-green-700/40 text-green-200 text-sm font-bold border-2 border-green-600">
                   Minimal
                 </div>
               </div>
@@ -161,17 +161,17 @@ export default function SettingsPage() {
           </GlassCard>
 
           {/* Self-Hosting Info */}
-          <GlassCard>
-            <h2 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-gray-200">
+          <GlassCard className="fade-in">
+            <h2 className="text-2xl font-bold mb-4 text-leather-100">
               🐳 Self-Hosting
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
+            <p className="text-leather-300 mb-4">
               4diary supports self-hosting with Docker. Check the README for deployment instructions.
             </p>
-            <div className="bg-gray-900 text-gray-100 p-4 rounded-lg font-mono text-sm overflow-x-auto">
+            <div className="bg-leather-900 text-leather-200 p-4 border-2 border-leather-800 font-mono text-sm overflow-x-auto">
               <div>docker-compose up -d</div>
             </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-4">
+            <p className="text-sm text-leather-300 mt-4">
               Requirements: Docker, MongoDB, Redis (optional)
             </p>
           </GlassCard>
