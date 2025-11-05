@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 const TEXTURE_MARKS = Array.from({ length: 20 }, (_, i) => ({
   left: `${((i * 23) % 100)}%`,
   top: `${((i * 37) % 100)}%`,
+  borderRadius: i % 2 === 0 ? '50%' : '0%',
 }));
 
 export default function FruityBackground() {
@@ -75,8 +76,9 @@ export default function FruityBackground() {
           key={i}
           className="absolute w-1 h-1 bg-leather-900/40"
           style={{
-            ...pos,
-            borderRadius: Math.random() > 0.5 ? '50%' : '0%',
+            left: pos.left,
+            top: pos.top,
+            borderRadius: pos.borderRadius,
           }}
           animate={{
             opacity: [0.3, 0.6, 0.3],
