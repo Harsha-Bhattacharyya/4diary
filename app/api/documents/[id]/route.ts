@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDatabase, collections } from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
+import { inMemoryStorage } from "@/lib/inMemoryStorage";
 
 /**
  * GET /api/documents/[id]
@@ -19,11 +20,26 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const db = await getDatabase();
+
+    // Use in-memory storage if database is not available
+    if (!db) {
+      const document = inMemoryStorage.getDocument(id);
+
+      if (!document || document.userId !== userId) {
+        return NextResponse.json(
+          { error: "Document not found" },
+          { status: 404 }
+        );
+      }
+
+      return NextResponse.json({ document });
+    }
+
     if (!ObjectId.isValid(id)) {
       return NextResponse.json({ error: "Invalid document ID" }, { status: 400 });
     }
 
-    const db = await getDatabase();
     const document = await db
       .collection(collections.documents)
       .findOne({ _id: new ObjectId(id), userId });

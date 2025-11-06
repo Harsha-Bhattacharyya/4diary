@@ -10,7 +10,6 @@ import {
   decryptDocumentKey,
   storeMasterKey,
   retrieveMasterKey,
-  type MasterKey,
 } from "./keys";
 
 /**

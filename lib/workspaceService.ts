@@ -4,7 +4,6 @@
 
 import { keyManager } from "./crypto/keyManager";
 import { exportKey } from "./crypto/keys";
-import { encryptToBase64 } from "./crypto/encrypt";
 
 export interface Workspace {
   id: string;

@@ -105,7 +105,7 @@ export async function updateDocument(
     let documentKey = keyManager.getCachedDocumentKey(params.id);
     if (!documentKey) {
       // Need to fetch the document to get its encrypted key
-      const doc = await fetchDocument(params.id, params.userId);
+      await fetchDocument(params.id, params.userId);
       documentKey = keyManager.getCachedDocumentKey(params.id);
       if (!documentKey) {
         throw new Error("Failed to retrieve document key");
