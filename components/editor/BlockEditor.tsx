@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useCreateBlockNote, BlockNoteViewRaw } from "@blocknote/react";
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/react/style.css";
+import FormattingToolbar from "./FormattingToolbar";
 
 interface BlockEditorProps {
   initialContent?: unknown[];
@@ -12,6 +13,7 @@ interface BlockEditorProps {
   autoSave?: boolean;
   autoSaveInterval?: number;
   editable?: boolean;
+  showToolbar?: boolean;
 }
 
 export default function BlockEditor({
@@ -21,6 +23,7 @@ export default function BlockEditor({
   autoSave = true,
   autoSaveInterval = 2000,
   editable = true,
+  showToolbar = true,
 }: BlockEditorProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
@@ -62,6 +65,9 @@ export default function BlockEditor({
 
   return (
     <div className="relative w-full h-full">
+      {/* Formatting Toolbar */}
+      {showToolbar && <FormattingToolbar editor={editor} />}
+
       {/* Save status */}
       {autoSave && (
         <div className="absolute top-4 right-4 z-10 px-3 py-1 rounded-full glass-card text-xs">
