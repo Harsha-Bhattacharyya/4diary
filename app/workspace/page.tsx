@@ -26,6 +26,10 @@ const BlockEditor = dynamic(() => import("@/components/editor/BlockEditor"), {
 });
 
 // Demo user ID - in production, this would come from auth
+// SECURITY NOTE: This is a demo implementation. In production:
+// 1. Implement proper authentication (e.g., NextAuth.js, Auth0, Clerk)
+// 2. Get user ID from authenticated session
+// 3. Never hard-code user identifiers
 const DEMO_USER_ID = "demo-user";
 
 function WorkspaceContent() {

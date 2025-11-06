@@ -34,8 +34,10 @@ export async function createWorkspace(
   // Export and encrypt the master key for storage
   const masterKeyData = await exportKey(masterKey);
 
-  // For demo purposes, we'll use a simple encryption
-  // In production, this should be encrypted with user's password
+  // TODO: In production, encrypt this with user's password using PBKDF2
+  // For demo purposes, we're using base64 encoding
+  // SECURITY NOTE: This is NOT secure and should be replaced with proper
+  // password-based encryption in production
   const encryptedMasterKey = btoa(masterKeyData);
   const salt = btoa(
     String.fromCharCode(...crypto.getRandomValues(new Uint8Array(16)))

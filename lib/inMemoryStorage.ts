@@ -78,7 +78,10 @@ class InMemoryStorage {
 
   // Workspace operations
   createWorkspace(workspace: Omit<StoredWorkspace, "_id">): StoredWorkspace {
-    const id = Math.random().toString(36).substring(2, 15);
+    const id =
+      typeof crypto !== "undefined" && crypto.randomUUID
+        ? crypto.randomUUID()
+        : Math.random().toString(36).substring(2, 15);
     const newWorkspace: StoredWorkspace = {
       ...workspace,
       _id: id,
@@ -94,9 +97,12 @@ class InMemoryStorage {
     );
   }
 
-  // Document operations
+  // Create a unique document ID using crypto
   createDocument(document: Omit<StoredDocument, "_id">): StoredDocument {
-    const id = Math.random().toString(36).substring(2, 15);
+    const id =
+      typeof crypto !== "undefined" && crypto.randomUUID
+        ? crypto.randomUUID()
+        : Math.random().toString(36).substring(2, 15);
     const newDocument: StoredDocument = {
       ...document,
       _id: id,
