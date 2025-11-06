@@ -13,9 +13,10 @@ interface NavItem {
 interface SidebarProps {
   workspaceId?: string;
   documents?: Array<{ id: string; title: string; folder?: string }>;
+  onDocumentClick?: (docId: string) => void;
 }
 
-export default function Sidebar({ workspaceId, documents = [] }: SidebarProps) {
+export default function Sidebar({ workspaceId, documents = [], onDocumentClick }: SidebarProps) {
   const pathname = usePathname();
 
   const navItems: NavItem[] = [
@@ -65,14 +66,14 @@ export default function Sidebar({ workspaceId, documents = [] }: SidebarProps) {
           </h3>
           <div className="flex flex-col gap-1">
             {documents.slice(0, 10).map((doc) => (
-              <Link
+              <button
                 key={doc.id}
-                href={`/workspace/${workspaceId}?doc=${doc.id}`}
-                className="px-3 py-2 text-sm hover:bg-leather-700 text-leather-300 truncate transition-all duration-200"
+                onClick={() => onDocumentClick?.(doc.id)}
+                className="px-3 py-2 text-sm hover:bg-leather-700 text-leather-300 truncate transition-all duration-200 text-left w-full"
                 title={doc.title}
               >
                 📄 {doc.title}
-              </Link>
+              </button>
             ))}
           </div>
         </div>

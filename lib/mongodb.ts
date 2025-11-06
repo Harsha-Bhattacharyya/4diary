@@ -39,13 +39,19 @@ export default clientPromise;
 
 /**
  * Get database instance
+ * Returns null if MongoDB is not available
  */
-export async function getDatabase(): Promise<Db> {
+export async function getDatabase(): Promise<Db | null> {
   if (!uri) {
-    throw new Error('MONGODB_URI environment variable is not set');
+    return null;
   }
-  const client = await clientPromise;
-  return client.db("4diary");
+  try {
+    const client = await clientPromise;
+    return client.db("4diary");
+  } catch (error) {
+    console.error("MongoDB connection failed:", error);
+    return null;
+  }
 }
 
 /**

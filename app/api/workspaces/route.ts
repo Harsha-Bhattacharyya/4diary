@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDatabase, collections, Workspace } from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
+import { inMemoryStorage } from "@/lib/inMemoryStorage";
 
 /**
  * GET /api/workspaces
@@ -16,6 +17,13 @@ export async function GET(request: NextRequest) {
     }
 
     const db = await getDatabase();
+
+    // Use in-memory storage if database is not available
+    if (!db) {
+      const workspaces = inMemoryStorage.getWorkspaces(userId);
+      return NextResponse.json({ workspaces });
+    }
+
     const workspaces = await db
       .collection(collections.workspaces)
       .find({ userId })
@@ -49,6 +57,24 @@ export async function POST(request: NextRequest) {
     }
 
     const db = await getDatabase();
+
+    // Use in-memory storage if database is not available
+    if (!db) {
+      const workspace = inMemoryStorage.createWorkspace({
+        userId,
+        name,
+        encryptedMasterKey,
+        salt,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      });
+
+      return NextResponse.json({
+        id: workspace._id,
+        workspace,
+      });
+    }
+
     const workspace: Workspace = {
       userId,
       name,
