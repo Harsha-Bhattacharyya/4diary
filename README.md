@@ -34,22 +34,17 @@ cd 4diary
 npm install
 ```
 
-3. Create `.env.local` file:
+3. Create enviroment variable with your MongoDB URI:
 ```bash
-cp .env.local.example .env.local
+export MONGODB_URI=mongodb://localhost:27017/4diary
 ```
 
-4. Update `.env.local` with your MongoDB URI:
-```env
-MONGODB_URI=mongodb://localhost:27017/4diary
-```
-
-5. Run the development server:
+4. Run the development server:
 ```bash
 npm run dev
 ```
 
-6. Open [http://localhost:3000](http://localhost:3000) in your browser
+5. Open [http://localhost:3000](http://localhost:3000) in your browser
 
 ## 🐳 Self-Hosting with Docker
 
@@ -151,7 +146,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the BSD-3 Clause License - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
@@ -166,4 +161,4 @@ For issues and questions, please use the GitHub issue tracker.
 
 ---
 
-Built with privacy, security, and beauty in mind. 🔒✨
+Built with ♥️ in  🇮🇳
