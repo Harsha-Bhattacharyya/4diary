@@ -11,8 +11,8 @@ export default function Home() {
       <main className="relative z-10 flex min-h-screen flex-col items-center justify-center px-6 py-12">
         {/* Hero Section */}
         <div className="max-w-6xl mx-auto text-center mb-16 fade-in">
-        <img src="4diary.png" alt="logo" > 
-	<p className="text-2xl md:text-3xl font-bold text-leather-200 mb-4 fade-in-delay-1">
+          <img src="4diary.png" alt="logo" />
+          <p className="text-2xl md:text-3xl font-bold text-leather-200 mb-4 fade-in-delay-1">
             Privacy-First Note-Taking
           </p>
           <p className="text-lg text-leather-300 max-w-2xl mx-auto mb-8 fade-in-delay-2">
