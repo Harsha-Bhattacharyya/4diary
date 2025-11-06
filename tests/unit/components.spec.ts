@@ -8,7 +8,7 @@ import { test, expect } from '@playwright/test';
 test.describe('EditableTitle Component', () => {
   test('should render title text', async ({ page }) => {
     await page.goto('/workspace');
-    await page.waitForTimeout(2000);
+    await page.waitForLoadState('networkidle');
     
     // Create a new document to get an editable title
     const newDocButton = page.getByRole('button', { name: /New Document/i });
@@ -24,7 +24,7 @@ test.describe('EditableTitle Component', () => {
 
   test('should switch to edit mode on click', async ({ page }) => {
     await page.goto('/workspace');
-    await page.waitForTimeout(2000);
+    await page.waitForLoadState('networkidle');
     
     const newDocButton = page.getByRole('button', { name: /New Document/i });
     
@@ -47,7 +47,7 @@ test.describe('EditableTitle Component', () => {
 
   test('should save title on Enter key', async ({ page }) => {
     await page.goto('/workspace');
-    await page.waitForTimeout(2000);
+    await page.waitForLoadState('networkidle');
     
     const newDocButton = page.getByRole('button', { name: /New Document/i });
     
@@ -78,7 +78,7 @@ test.describe('EditableTitle Component', () => {
 
   test('should cancel edit on Escape key', async ({ page }) => {
     await page.goto('/workspace');
-    await page.waitForTimeout(2000);
+    await page.waitForLoadState('networkidle');
     
     const newDocButton = page.getByRole('button', { name: /New Document/i });
     
@@ -110,7 +110,7 @@ test.describe('EditableTitle Component', () => {
 test.describe('FormattingToolbar Component', () => {
   test('should render all text formatting buttons', async ({ page }) => {
     await page.goto('/workspace');
-    await page.waitForTimeout(2000);
+    await page.waitForLoadState('networkidle');
     
     const newDocButton = page.getByRole('button', { name: /New Document/i });
     
@@ -129,7 +129,7 @@ test.describe('FormattingToolbar Component', () => {
 
   test('should render block formatting buttons', async ({ page }) => {
     await page.goto('/workspace');
-    await page.waitForTimeout(2000);
+    await page.waitForLoadState('networkidle');
     
     const newDocButton = page.getByRole('button', { name: /New Document/i });
     

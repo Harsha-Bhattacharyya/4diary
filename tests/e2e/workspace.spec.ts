@@ -5,7 +5,7 @@ test.describe('Workspace', () => {
     await page.goto('/workspace');
     
     // Wait for initialization
-    await page.waitForTimeout(2000);
+    await page.waitForLoadState('networkidle');
     
     // Check for workspace elements
     const workspaceOrLoading = page.getByText(/Workspace|Initializing encryption keys|Error/i);
@@ -16,7 +16,7 @@ test.describe('Workspace', () => {
     await page.goto('/workspace');
     
     // Wait for page to load
-    await page.waitForTimeout(2000);
+    await page.waitForLoadState('networkidle');
     
     // Check if sidebar is visible (look for navigation items)
     const sidebar = page.locator('aside');
@@ -43,7 +43,7 @@ test.describe('Workspace', () => {
     await page.goto('/workspace');
     
     // Wait for initialization
-    await page.waitForTimeout(2000);
+    await page.waitForLoadState('networkidle');
     
     // Click "New Document" button if it exists
     const newDocButton = page.getByRole('button', { name: /New Document/i });
@@ -63,7 +63,7 @@ test.describe('Workspace', () => {
     await page.goto('/workspace');
     
     // Wait for initialization
-    await page.waitForTimeout(2000);
+    await page.waitForLoadState('networkidle');
     
     // Create a new document
     const newDocButton = page.getByRole('button', { name: /New Document/i });
@@ -87,7 +87,7 @@ test.describe('Workspace', () => {
     await page.goto('/workspace');
     
     // Wait for initialization
-    await page.waitForTimeout(2000);
+    await page.waitForLoadState('networkidle');
     
     // Create a new document
     const newDocButton = page.getByRole('button', { name: /New Document/i });

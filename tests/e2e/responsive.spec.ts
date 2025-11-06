@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test.describe('Sidebar Component', () => {
   test('should be visible on workspace page', async ({ page }) => {
     await page.goto('/workspace');
-    await page.waitForTimeout(2000);
+    await page.waitForLoadState('networkidle');
     
     const sidebar = page.locator('aside');
     await expect(sidebar).toBeVisible();
@@ -11,7 +11,7 @@ test.describe('Sidebar Component', () => {
 
   test('should have navigation items', async ({ page }) => {
     await page.goto('/workspace');
-    await page.waitForTimeout(2000);
+    await page.waitForLoadState('networkidle');
     
     // Check for navigation links
     await expect(page.getByRole('link', { name: /Home/i })).toBeVisible();
@@ -22,7 +22,7 @@ test.describe('Sidebar Component', () => {
 
   test('should collapse when toggle button is clicked', async ({ page }) => {
     await page.goto('/workspace');
-    await page.waitForTimeout(2000);
+    await page.waitForLoadState('networkidle');
     
     const sidebar = page.locator('aside');
     const toggleButton = sidebar.locator('button').first();
@@ -52,7 +52,7 @@ test.describe('Mobile Responsiveness', () => {
     await page.setViewportSize({ width: 375, height: 667 });
     
     await page.goto('/workspace');
-    await page.waitForTimeout(2000);
+    await page.waitForLoadState('networkidle');
     
     const sidebar = page.locator('aside');
     
@@ -70,7 +70,7 @@ test.describe('Mobile Responsiveness', () => {
     await page.setViewportSize({ width: 375, height: 667 });
     
     await page.goto('/workspace');
-    await page.waitForTimeout(2000);
+    await page.waitForLoadState('networkidle');
     
     // Create a document
     const newDocButton = page.getByRole('button', { name: /New Document/i });
@@ -94,7 +94,7 @@ test.describe('Mobile Responsiveness', () => {
     await page.setViewportSize({ width: 375, height: 667 });
     
     await page.goto('/workspace');
-    await page.waitForTimeout(2000);
+    await page.waitForLoadState('networkidle');
     
     // Check that buttons are not too small for touch
     const buttons = page.getByRole('button');
