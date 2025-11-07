@@ -1,0 +1,16 @@
+language: "en-US"
+reviews:
+  profile: "assertive"
+  auto_review:
+    enabled: true
+    ignore_title_keywords: ["wip", "draft"]
+  tools:
+    eslint: { enabled: true }
+    ruff: { enabled: true }
+    gitleaks: { enabled: true }
+chat:
+  auto_reply: true
+knowledge_base:
+  code_guidelines:
+    enabled: true
+    filePatterns: ["**/github-copilot.md"]
