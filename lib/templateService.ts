@@ -40,6 +40,9 @@ export async function createDocumentFromTemplate(
   // Create content from template
   const content = createFromTemplate(params.templateId, variables);
 
+  // Ensure content is an array
+  const contentArray = Array.isArray(content) ? content : [];
+
   // Determine document title
   const documentTitle = params.title || variables.title || template.name;
 
@@ -53,7 +56,7 @@ export async function createDocumentFromTemplate(
   const document = await createDocument({
     workspaceId: params.workspaceId,
     userId: params.userId,
-    content,
+    content: contentArray,
     metadata,
   });
 

@@ -5,9 +5,18 @@
 
 import JSZip from "jszip";
 
+// BlockNote block structure
+interface BlockNoteBlock {
+  type: string;
+  props?: Record<string, unknown>;
+  content?: unknown;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
+}
+
 export interface ExportDocument {
   title: string;
-  content: any; // BlockNote content
+  content: unknown; // BlockNote content
   folder?: string;
   tags?: string[];
 }
@@ -15,17 +24,18 @@ export interface ExportDocument {
 /**
  * Convert BlockNote content to Markdown
  */
-export function blockNoteToMarkdown(content: any[]): string {
+export function blockNoteToMarkdown(content: unknown[]): string {
   if (!Array.isArray(content)) {
     return "";
   }
 
   let markdown = "";
 
-  content.forEach((block) => {
+  content.forEach((blockUnknown) => {
+    const block = blockUnknown as BlockNoteBlock;
     switch (block.type) {
       case "heading":
-        const level = block.props?.level || 1;
+        const level = (block.props?.level as number) || 1;
         const headingText = extractText(block.content);
         markdown += `${"#".repeat(level)} ${headingText}\n\n`;
         break;
@@ -78,7 +88,7 @@ export function blockNoteToMarkdown(content: any[]): string {
 /**
  * Extract text from BlockNote content
  */
-function extractText(content: any): string {
+function extractText(content: unknown): string {
   if (!content) return "";
   if (typeof content === "string") return content;
   if (Array.isArray(content)) {
@@ -112,7 +122,7 @@ export function exportDocumentAsMarkdown(document: ExportDocument): string {
   }
 
   markdown += "---\n\n";
-  markdown += blockNoteToMarkdown(document.content);
+  markdown += blockNoteToMarkdown(Array.isArray(document.content) ? document.content : []);
 
   return markdown;
 }
@@ -206,10 +216,12 @@ function sanitizeFilename(filename: string): string {
 /**
  * Import markdown to BlockNote content
  */
-export function markdownToBlockNote(markdown: string): any[] {
+export function markdownToBlockNote(markdown: string): unknown[] {
   const lines = markdown.split("\n");
-  const blocks: any[] = [];
+  const blocks: unknown[] = [];
 
+  // Track list type state for proper formatting
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let currentListType: "bullet" | "numbered" | null = null;
   let inCodeBlock = false;
   let codeBlockContent: string[] = [];

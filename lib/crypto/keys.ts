@@ -55,12 +55,12 @@ export async function deriveMasterKeyFromPassword(
     ["deriveBits", "deriveKey"]
   );
 
-  const pbkdf2Params: any = {
+  const pbkdf2Params = {
     name: "PBKDF2",
     salt: salt,
     iterations: PBKDF2_ITERATIONS,
     hash: "SHA-256",
-  };
+  } as Pbkdf2Params;
 
   const masterKey = await crypto.subtle.deriveKey(
     pbkdf2Params,

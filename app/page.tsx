@@ -3,6 +3,13 @@ import FruityBackground from "@/components/ui/FruityBackground";
 import GlassCard from "@/components/ui/GlassCard";
 import FruityButton from "@/components/ui/FruityButton";
 
+/**
+ * Render the homepage containing the hero, feature cards, and footer.
+ *
+ * Renders a centered hero section with branding and primary call-to-action buttons (links to /workspace and /templates), a responsive features grid of cards, and a footer with an about link.
+ *
+ * @returns The React element representing the homepage layout.
+ */
 export default function Home() {
   return (
     <div className="min-h-screen relative">
@@ -11,8 +18,8 @@ export default function Home() {
       <main className="relative z-10 flex min-h-screen flex-col items-center justify-center px-6 py-12">
         {/* Hero Section */}
         <div className="max-w-6xl mx-auto text-center mb-16 fade-in">
-        <img src="4diary.png" alt="logo" > 
-	<p className="text-2xl md:text-3xl font-bold text-leather-200 mb-4 fade-in-delay-1">
+          <img src="4diary.png" alt="logo" />
+          <p className="text-2xl md:text-3xl font-bold text-leather-200 mb-4 fade-in-delay-1">
             Privacy-First Note-Taking
           </p>
           <p className="text-lg text-leather-300 max-w-2xl mx-auto mb-8 fade-in-delay-2">

@@ -7,6 +7,7 @@ import FruityBackground from "@/components/ui/FruityBackground";
 import Sidebar from "@/components/ui/Sidebar";
 import GlassCard from "@/components/ui/GlassCard";
 import FruityButton from "@/components/ui/FruityButton";
+import EditableTitle from "@/components/ui/EditableTitle";
 import dynamic from "next/dynamic";
 import { keyManager } from "@/lib/crypto/keyManager";
 import {
@@ -32,6 +33,13 @@ const BlockEditor = dynamic(() => import("@/components/editor/BlockEditor"), {
 // 3. Never hard-code user identifiers
 const DEMO_USER_ID = "demo-user";
 
+/**
+ * Render the workspace UI, initialize encryption keys, and manage workspace and document state including creation, opening, editing, title updates, and export.
+ *
+ * Renders a sidebar of documents, a toolbar with document and workspace actions, an editor for the active document (or a welcome grid when none is open), and informational banners. Handles initialization, loading, and error states.
+ *
+ * @returns The workspace content as a JSX element.
+ */
 function WorkspaceContent() {
   const searchParams = useSearchParams();
   const templateId = searchParams.get("template");
@@ -42,6 +50,7 @@ function WorkspaceContent() {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   // Initialize workspace and load documents
   useEffect(() => {
@@ -153,6 +162,40 @@ function WorkspaceContent() {
     }
   };
 
+  const handleTitleChange = async (newTitle: string) => {
+    if (!currentDocument) return;
+
+    try {
+      const updatedMetadata = {
+        ...currentDocument.metadata,
+        title: newTitle,
+      };
+
+      await updateDocument({
+        id: currentDocument.id,
+        userId: DEMO_USER_ID,
+        content: currentDocument.content,
+        metadata: updatedMetadata,
+      });
+
+      // Update local state
+      setCurrentDocument({
+        ...currentDocument,
+        metadata: updatedMetadata,
+      });
+
+      // Reload documents list to reflect the title change
+      if (workspaceId) {
+        const updatedDocs = await listDocuments(workspaceId, DEMO_USER_ID);
+        setDocuments(updatedDocs);
+      }
+    } catch (err) {
+      console.error("Title update error:", err);
+      setError(err instanceof Error ? err.message : "Failed to update title");
+      throw err instanceof Error ? err : new Error(String(err));
+    }
+  };
+
   const handleExportDocument = async () => {
     if (!currentDocument) return;
 
@@ -233,26 +276,36 @@ function WorkspaceContent() {
             folder: doc.metadata.folder,
           }))}
           onDocumentClick={handleOpenDocument}
+          collapsed={sidebarCollapsed}
+          onToggle={setSidebarCollapsed}
         />
       </div>
 
       {/* Main Content */}
-      <main className="relative z-10 flex-1 p-8 overflow-y-auto">
+      <main className={`relative z-10 flex-1 p-8 overflow-y-auto transition-all duration-300 ${
+        sidebarCollapsed ? 'ml-0' : ''
+      }`}>
         <div className="max-w-5xl mx-auto">
           {/* Toolbar */}
           <GlassCard className="mb-6 fade-in-delay-1">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between flex-wrap gap-4">
               <div className="flex items-center gap-4">
-                <h2 className="text-2xl font-bold text-leather-100">
-                  {currentDocument ? currentDocument.metadata.title : "Workspace"}
-                </h2>
+                {currentDocument ? (
+                  <EditableTitle
+                    title={currentDocument.metadata.title}
+                    onSave={handleTitleChange}
+                    className="text-2xl font-bold text-leather-100"
+                  />
+                ) : (
+                  <h2 className="text-2xl font-bold text-leather-100">Workspace</h2>
+                )}
                 {initialized && (
                   <span className="text-xs text-leather-300 px-2 py-1 rounded-full glass-card">
                     🔐 Encrypted
                   </span>
                 )}
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <FruityButton variant="parchment" size="sm" onClick={handleCreateDocument}>
                   ➕ New Document
                 </FruityButton>
@@ -404,4 +457,3 @@ export default function WorkspacePage() {
     </Suspense>
   );
 }
-

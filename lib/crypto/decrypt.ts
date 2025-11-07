@@ -15,10 +15,10 @@ export async function decrypt(
   key: CryptoKey
 ): Promise<string> {
   // Decrypt the data
-  const algorithm: any = {
+  const algorithm = {
     name: "AES-GCM",
     iv: ivData,
-  };
+  } as AesGcmParams;
   
   const decrypted = await crypto.subtle.decrypt(
     algorithm,
@@ -61,7 +61,7 @@ export async function decryptFromBase64(
  * @param key - The CryptoKey to use for decryption
  * @returns Decrypted and parsed object
  */
-export async function decryptJSON<T = any>(
+export async function decryptJSON<T = unknown>(
   encryptedBase64: string,
   key: CryptoKey
 ): Promise<T> {
@@ -82,7 +82,7 @@ export async function decryptFromStorage(
 /**
  * Decrypt document content
  */
-export async function decryptDocument<T = any>(
+export async function decryptDocument<T = unknown>(
   encryptedContent: string,
   documentKey: CryptoKey
 ): Promise<T> {
@@ -93,7 +93,7 @@ export async function decryptDocument<T = any>(
 /**
  * Batch decrypt multiple documents
  */
-export async function decryptDocuments<T = any>(
+export async function decryptDocuments<T = unknown>(
   documents: Array<{ encryptedContent: string; id: string }>,
   documentKeys: Map<string, CryptoKey>
 ): Promise<Array<{ id: string; content: T }>> {

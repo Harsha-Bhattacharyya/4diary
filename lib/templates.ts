@@ -15,7 +15,7 @@ export interface DocumentTemplate {
   description: string;
   category: string;
   icon?: string;
-  content: any; // BlockNote content structure
+  content: unknown; // BlockNote content structure
   variables: TemplateVariable[];
 }
 
@@ -23,9 +23,9 @@ export interface DocumentTemplate {
  * Replace template variables with actual values
  */
 export function processTemplateVariables(
-  content: any,
+  content: unknown,
   variables: Record<string, string>
-): any {
+): unknown {
   const contentString = JSON.stringify(content);
   let processed = contentString;
 
@@ -347,7 +347,7 @@ export function getTemplateCategories(): string[] {
 export function createFromTemplate(
   templateId: string,
   variables?: Record<string, string>
-): any {
+): unknown {
   const template = getTemplateById(templateId);
   if (!template) {
     throw new Error(`Template not found: ${templateId}`);
