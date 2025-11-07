@@ -7,6 +7,12 @@ interface FormattingToolbarProps {
   editor: BlockNoteEditor | null;
 }
 
+/**
+ * Renders a formatting toolbar for a BlockNote editor with text and block controls.
+ *
+ * @param editor - The BlockNote editor instance to operate on; when `null`, the toolbar renders nothing.
+ * @returns The toolbar JSX element when `editor` is provided, otherwise `null`.
+ */
 export default function FormattingToolbar({ editor }: FormattingToolbarProps) {
   if (!editor) return null;
 

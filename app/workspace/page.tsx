@@ -33,6 +33,13 @@ const BlockEditor = dynamic(() => import("@/components/editor/BlockEditor"), {
 // 3. Never hard-code user identifiers
 const DEMO_USER_ID = "demo-user";
 
+/**
+ * Render the workspace UI, initialize encryption keys, and manage workspace and document state including creation, opening, editing, title updates, and export.
+ *
+ * Renders a sidebar of documents, a toolbar with document and workspace actions, an editor for the active document (or a welcome grid when none is open), and informational banners. Handles initialization, loading, and error states.
+ *
+ * @returns The workspace content as a JSX element.
+ */
 function WorkspaceContent() {
   const searchParams = useSearchParams();
   const templateId = searchParams.get("template");
@@ -449,4 +456,3 @@ export default function WorkspacePage() {
     </Suspense>
   );
 }
-
