@@ -13,4 +13,4 @@ chat:
 knowledge_base:
   code_guidelines:
     enabled: true
-    filePatterns: ["**/github-copilot.md"]
+    filePatterns: ["**/copilot-instructions.md"]
