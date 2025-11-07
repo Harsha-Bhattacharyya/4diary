@@ -192,6 +192,7 @@ function WorkspaceContent() {
     } catch (err) {
       console.error("Title update error:", err);
       setError(err instanceof Error ? err.message : "Failed to update title");
+      throw err instanceof Error ? err : new Error(String(err));
     }
   };
 
