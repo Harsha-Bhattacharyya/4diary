@@ -36,7 +36,7 @@ export enum EventType {
  */
 export async function trackEvent(
   event: EventType,
-  metadata?: Record<string, any>,
+  metadata?: Record<string, unknown>,
   sessionId?: string
 ): Promise<void> {
   try {
@@ -65,11 +65,11 @@ export async function trackEvent(
  * Remove any PII from metadata
  */
 function sanitizeMetadata(
-  metadata?: Record<string, any>
-): Record<string, any> | undefined {
+  metadata?: Record<string, unknown>
+): Record<string, unknown> | undefined {
   if (!metadata) return undefined;
 
-  const sanitized: Record<string, any> = {};
+  const sanitized: Record<string, unknown> = {};
 
   // Only allow specific whitelisted fields
   const allowedFields = [
@@ -145,7 +145,7 @@ export async function getAnalyticsSummary(
 export function useAnalytics() {
   const track = async (
     event: EventType,
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
   ): Promise<void> => {
     try {
       // Get or create session ID

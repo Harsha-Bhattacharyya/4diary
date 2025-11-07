@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 
 interface EditableTitleProps {
   title: string;
-  onSave: (newTitle: string) => void;
+  onSave: (newTitle: string) => Promise<void>;
   className?: string;
 }
 
@@ -14,13 +14,14 @@ interface EditableTitleProps {
  * The component displays the provided `title` as a clickable heading; clicking enters edit mode and replaces the heading with a focused text input. Editing is saved on blur or Enter (trims whitespace and calls `onSave` only if the trimmed value is non-empty and changed), and cancelled with Escape or by providing an empty value (which resets to the original title).
  *
  * @param title - The initial and displayed title text.
- * @param onSave - Callback invoked with the trimmed new title when a save occurs.
+ * @param onSave - Async callback invoked with the trimmed new title when a save occurs. On rejection, the title reverts to the original value.
  * @param className - Optional additional CSS classes applied to the rendered element.
  * @returns A heading element when not editing, or a text input element when editing.
  */
 export default function EditableTitle({ title, onSave, className = "" }: EditableTitleProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [currentTitle, setCurrentTitle] = useState(title);
+  const [isSaving, setIsSaving] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -34,14 +35,28 @@ export default function EditableTitle({ title, onSave, className = "" }: Editabl
     }
   }, [isEditing]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const trimmedTitle = currentTitle.trim();
     if (trimmedTitle && trimmedTitle !== title) {
-      onSave(trimmedTitle);
+      setIsSaving(true);
+      try {
+        await onSave(trimmedTitle);
+        setIsEditing(false);
+      } catch (err) {
+        // On error, revert to the original title
+        console.error("Failed to save title:", err);
+        setCurrentTitle(title);
+        setIsEditing(false);
+      } finally {
+        setIsSaving(false);
+      }
     } else if (!trimmedTitle) {
       setCurrentTitle(title); // Reset to original if empty
+      setIsEditing(false);
+    } else {
+      // No change, just exit edit mode
+      setIsEditing(false);
     }
-    setIsEditing(false);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -64,6 +79,7 @@ export default function EditableTitle({ title, onSave, className = "" }: Editabl
         onKeyDown={handleKeyDown}
         className={`bg-transparent border-b-2 border-leather-400 outline-none ${className}`}
         maxLength={100}
+        disabled={isSaving}
       />
     );
   }
