@@ -3,6 +3,13 @@ import FruityBackground from "@/components/ui/FruityBackground";
 import GlassCard from "@/components/ui/GlassCard";
 import FruityButton from "@/components/ui/FruityButton";
 
+/**
+ * Render the homepage containing the hero, feature cards, and footer.
+ *
+ * Renders a centered hero section with branding and primary call-to-action buttons (links to /workspace and /templates), a responsive features grid of cards, and a footer with an about link.
+ *
+ * @returns The React element representing the homepage layout.
+ */
 export default function Home() {
   return (
     <div className="min-h-screen relative">

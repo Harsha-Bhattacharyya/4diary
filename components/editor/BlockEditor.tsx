@@ -16,6 +16,21 @@ interface BlockEditorProps {
   showToolbar?: boolean;
 }
 
+/**
+ * Renders a BlockNote-based rich text editor with an optional formatting toolbar and auto-save.
+ *
+ * When `autoSave` is enabled and an `onSave` handler is provided, the editor will periodically invoke
+ * `onSave` with the current document content. Changes to the document invoke `onChange` when provided.
+ *
+ * @param initialContent - Initial document blocks to populate the editor.
+ * @param onChange - Callback invoked with the current document content after edits.
+ * @param onSave - Callback invoked with the current document content for persistent saving.
+ * @param autoSave - Whether the editor should automatically save changes (default: `true`).
+ * @param autoSaveInterval - Time in milliseconds between automatic saves (default: `2000`).
+ * @param editable - Whether the editor content is editable (default: `true`).
+ * @param showToolbar - Whether to display the formatting toolbar (default: `true`).
+ * @returns The editor's JSX element.
+ */
 export default function BlockEditor({
   initialContent,
   onChange,

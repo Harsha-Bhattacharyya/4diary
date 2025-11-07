@@ -8,6 +8,16 @@ interface EditableTitleProps {
   className?: string;
 }
 
+/**
+ * Render an editable title that toggles between a heading and an inline text input.
+ *
+ * The component displays the provided `title` as a clickable heading; clicking enters edit mode and replaces the heading with a focused text input. Editing is saved on blur or Enter (trims whitespace and calls `onSave` only if the trimmed value is non-empty and changed), and cancelled with Escape or by providing an empty value (which resets to the original title).
+ *
+ * @param title - The initial and displayed title text.
+ * @param onSave - Callback invoked with the trimmed new title when a save occurs.
+ * @param className - Optional additional CSS classes applied to the rendered element.
+ * @returns A heading element when not editing, or a text input element when editing.
+ */
 export default function EditableTitle({ title, onSave, className = "" }: EditableTitleProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [currentTitle, setCurrentTitle] = useState(title);

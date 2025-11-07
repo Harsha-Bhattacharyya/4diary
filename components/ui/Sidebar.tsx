@@ -18,6 +18,16 @@ interface SidebarProps {
   onToggle?: (collapsed: boolean) => void;
 }
 
+/**
+ * Render the application sidebar with navigation links, optional workspace documents, and collapsible layout.
+ *
+ * @param workspaceId - Optional workspace identifier; when present and documents are provided, shows the Recent Documents section.
+ * @param documents - Array of recent documents to display when inside a workspace; at most the first 10 documents are rendered.
+ * @param onDocumentClick - Callback invoked with a document `id` when a document entry is clicked.
+ * @param controlledCollapsed - If provided, controls the sidebar's collapsed state; when omitted the component manages collapse internally.
+ * @param onToggle - Optional callback called with the new collapsed state whenever the sidebar is toggled (including automatic collapse on small screens).
+ * @returns The rendered sidebar React element.
+ */
 export default function Sidebar({ 
   workspaceId, 
   documents = [], 
