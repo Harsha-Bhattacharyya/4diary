@@ -618,10 +618,7 @@ test.describe('BlockEditor Component - Advanced Tests', () => {
       // Type something to trigger save
       await page.keyboard.type('Test content');
       
-      // Look for saving indicator quickly
-      const savingIndicator = page.locator('text=/💾 Saving/i');
-      
-      // The indicator might be visible briefly
+      // Wait for autosave to complete
       await page.waitForTimeout(1500);
     }
   });

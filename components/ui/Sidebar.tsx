@@ -101,7 +101,6 @@ export default function Sidebar({
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           const emoji = item.label.split(' ')[0];
-          const label = item.label.substring(emoji.length + 1);
           
           return (
             <Link
