@@ -1,8 +1,11 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
 import FruityBackground from "@/components/ui/FruityBackground";
 import GlassCard from "@/components/ui/GlassCard";
 import FruityButton from "@/components/ui/FruityButton";
+import TopMenu from "@/components/ui/TopMenu";
 import { builtInTemplates, getTemplateCategories } from "@/lib/templates";
 
 export default function TemplatesPage() {
@@ -11,17 +14,16 @@ export default function TemplatesPage() {
   return (
     <div className="min-h-screen relative">
       <FruityBackground />
+      
+      {/* Top Menu */}
+      <div className="relative z-10">
+        <TopMenu currentPage="Templates" />
+      </div>
 
       <main className="relative z-10 px-6 py-12">
         {/* Header */}
         <div className="max-w-6xl mx-auto mb-12 fade-in">
-          <Link href="/">
-            <FruityButton variant="parchment" size="sm">
-              ← Back to Home
-            </FruityButton>
-          </Link>
-
-          <h1 className="text-5xl font-bold mt-8 mb-4 text-leather-100">
+          <h1 className="text-5xl font-bold mb-4 text-leather-100">
             Document Templates
           </h1>
           <p className="text-lg text-leather-300">

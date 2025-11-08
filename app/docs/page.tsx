@@ -5,6 +5,7 @@ import Link from "next/link";
 import FruityBackground from "@/components/ui/FruityBackground";
 import GlassCard from "@/components/ui/GlassCard";
 import FruityButton from "@/components/ui/FruityButton";
+import TopMenu from "@/components/ui/TopMenu";
 
 /**
  * Render the documentation page with navigation and content sections.
@@ -12,7 +13,6 @@ import FruityButton from "@/components/ui/FruityButton";
  * @returns The React element representing the docs page layout.
  */
 export default function DocsPage() {
-  const [menuOpen, setMenuOpen] = useState(false);
 
   const sections = [
     {
@@ -120,62 +120,18 @@ This will start:
     <div className="min-h-screen relative">
       <FruityBackground />
 
+      {/* Top Menu */}
+      <div className="relative z-10">
+        <TopMenu currentPage="Docs" />
+      </div>
+
       {/* Header */}
       <div className="relative z-10 px-6 py-6">
         <div className="max-w-4xl mx-auto">
-          <div className="flex justify-between items-center mb-4">
-            <div>
-              <h1 className="text-4xl font-bold text-leather-100 mb-2">Docs</h1>
-              <div className="h-1 w-20 bg-leather-300 rounded"></div>
-            </div>
-            <button
-              onClick={() => setMenuOpen(!menuOpen)}
-              className="text-leather-200 hover:text-leather-100 transition-colors p-2"
-              aria-label="Toggle menu"
-            >
-              <svg
-                className="w-8 h-8"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </svg>
-            </button>
+          <div className="mb-4">
+            <h1 className="text-4xl font-bold text-leather-100 mb-2">Documentation</h1>
+            <div className="h-1 w-20 bg-leather-300 rounded"></div>
           </div>
-
-          {/* Menu Dropdown */}
-          {menuOpen && (
-            <GlassCard className="mb-4 fade-in">
-              <div className="flex flex-col gap-2 p-4">
-                <Link href="/">
-                  <FruityButton variant="parchment" size="sm" className="w-full">
-                    Home
-                  </FruityButton>
-                </Link>
-                <Link href="/workspace">
-                  <FruityButton variant="parchment" size="sm" className="w-full">
-                    Workspace
-                  </FruityButton>
-                </Link>
-                <Link href="/templates">
-                  <FruityButton variant="parchment" size="sm" className="w-full">
-                    Templates
-                  </FruityButton>
-                </Link>
-                <Link href="/about">
-                  <FruityButton variant="parchment" size="sm" className="w-full">
-                    About
-                  </FruityButton>
-                </Link>
-              </div>
-            </GlassCard>
-          )}
         </div>
       </div>
 

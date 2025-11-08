@@ -1,6 +1,10 @@
+"use client";
+
 import Link from "next/link";
 import FruityBackground from "@/components/ui/FruityBackground";
 import FruityButton from "@/components/ui/FruityButton";
+import TopMenu from "@/components/ui/TopMenu";
+import Image from "next/image";
 
 /**
  * Render the homepage containing the hero, feature cards, and footer.
@@ -14,27 +18,32 @@ export default function Home() {
     <div className="min-h-screen relative">
       <FruityBackground />
       
-      {/* Top Bar */}
-      <div className="relative z-10 flex justify-between items-center px-6 py-4">
-        <div className="text-leather-200 font-semibold">Home Page</div>
-        <Link href="/workspace">
-          <FruityButton variant="parchment" size="sm">
-            Log in
-          </FruityButton>
-        </Link>
+      {/* Top Menu */}
+      <div className="relative z-10">
+        <TopMenu currentPage="Home" />
       </div>
       
       <main className="relative z-10 flex min-h-[calc(100vh-80px)] flex-col items-center justify-center px-6 py-12">
         {/* Hero Section */}
         <div className="max-w-4xl mx-auto text-center mb-16 fade-in">
-          <h1 className="text-6xl md:text-7xl font-bold text-leather-100 mb-4">
-            4Diary
-          </h1>
-          <p className="text-xl md:text-2xl text-leather-200 mb-8 fade-in-delay-1">
-            Catering to your note needs with privacy and style.
-          </p>
+          {/* Logo Image */}
+          <div className="mb-6 flex justify-center">
+            <Image
+              src="/4diary.png"
+              alt="4Diary Logo"
+              width={400}
+              height={150}
+              priority
+              className="w-auto h-auto max-w-full"
+            />
+          </div>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16 fade-in-delay-2">
+          {/* Tagline in Header Style with Quotes */}
+          <h2 className="text-3xl md:text-4xl font-serif italic text-leather-100 mb-12 fade-in-delay-1">
+            &ldquo;Catering to your note needs with privacy and style.&rdquo;
+          </h2>
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-20 fade-in-delay-2">
             <Link href="/workspace">
               <FruityButton variant="gradient" size="lg">
                 Get Started
@@ -47,42 +56,46 @@ export default function Home() {
             </Link>
           </div>
 
-          {/* Why 4Diary Section */}
-          <div className="text-left max-w-2xl mx-auto fade-in-delay-3">
-            <h2 className="text-2xl font-bold text-leather-100 mb-6 text-center">
+          {/* Why 4Diary Section - Darker, More Professional */}
+          <div className="bg-black bg-opacity-50 backdrop-blur-sm rounded-2xl p-8 md:p-12 border border-leather-400 shadow-2xl fade-in-delay-3">
+            <h2 className="text-3xl md:text-4xl font-bold text-leather-100 mb-8 tracking-wide">
               Why 4Diary?
             </h2>
-            <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <span className="text-xl font-bold text-leather-200">①</span>
-                <p className="text-leather-300">
-                  <span className="font-semibold text-leather-200">AES Encryption</span> — secure data
-                </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+              <div className="flex items-start gap-4 p-4 rounded-lg bg-leather-600 bg-opacity-30 hover:bg-opacity-50 transition-all">
+                <span className="text-3xl font-bold text-leather-100 flex-shrink-0">①</span>
+                <div>
+                  <h3 className="font-bold text-xl text-leather-100 mb-2">AES Encryption</h3>
+                  <p className="text-leather-200">Military-grade security for your data</p>
+                </div>
               </div>
-              <div className="flex items-start gap-3">
-                <span className="text-xl font-bold text-leather-200">②</span>
-                <p className="text-leather-300">
-                  <span className="font-semibold text-leather-200">Server never sees your writing</span>
-                </p>
+              <div className="flex items-start gap-4 p-4 rounded-lg bg-leather-600 bg-opacity-30 hover:bg-opacity-50 transition-all">
+                <span className="text-3xl font-bold text-leather-100 flex-shrink-0">②</span>
+                <div>
+                  <h3 className="font-bold text-xl text-leather-100 mb-2">Zero-Knowledge</h3>
+                  <p className="text-leather-200">Server never sees your writing</p>
+                </div>
               </div>
-              <div className="flex items-start gap-3">
-                <span className="text-xl font-bold text-leather-200">③</span>
-                <p className="text-leather-300">
-                  <span className="font-semibold text-leather-200">Self-hostable</span> — run it yourself
-                </p>
+              <div className="flex items-start gap-4 p-4 rounded-lg bg-leather-600 bg-opacity-30 hover:bg-opacity-50 transition-all">
+                <span className="text-3xl font-bold text-leather-100 flex-shrink-0">③</span>
+                <div>
+                  <h3 className="font-bold text-xl text-leather-100 mb-2">Self-Hostable</h3>
+                  <p className="text-leather-200">Run it yourself, own your data</p>
+                </div>
               </div>
-              <div className="flex items-start gap-3">
-                <span className="text-xl font-bold text-leather-200">④</span>
-                <p className="text-leather-300">
-                  <span className="font-semibold text-leather-200">FLOSS</span> — free, open-source, endless freedom
-                </p>
+              <div className="flex items-start gap-4 p-4 rounded-lg bg-leather-600 bg-opacity-30 hover:bg-opacity-50 transition-all">
+                <span className="text-3xl font-bold text-leather-100 flex-shrink-0">④</span>
+                <div>
+                  <h3 className="font-bold text-xl text-leather-100 mb-2">FLOSS</h3>
+                  <p className="text-leather-200">Free, open-source, endless freedom</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Footer */}
-        <footer className="text-center text-leather-300 text-sm fade-in-delay-2">
+        <footer className="text-center text-leather-300 text-sm fade-in-delay-2 mt-8">
           <p>Made with ❤️ in 🇮🇳</p>
         </footer>
       </main>
