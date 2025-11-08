@@ -3,20 +3,35 @@
  */
 
 // Dynamically import anime.js to avoid SSR issues
-async function getAnime(): Promise<unknown> {
+async function getAnime(): Promise<any> {
   if (typeof window !== 'undefined') {
-    const animeModule = await import('animejs');
-    // Handle both default and named exports
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return (animeModule as any).default || animeModule;
+    try {
+      const animeModule = await import('animejs');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return (animeModule as any).default || animeModule;
+    } catch (error) {
+      console.error('Failed to load anime.js:', error);
+      return null;
+    }
   }
   return null;
 }
 
-// Fade in animation
+// Fade in animation with fallback
 export const fadeIn = async (targets: string | HTMLElement | HTMLElement[], delay = 0) => {
   const anime = await getAnime();
-  if (!anime) return;
+  
+  // Fallback: just remove opacity-0 if anime fails
+  if (!anime) {
+    const elements = typeof targets === 'string' ? document.querySelectorAll(targets) : Array.isArray(targets) ? targets : [targets];
+    elements.forEach((el: any) => {
+      if (el && el.classList) {
+        el.classList.remove('opacity-0');
+        el.style.opacity = '1';
+      }
+    });
+    return;
+  }
   
   return anime({
     targets,
@@ -28,10 +43,20 @@ export const fadeIn = async (targets: string | HTMLElement | HTMLElement[], dela
   });
 };
 
-// Slide in from left
+// Slide in from left with fallback
 export const slideInLeft = async (targets: string | HTMLElement | HTMLElement[], delay = 0) => {
   const anime = await getAnime();
-  if (!anime) return;
+  
+  if (!anime) {
+    const elements = typeof targets === 'string' ? document.querySelectorAll(targets) : Array.isArray(targets) ? targets : [targets];
+    elements.forEach((el: any) => {
+      if (el && el.classList) {
+        el.classList.remove('opacity-0');
+        el.style.opacity = '1';
+      }
+    });
+    return;
+  }
   
   return anime({
     targets,
@@ -43,10 +68,20 @@ export const slideInLeft = async (targets: string | HTMLElement | HTMLElement[],
   });
 };
 
-// Slide in from right
+// Slide in from right with fallback
 export const slideInRight = async (targets: string | HTMLElement | HTMLElement[], delay = 0) => {
   const anime = await getAnime();
-  if (!anime) return;
+  
+  if (!anime) {
+    const elements = typeof targets === 'string' ? document.querySelectorAll(targets) : Array.isArray(targets) ? targets : [targets];
+    elements.forEach((el: any) => {
+      if (el && el.classList) {
+        el.classList.remove('opacity-0');
+        el.style.opacity = '1';
+      }
+    });
+    return;
+  }
   
   return anime({
     targets,
@@ -58,10 +93,20 @@ export const slideInRight = async (targets: string | HTMLElement | HTMLElement[]
   });
 };
 
-// Scale in animation
+// Scale in animation with fallback
 export const scaleIn = async (targets: string | HTMLElement | HTMLElement[], delay = 0) => {
   const anime = await getAnime();
-  if (!anime) return;
+  
+  if (!anime) {
+    const elements = typeof targets === 'string' ? document.querySelectorAll(targets) : Array.isArray(targets) ? targets : [targets];
+    elements.forEach((el: any) => {
+      if (el && el.classList) {
+        el.classList.remove('opacity-0');
+        el.style.opacity = '1';
+      }
+    });
+    return;
+  }
   
   return anime({
     targets,
@@ -73,10 +118,22 @@ export const scaleIn = async (targets: string | HTMLElement | HTMLElement[], del
   });
 };
 
-// Stagger animation for multiple elements
+// Stagger animation for multiple elements with fallback
 export const staggerFadeIn = async (targets: string | HTMLElement | HTMLElement[], staggerDelay = 100) => {
   const anime = await getAnime();
-  if (!anime) return;
+  
+  if (!anime) {
+    const elements = typeof targets === 'string' ? document.querySelectorAll(targets) : Array.isArray(targets) ? targets : [targets];
+    elements.forEach((el: any, index: number) => {
+      if (el && el.classList) {
+        setTimeout(() => {
+          el.classList.remove('opacity-0');
+          el.style.opacity = '1';
+        }, index * staggerDelay);
+      }
+    });
+    return;
+  }
   
   return anime({
     targets,
@@ -88,10 +145,20 @@ export const staggerFadeIn = async (targets: string | HTMLElement | HTMLElement[
   });
 };
 
-// Logo animation
+// Logo animation with fallback
 export const logoAnimation = async (targets: string | HTMLElement | HTMLElement[]) => {
   const anime = await getAnime();
-  if (!anime) return;
+  
+  if (!anime) {
+    const elements = typeof targets === 'string' ? document.querySelectorAll(targets) : Array.isArray(targets) ? targets : [targets];
+    elements.forEach((el: any) => {
+      if (el && el.classList) {
+        el.classList.remove('opacity-0');
+        el.style.opacity = '1';
+      }
+    });
+    return;
+  }
   
   return anime({
     targets,
