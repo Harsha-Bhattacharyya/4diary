@@ -51,7 +51,7 @@ npm run dev
 ### Using Docker Compose (Recommended)
 
 1. Clone the repository
-2. Create `.env.local` with your configuration
+2. Export your MongoDB URI,Redis,port
 3. Run:
 
 ```bash
