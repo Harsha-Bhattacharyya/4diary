@@ -1,4 +1,6 @@
 # 4diary
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FHarsha-Bhattacharyya%2F4diary.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FHarsha-Bhattacharyya%2F4diary?ref=badge_shield)
+
 
 A privacy-focused, end-to-end encrypted note-taking application built with Next.js. Think Notion, but with military-grade encryption and complete privacy.
 
@@ -147,6 +149,9 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## 📄 License
 
 This project is licensed under the BSD-3 Clause License - see the [LICENSE](LICENSE) file for details.
+
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FHarsha-Bhattacharyya%2F4diary.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FHarsha-Bhattacharyya%2F4diary?ref=badge_large)
 
 ## 🙏 Acknowledgments
 
