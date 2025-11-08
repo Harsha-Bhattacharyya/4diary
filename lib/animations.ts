@@ -3,10 +3,11 @@
  */
 
 // Dynamically import anime.js to avoid SSR issues
-async function getAnime() {
+async function getAnime(): Promise<unknown> {
   if (typeof window !== 'undefined') {
     const animeModule = await import('animejs');
     // Handle both default and named exports
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return (animeModule as any).default || animeModule;
   }
   return null;

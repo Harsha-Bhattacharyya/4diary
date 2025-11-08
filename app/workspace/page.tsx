@@ -51,6 +51,7 @@ function WorkspaceContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   // Initialize workspace and load documents
   useEffect(() => {
@@ -275,7 +276,8 @@ function WorkspaceContent() {
           <div className="flex items-center justify-between px-6 py-4">
             {/* Menu Button */}
             <button
-              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+              type="button"
+              onClick={() => setDropdownOpen(!dropdownOpen)}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
               aria-label="Toggle menu"
             >
@@ -307,6 +309,7 @@ function WorkspaceContent() {
 
             {/* Close Button */}
             <button
+              type="button"
               onClick={handleCloseDocument}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
               aria-label="Close document"
@@ -330,21 +333,25 @@ function WorkspaceContent() {
           </div>
 
           {/* Dropdown Menu */}
-          {!sidebarCollapsed && (
+          {dropdownOpen && (
             <div className="absolute top-full left-0 mt-2 ml-4 bg-white rounded-lg shadow-lg border border-gray-200 py-2 min-w-[200px] fade-in">
               <button
+                type="button"
                 onClick={handleCreateDocument}
                 className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
               >
                 ➕ New Document
               </button>
-              <Link
-                href="/templates"
-                className="block w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
-              >
-                📄 Templates
+              <Link href="/templates">
+                <button
+                  type="button"
+                  className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+                >
+                  📄 Templates
+                </button>
               </Link>
               <button
+                type="button"
                 onClick={handleExportDocument}
                 className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
               >
@@ -352,17 +359,20 @@ function WorkspaceContent() {
               </button>
               {documents.length > 0 && (
                 <button
+                  type="button"
                   onClick={handleExportWorkspace}
                   className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
                 >
                   📦 Export All
                 </button>
               )}
-              <Link
-                href="/settings"
-                className="block w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
-              >
-                ⚙️ Settings
+              <Link href="/settings">
+                <button
+                  type="button"
+                  className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+                >
+                  ⚙️ Settings
+                </button>
               </Link>
               <div className="border-t border-gray-200 my-2"></div>
               <div className="px-4 py-2 text-sm text-gray-500">
@@ -387,34 +397,34 @@ function WorkspaceContent() {
           <div className="max-w-4xl mx-auto px-6 py-3">
             <div className="flex items-center justify-center gap-2 flex-wrap">
               {/* Text Formatting */}
-              <button className="px-3 py-2 hover:bg-gray-100 rounded transition-colors font-bold">
+              <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors font-bold">
                 B
               </button>
-              <button className="px-3 py-2 hover:bg-gray-100 rounded transition-colors italic">
+              <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors italic">
                 I
               </button>
-              <button className="px-3 py-2 hover:bg-gray-100 rounded transition-colors">
+              <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors">
                 ⟨/⟩
               </button>
               <div className="h-6 w-px bg-gray-300 mx-2"></div>
               {/* Block Formatting */}
-              <button className="px-3 py-2 hover:bg-gray-100 rounded transition-colors text-sm">
+              <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors text-sm">
                 H1
               </button>
-              <button className="px-3 py-2 hover:bg-gray-100 rounded transition-colors text-sm">
+              <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors text-sm">
                 H2
               </button>
-              <button className="px-3 py-2 hover:bg-gray-100 rounded transition-colors text-sm">
+              <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors text-sm">
                 H3
               </button>
               <div className="h-6 w-px bg-gray-300 mx-2"></div>
-              <button className="px-3 py-2 hover:bg-gray-100 rounded transition-colors">
+              <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors">
                 •
               </button>
-              <button className="px-3 py-2 hover:bg-gray-100 rounded transition-colors">
+              <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors">
                 1.
               </button>
-              <button className="px-3 py-2 hover:bg-gray-100 rounded transition-colors">
+              <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors">
                 ☑
               </button>
             </div>
