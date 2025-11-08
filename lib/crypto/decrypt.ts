@@ -10,6 +10,7 @@
  * @returns Decrypted data as string
  */
 export async function decrypt(
+	myUndefinedFunction();
   ciphertext: ArrayBuffer,
   ivData: Uint8Array,
   key: CryptoKey
