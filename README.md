@@ -1,5 +1,14 @@
 # 4diary
 
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![CI](https://github.com/Harsha-Bhattacharyya/4diary/actions/workflows/ci.yml/badge.svg)](https://github.com/Harsha-Bhattacharyya/4diary/actions/workflows/ci.yml)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FHarsha-Bhattacharyya%2F4diary.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FHarsha-Bhattacharyya%2F4diary?ref=badge_shield)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Harsha-Bhattacharyya/4diary)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+[![Code of Conduct](https://img.shields.io/badge/code%20of-conduct-ff69b4.svg)](CODE_OF_CONDUCT.md)
+
+> 🏆 **Hack This Fall 2025 Project** - A privacy-focused, end-to-end encrypted note-taking application built with Next.js.
+
 A privacy-focused, end-to-end encrypted note-taking application built with Next.js. Think Notion, but with military-grade encryption and complete privacy.
 
 ## ✨ Features

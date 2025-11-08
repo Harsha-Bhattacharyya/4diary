@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import FruityBackground from "@/components/ui/FruityBackground";
 import GlassCard from "@/components/ui/GlassCard";
 import FruityButton from "@/components/ui/FruityButton";
 import TopMenu from "@/components/ui/TopMenu";
-import { fadeIn, staggerFadeIn } from "@/lib/animations";
 
 export default function SettingsPage() {
   const [exportInProgress, setExportInProgress] = useState(false);
@@ -19,14 +18,6 @@ export default function SettingsPage() {
     }, 1000);
   };
 
-  useEffect(() => {
-    // Animate header
-    fadeIn('.settings-header', 0);
-    
-    // Animate settings cards
-    staggerFadeIn('.settings-card', 150);
-  }, []);
-
   return (
     <div className="min-h-screen relative">
       <FruityBackground />
@@ -39,7 +30,7 @@ export default function SettingsPage() {
       <main className="relative z-10 px-6 py-12">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
-          <div className="mb-12 settings-header opacity-0">
+          <div className="mb-12 fade-in">
             <h1 className="text-5xl font-bold mb-4 text-leather-100">
               Settings
             </h1>
@@ -49,7 +40,7 @@ export default function SettingsPage() {
           </div>
 
           {/* Security Settings */}
-          <GlassCard className="mb-6 settings-card opacity-0">
+          <GlassCard className="mb-6 settings-card">
             <h2 className="text-2xl font-bold mb-4 text-leather-100">
               🔒 Security
             </h2>
@@ -99,7 +90,7 @@ export default function SettingsPage() {
           </GlassCard>
 
           {/* Export Settings */}
-          <GlassCard className="mb-6 settings-card opacity-0">
+          <GlassCard className="mb-6 settings-card">
             <h2 className="text-2xl font-bold mb-4 text-leather-100">
               📥 Export & Backup
             </h2>
@@ -133,7 +124,7 @@ export default function SettingsPage() {
           </GlassCard>
 
           {/* Privacy Settings */}
-          <GlassCard className="mb-6 settings-card opacity-0">
+          <GlassCard className="mb-6 settings-card">
             <h2 className="text-2xl font-bold mb-4 text-leather-100">
               🕵️ Privacy
             </h2>

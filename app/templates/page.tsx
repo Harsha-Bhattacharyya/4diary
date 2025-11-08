@@ -1,24 +1,15 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import Link from "next/link";
 import FruityBackground from "@/components/ui/FruityBackground";
 import GlassCard from "@/components/ui/GlassCard";
 import FruityButton from "@/components/ui/FruityButton";
 import TopMenu from "@/components/ui/TopMenu";
 import { builtInTemplates, getTemplateCategories } from "@/lib/templates";
-import { fadeIn, staggerFadeIn } from "@/lib/animations";
 
 export default function TemplatesPage() {
   const categories = getTemplateCategories();
-
-  useEffect(() => {
-    // Animate header
-    fadeIn('.templates-header', 0);
-    
-    // Animate categories
-    staggerFadeIn('.template-category', 200);
-  }, []);
 
   return (
     <div className="min-h-screen relative">
@@ -31,24 +22,24 @@ export default function TemplatesPage() {
 
       <main className="relative z-10 px-6 py-12">
         {/* Header */}
-        <div className="max-w-6xl mx-auto mb-12 templates-header opacity-0">
+        <div className="max-w-6xl mx-auto mb-12 fade-in">
           <h1 className="text-5xl font-bold mb-4 text-leather-100">
             Document Templates
           </h1>
-          <p className="text-lg text-leather-300">
+          <p className="text-leather-300">
             Start quickly with pre-built templates for your notes, journals, and projects.
           </p>
         </div>
 
         {/* Categories */}
         <div className="max-w-6xl mx-auto">
-          {categories.map((category, idx) => {
+          {categories.map((category) => {
             const categoryTemplates = builtInTemplates.filter(
               (t) => t.category === category
             );
             
             return (
-              <div key={category} className="mb-12 template-category opacity-0">
+              <div key={category} className="mb-12 fade-in-delay-1">
                 <h2 className="text-2xl font-bold mb-6 capitalize text-leather-100">
                   {category}
                 </h2>

@@ -1,16 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
 import FruityBackground from "@/components/ui/FruityBackground";
 import TopMenu from "@/components/ui/TopMenu";
-import { fadeIn, scaleIn } from "@/lib/animations";
 
 export default function About() {
-  useEffect(() => {
-    // Animate content
-    scaleIn('.about-content', 200);
-  }, []);
-
   return (
     <div className="min-h-screen relative">
       <FruityBackground />
@@ -21,7 +14,7 @@ export default function About() {
       </div>
 
       <main className="relative z-10 flex min-h-[calc(100vh-80px)] items-center justify-center px-6 py-12">
-        <div className="max-w-3xl mx-auto text-center about-content opacity-0">
+        <div className="max-w-3xl mx-auto text-center fade-in">
           <h1 className="text-4xl md:text-5xl font-bold text-leather-100 mb-6">
             About 4diary
           </h1>
