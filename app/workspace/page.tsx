@@ -262,6 +262,163 @@ function WorkspaceContent() {
     );
   }
 
+  const handleCloseDocument = () => {
+    setCurrentDocument(null);
+  };
+
+  // Full-screen editor mode when a document is open
+  if (currentDocument) {
+    return (
+      <div className="min-h-screen relative bg-white">
+        {/* Top Bar with Menu and Title */}
+        <div className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+          <div className="flex items-center justify-between px-6 py-4">
+            {/* Menu Button */}
+            <button
+              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              aria-label="Toggle menu"
+            >
+              <svg
+                className="w-6 h-6 text-gray-700"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
+            </button>
+
+            {/* Title */}
+            <div className="flex-1 mx-6">
+              <EditableTitle
+                title={currentDocument.metadata.title}
+                onSave={handleTitleChange}
+                className="text-2xl font-bold text-gray-900 text-center"
+              />
+            </div>
+
+            {/* Close Button */}
+            <button
+              onClick={handleCloseDocument}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              aria-label="Close document"
+            >
+              <svg
+                className="w-6 h-6 text-gray-700"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
+
+          {/* Dropdown Menu */}
+          {!sidebarCollapsed && (
+            <div className="absolute top-full left-0 mt-2 ml-4 bg-white rounded-lg shadow-lg border border-gray-200 py-2 min-w-[200px] fade-in">
+              <button
+                onClick={handleCreateDocument}
+                className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+              >
+                ➕ New Document
+              </button>
+              <Link href="/templates">
+                <button className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors">
+                  📄 Templates
+                </button>
+              </Link>
+              <button
+                onClick={handleExportDocument}
+                className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+              >
+                📥 Export
+              </button>
+              {documents.length > 0 && (
+                <button
+                  onClick={handleExportWorkspace}
+                  className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+                >
+                  📦 Export All
+                </button>
+              )}
+              <Link href="/settings">
+                <button className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors">
+                  ⚙️ Settings
+                </button>
+              </Link>
+              <div className="border-t border-gray-200 my-2"></div>
+              <div className="px-4 py-2 text-sm text-gray-500">
+                🔐 End-to-end encrypted
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Editor Content */}
+        <div className="pt-20 pb-24 px-6 max-w-4xl mx-auto min-h-screen">
+          <BlockEditor
+            initialContent={currentDocument.content}
+            onSave={handleSave}
+            autoSave={true}
+            showToolbar={false}
+          />
+        </div>
+
+        {/* Bottom Formatting Toolbar */}
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-lg">
+          <div className="max-w-4xl mx-auto px-6 py-3">
+            <div className="flex items-center justify-center gap-2 flex-wrap">
+              {/* Text Formatting */}
+              <button className="px-3 py-2 hover:bg-gray-100 rounded transition-colors font-bold">
+                B
+              </button>
+              <button className="px-3 py-2 hover:bg-gray-100 rounded transition-colors italic">
+                I
+              </button>
+              <button className="px-3 py-2 hover:bg-gray-100 rounded transition-colors">
+                ⟨/⟩
+              </button>
+              <div className="h-6 w-px bg-gray-300 mx-2"></div>
+              {/* Block Formatting */}
+              <button className="px-3 py-2 hover:bg-gray-100 rounded transition-colors text-sm">
+                H1
+              </button>
+              <button className="px-3 py-2 hover:bg-gray-100 rounded transition-colors text-sm">
+                H2
+              </button>
+              <button className="px-3 py-2 hover:bg-gray-100 rounded transition-colors text-sm">
+                H3
+              </button>
+              <div className="h-6 w-px bg-gray-300 mx-2"></div>
+              <button className="px-3 py-2 hover:bg-gray-100 rounded transition-colors">
+                •
+              </button>
+              <button className="px-3 py-2 hover:bg-gray-100 rounded transition-colors">
+                1.
+              </button>
+              <button className="px-3 py-2 hover:bg-gray-100 rounded transition-colors">
+                ☑
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Workspace view when no document is open
   return (
     <div className="min-h-screen relative flex">
       <FruityBackground />
@@ -290,15 +447,7 @@ function WorkspaceContent() {
           <GlassCard className="mb-6 fade-in-delay-1">
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div className="flex items-center gap-4">
-                {currentDocument ? (
-                  <EditableTitle
-                    title={currentDocument.metadata.title}
-                    onSave={handleTitleChange}
-                    className="text-2xl font-bold text-leather-100"
-                  />
-                ) : (
-                  <h2 className="text-2xl font-bold text-leather-100">Workspace</h2>
-                )}
+                <h2 className="text-2xl font-bold text-leather-100">Workspace</h2>
                 {initialized && (
                   <span className="text-xs text-leather-300 px-2 py-1 rounded-full glass-card">
                     🔐 Encrypted
@@ -314,11 +463,6 @@ function WorkspaceContent() {
                     📄 Templates
                   </FruityButton>
                 </Link>
-                {currentDocument && (
-                  <FruityButton variant="parchment" size="sm" onClick={handleExportDocument}>
-                    📥 Export
-                  </FruityButton>
-                )}
                 {documents.length > 0 && (
                   <FruityButton variant="parchment" size="sm" onClick={handleExportWorkspace}>
                     📦 Export All
@@ -333,88 +477,78 @@ function WorkspaceContent() {
             </div>
           </GlassCard>
 
-          {/* Editor or Welcome */}
-          {currentDocument ? (
-            <GlassCard className="min-h-[600px] fade-in-delay-2">
-              <BlockEditor
-                initialContent={currentDocument.content}
-                onSave={handleSave}
-                autoSave={true}
-              />
+          {/* Welcome Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <GlassCard hover className="fade-in-delay-2">
+              <div className="p-4">
+                <div className="text-4xl mb-4">📝</div>
+                <h3 className="text-xl font-bold mb-2 text-leather-100">
+                  Create Your First Note
+                </h3>
+                <p className="text-leather-300 mb-4">
+                  Start writing with end-to-end encryption. Your notes are secure from the moment you type them.
+                </p>
+                <FruityButton variant="leather" size="sm" onClick={handleCreateDocument}>
+                  Create Note
+                </FruityButton>
+              </div>
             </GlassCard>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <GlassCard hover className="fade-in-delay-2">
-                <div className="p-4">
-                  <div className="text-4xl mb-4">📝</div>
-                  <h3 className="text-xl font-bold mb-2 text-leather-100">
-                    Create Your First Note
-                  </h3>
-                  <p className="text-leather-300 mb-4">
-                    Start writing with end-to-end encryption. Your notes are secure from the moment you type them.
-                  </p>
-                  <FruityButton variant="leather" size="sm" onClick={handleCreateDocument}>
-                    Create Note
+
+            <GlassCard hover className="fade-in-delay-3">
+              <div className="p-4">
+                <div className="text-4xl mb-4">📄</div>
+                <h3 className="text-xl font-bold mb-2 text-leather-100">
+                  Use a Template
+                </h3>
+                <p className="text-leather-300 mb-4">
+                  Get started quickly with pre-built templates for journals, meetings, projects, and more.
+                </p>
+                <Link href="/templates">
+                  <FruityButton variant="leather" size="sm">
+                    Browse Templates
                   </FruityButton>
-                </div>
-              </GlassCard>
+                </Link>
+              </div>
+            </GlassCard>
 
-              <GlassCard hover className="fade-in-delay-3">
-                <div className="p-4">
-                  <div className="text-4xl mb-4">📄</div>
-                  <h3 className="text-xl font-bold mb-2 text-leather-100">
-                    Use a Template
-                  </h3>
-                  <p className="text-leather-300 mb-4">
-                    Get started quickly with pre-built templates for journals, meetings, projects, and more.
-                  </p>
-                  <Link href="/templates">
-                    <FruityButton variant="leather" size="sm">
-                      Browse Templates
-                    </FruityButton>
-                  </Link>
-                </div>
-              </GlassCard>
+            <GlassCard hover className="fade-in">
+              <div className="p-4">
+                <div className="text-4xl mb-4">🔒</div>
+                <h3 className="text-xl font-bold mb-2 text-leather-100">
+                  Your Privacy Matters
+                </h3>
+                <p className="text-leather-300 mb-4">
+                  All documents use AES-256-GCM encryption. Master keys are stored locally in your browser.
+                </p>
+                <Link href="/settings">
+                  <FruityButton variant="parchment" size="sm">
+                    Security Settings
+                  </FruityButton>
+                </Link>
+              </div>
+            </GlassCard>
 
-              <GlassCard hover className="fade-in">
-                <div className="p-4">
-                  <div className="text-4xl mb-4">🔒</div>
-                  <h3 className="text-xl font-bold mb-2 text-leather-100">
-                    Your Privacy Matters
-                  </h3>
-                  <p className="text-leather-300 mb-4">
-                    All documents use AES-256-GCM encryption. Master keys are stored locally in your browser.
-                  </p>
-                  <Link href="/settings">
-                    <FruityButton variant="parchment" size="sm">
-                      Security Settings
-                    </FruityButton>
-                  </Link>
-                </div>
-              </GlassCard>
-
-              <GlassCard hover className="fade-in-delay-1">
-                <div className="p-4">
-                  <div className="text-4xl mb-4">📥</div>
-                  <h3 className="text-xl font-bold mb-2 text-leather-100">
-                    Export Anytime
-                  </h3>
-                  <p className="text-leather-300 mb-4">
-                    Your data is yours. Export as Markdown or ZIP files whenever you want.
-                  </p>
-                  {documents.length > 0 ? (
-                    <FruityButton variant="parchment" size="sm" onClick={handleExportWorkspace}>
-                      Export Workspace
-                    </FruityButton>
-                  ) : (
-                    <FruityButton variant="parchment" size="sm" disabled>
-                      No Documents Yet
-                    </FruityButton>
-                  )}
-                </div>
-              </GlassCard>
-            </div>
-          )}
+            <GlassCard hover className="fade-in-delay-1">
+              <div className="p-4">
+                <div className="text-4xl mb-4">📥</div>
+                <h3 className="text-xl font-bold mb-2 text-leather-100">
+                  Export Anytime
+                </h3>
+                <p className="text-leather-300 mb-4">
+                  Your data is yours. Export as Markdown or ZIP files whenever you want.
+                </p>
+                {documents.length > 0 ? (
+                  <FruityButton variant="parchment" size="sm" onClick={handleExportWorkspace}>
+                    Export Workspace
+                  </FruityButton>
+                ) : (
+                  <FruityButton variant="parchment" size="sm" disabled>
+                    No Documents Yet
+                  </FruityButton>
+                )}
+              </div>
+            </GlassCard>
+          </div>
 
           {/* Info Banner */}
           <GlassCard className="mt-6 fade-in-delay-2">
