@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import FruityBackground from "@/components/ui/FruityBackground";
 import TopMenu from "@/components/ui/TopMenu";
 
