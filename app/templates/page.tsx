@@ -1,15 +1,24 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
 import FruityBackground from "@/components/ui/FruityBackground";
 import GlassCard from "@/components/ui/GlassCard";
 import FruityButton from "@/components/ui/FruityButton";
 import TopMenu from "@/components/ui/TopMenu";
 import { builtInTemplates, getTemplateCategories } from "@/lib/templates";
+import { fadeIn, staggerFadeIn } from "@/lib/animations";
 
 export default function TemplatesPage() {
   const categories = getTemplateCategories();
+
+  useEffect(() => {
+    // Animate header
+    fadeIn('.templates-header', 0);
+    
+    // Animate categories
+    staggerFadeIn('.template-category', 200);
+  }, []);
 
   return (
     <div className="min-h-screen relative">
@@ -22,7 +31,7 @@ export default function TemplatesPage() {
 
       <main className="relative z-10 px-6 py-12">
         {/* Header */}
-        <div className="max-w-6xl mx-auto mb-12 fade-in">
+        <div className="max-w-6xl mx-auto mb-12 templates-header opacity-0">
           <h1 className="text-5xl font-bold mb-4 text-leather-100">
             Document Templates
           </h1>
@@ -38,14 +47,8 @@ export default function TemplatesPage() {
               (t) => t.category === category
             );
             
-            // Determine fade-in class based on index
-            let fadeClass = 'fade-in';
-            if (idx === 1) fadeClass = 'fade-in-delay-1';
-            else if (idx === 2) fadeClass = 'fade-in-delay-2';
-            else if (idx >= 3) fadeClass = 'fade-in-delay-3';
-
             return (
-              <div key={category} className={`mb-12 ${fadeClass}`}>
+              <div key={category} className="mb-12 template-category opacity-0">
                 <h2 className="text-2xl font-bold mb-6 capitalize text-leather-100">
                   {category}
                 </h2>

@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import FruityBackground from "@/components/ui/FruityBackground";
 import GlassCard from "@/components/ui/GlassCard";
 import FruityButton from "@/components/ui/FruityButton";
 import TopMenu from "@/components/ui/TopMenu";
+import { fadeIn, slideInLeft, slideInRight } from "@/lib/animations";
 
 /**
  * Render the documentation page with navigation and content sections.
@@ -115,6 +116,26 @@ This will start:
     }
   };
 
+  useEffect(() => {
+    // Animate header on load
+    fadeIn('.docs-header', 0);
+    
+    // Animate content
+    fadeIn('.docs-content', 200);
+    
+    // Animate navigation
+    slideInLeft('.nav-prev', 400);
+    slideInRight('.nav-next', 400);
+    
+    // Animate section navigation
+    fadeIn('.section-nav', 600);
+  }, []);
+
+  // Re-animate content when section changes
+  useEffect(() => {
+    fadeIn('.docs-content', 0);
+  }, [currentSectionIndex]);
+
   return (
     <div className="min-h-screen relative">
       <FruityBackground />
@@ -125,7 +146,7 @@ This will start:
       </div>
 
       {/* Header */}
-      <div className="relative z-10 px-6 py-6">
+      <div className="relative z-10 px-6 py-6 docs-header opacity-0">
         <div className="max-w-4xl mx-auto">
           <div className="mb-4">
             <h1 className="text-4xl font-bold text-leather-100 mb-2">Documentation</h1>
@@ -137,7 +158,7 @@ This will start:
       {/* Main Content */}
       <main className="relative z-10 px-6 pb-12">
         <div className="max-w-4xl mx-auto">
-          <GlassCard className="mb-6 fade-in-delay-1">
+          <GlassCard className="mb-6 docs-content opacity-0">
             <div className="p-8">
               <h2 className="text-3xl font-bold text-leather-100 mb-6">
                 {currentSection.title}
@@ -149,15 +170,15 @@ This will start:
           </GlassCard>
 
           {/* Navigation */}
-          <div className="flex justify-between items-center fade-in-delay-2">
-            <div>
+          <div className="flex justify-between items-center">
+            <div className="nav-prev opacity-0">
               {currentSectionIndex > 0 && (
                 <FruityButton variant="parchment" onClick={goToPrevious}>
                   ← Previous — {sections[currentSectionIndex - 1].title}
                 </FruityButton>
               )}
             </div>
-            <div>
+            <div className="nav-next opacity-0">
               {currentSectionIndex < sections.length - 1 && (
                 <FruityButton variant="parchment" onClick={goToNext}>
                   Next — {sections[currentSectionIndex + 1].title} →
@@ -167,7 +188,7 @@ This will start:
           </div>
 
           {/* Section Navigation */}
-          <GlassCard className="mt-6 fade-in-delay-3">
+          <GlassCard className="mt-6 section-nav opacity-0">
             <div className="p-4">
               <h3 className="text-lg font-bold text-leather-100 mb-3">All Sections</h3>
               <div className="flex flex-wrap gap-2">
