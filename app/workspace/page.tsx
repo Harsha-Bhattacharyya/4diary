@@ -338,10 +338,11 @@ function WorkspaceContent() {
               >
                 ➕ New Document
               </button>
-              <Link href="/templates">
-                <button className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors">
-                  📄 Templates
-                </button>
+              <Link
+                href="/templates"
+                className="block w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+              >
+                📄 Templates
               </Link>
               <button
                 onClick={handleExportDocument}
@@ -357,10 +358,11 @@ function WorkspaceContent() {
                   📦 Export All
                 </button>
               )}
-              <Link href="/settings">
-                <button className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors">
-                  ⚙️ Settings
-                </button>
+              <Link
+                href="/settings"
+                className="block w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+              >
+                ⚙️ Settings
               </Link>
               <div className="border-t border-gray-200 my-2"></div>
               <div className="px-4 py-2 text-sm text-gray-500">
