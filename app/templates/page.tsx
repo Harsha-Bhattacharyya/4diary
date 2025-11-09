@@ -2,9 +2,9 @@
 
 import React from "react";
 import Link from "next/link";
-import FruityBackground from "@/components/ui/FruityBackground";
+import LeatherBackground from "@/components/ui/LeatherBackground";
 import GlassCard from "@/components/ui/GlassCard";
-import FruityButton from "@/components/ui/FruityButton";
+import LeatherButton from "@/components/ui/LeatherButton";
 import TopMenu from "@/components/ui/TopMenu";
 import { builtInTemplates, getTemplateCategories } from "@/lib/templates";
 
@@ -13,7 +13,7 @@ export default function TemplatesPage() {
 
   return (
     <div className="min-h-screen relative">
-      <FruityBackground />
+      <LeatherBackground />
       
       {/* Top Menu */}
       <div className="relative z-10">
@@ -56,9 +56,9 @@ export default function TemplatesPage() {
                             {template.description}
                           </p>
                           <Link href={`/workspace?template=${template.id}`}>
-                            <FruityButton variant="leather" size="sm">
+                            <LeatherButton variant="leather" size="sm">
                               Use Template
-                            </FruityButton>
+                            </LeatherButton>
                           </Link>
                         </div>
                       </div>
@@ -81,9 +81,9 @@ export default function TemplatesPage() {
                 Design custom templates that fit your unique workflow
               </p>
               <Link href="/workspace">
-                <FruityButton variant="leather" size="md">
+                <LeatherButton variant="leather" size="md">
                   Create Custom Template
-                </FruityButton>
+                </LeatherButton>
               </Link>
             </div>
           </GlassCard>

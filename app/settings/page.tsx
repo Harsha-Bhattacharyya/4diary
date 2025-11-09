@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import FruityBackground from "@/components/ui/FruityBackground";
+import LeatherBackground from "@/components/ui/LeatherBackground";
 import GlassCard from "@/components/ui/GlassCard";
-import FruityButton from "@/components/ui/FruityButton";
+import LeatherButton from "@/components/ui/LeatherButton";
 import TopMenu from "@/components/ui/TopMenu";
 
 export default function SettingsPage() {
@@ -20,7 +20,7 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-screen relative">
-      <FruityBackground />
+      <LeatherBackground />
       
       {/* Top Menu */}
       <div className="relative z-10">
@@ -102,14 +102,14 @@ export default function SettingsPage() {
                 <p className="text-sm text-leather-300 mb-4">
                   Download all your documents as Markdown files in a ZIP archive
                 </p>
-                <FruityButton
+                <LeatherButton
                   variant="leather"
                   size="md"
                   onClick={handleExportWorkspace}
                   disabled={exportInProgress}
                 >
                   {exportInProgress ? "Exporting..." : "Export Workspace"}
-                </FruityButton>
+                </LeatherButton>
               </div>
 
               <div className="pt-4 border-t border-leather-700">

@@ -2,7 +2,7 @@
 
 import React from "react";
 
-interface FruityButtonProps {
+interface LeatherButtonProps {
   children: React.ReactNode;
   onClick?: () => void;
   className?: string;
@@ -12,7 +12,7 @@ interface FruityButtonProps {
   type?: "button" | "submit" | "reset";
 }
 
-export default function FruityButton({
+export default function LeatherButton({
   children,
   onClick,
   className = "",
@@ -20,7 +20,7 @@ export default function FruityButton({
   size = "md",
   disabled = false,
   type = "button",
-}: FruityButtonProps) {
+}: LeatherButtonProps) {
   const sizeClasses = {
     sm: "px-4 py-2 text-sm",
     md: "px-6 py-3 text-base",

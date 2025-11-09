@@ -1,12 +1,12 @@
 "use client";
 
-import FruityBackground from "@/components/ui/FruityBackground";
+import LeatherBackground from "@/components/ui/LeatherBackground";
 import TopMenu from "@/components/ui/TopMenu";
 
 export default function About() {
   return (
     <div className="min-h-screen relative">
-      <FruityBackground />
+      <LeatherBackground />
       
       {/* Top Menu */}
       <div className="relative z-10">

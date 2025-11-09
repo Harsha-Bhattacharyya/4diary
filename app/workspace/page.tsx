@@ -3,10 +3,10 @@
 import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import FruityBackground from "@/components/ui/FruityBackground";
+import LeatherBackground from "@/components/ui/LeatherBackground";
 import Sidebar from "@/components/ui/Sidebar";
 import GlassCard from "@/components/ui/GlassCard";
-import FruityButton from "@/components/ui/FruityButton";
+import LeatherButton from "@/components/ui/LeatherButton";
 import EditableTitle from "@/components/ui/EditableTitle";
 import dynamic from "next/dynamic";
 import { keyManager } from "@/lib/crypto/keyManager";
@@ -234,7 +234,7 @@ function WorkspaceContent() {
   if (loading) {
     return (
       <div className="min-h-screen relative flex items-center justify-center">
-        <FruityBackground />
+        <LeatherBackground />
         <GlassCard className="relative z-10">
           <div className="p-8 text-center">
             <div className="text-4xl mb-4">🔐</div>
@@ -248,15 +248,15 @@ function WorkspaceContent() {
   if (error) {
     return (
       <div className="min-h-screen relative flex items-center justify-center">
-        <FruityBackground />
+        <LeatherBackground />
         <GlassCard className="relative z-10">
           <div className="p-8 text-center">
             <div className="text-4xl mb-4">⚠️</div>
             <h2 className="text-xl font-bold mb-2 text-leather-100">Error</h2>
             <p className="text-leather-300 mb-4">{error}</p>
-            <FruityButton variant="leather" onClick={() => window.location.reload()}>
+            <LeatherButton variant="leather" onClick={() => window.location.reload()}>
               Retry
-            </FruityButton>
+            </LeatherButton>
           </div>
         </GlassCard>
       </div>
@@ -437,7 +437,7 @@ function WorkspaceContent() {
   // Workspace view when no document is open
   return (
     <div className="min-h-screen relative flex">
-      <FruityBackground />
+      <LeatherBackground />
 
       {/* Sidebar */}
       <div className="relative z-10 fade-in">
@@ -471,23 +471,23 @@ function WorkspaceContent() {
                 )}
               </div>
               <div className="flex items-center gap-2 flex-wrap">
-                <FruityButton variant="parchment" size="sm" onClick={handleCreateDocument}>
+                <LeatherButton variant="parchment" size="sm" onClick={handleCreateDocument}>
                   ➕ New Document
-                </FruityButton>
+                </LeatherButton>
                 <Link href="/templates">
-                  <FruityButton variant="parchment" size="sm">
+                  <LeatherButton variant="parchment" size="sm">
                     📄 Templates
-                  </FruityButton>
+                  </LeatherButton>
                 </Link>
                 {documents.length > 0 && (
-                  <FruityButton variant="parchment" size="sm" onClick={handleExportWorkspace}>
+                  <LeatherButton variant="parchment" size="sm" onClick={handleExportWorkspace}>
                     📦 Export All
-                  </FruityButton>
+                  </LeatherButton>
                 )}
                 <Link href="/settings">
-                  <FruityButton variant="parchment" size="sm">
+                  <LeatherButton variant="parchment" size="sm">
                     ⚙️ Settings
-                  </FruityButton>
+                  </LeatherButton>
                 </Link>
               </div>
             </div>
@@ -504,9 +504,9 @@ function WorkspaceContent() {
                 <p className="text-leather-300 mb-4">
                   Start writing with end-to-end encryption. Your notes are secure from the moment you type them.
                 </p>
-                <FruityButton variant="leather" size="sm" onClick={handleCreateDocument}>
+                <LeatherButton variant="leather" size="sm" onClick={handleCreateDocument}>
                   Create Note
-                </FruityButton>
+                </LeatherButton>
               </div>
             </GlassCard>
 
@@ -520,9 +520,9 @@ function WorkspaceContent() {
                   Get started quickly with pre-built templates for journals, meetings, projects, and more.
                 </p>
                 <Link href="/templates">
-                  <FruityButton variant="leather" size="sm">
+                  <LeatherButton variant="leather" size="sm">
                     Browse Templates
-                  </FruityButton>
+                  </LeatherButton>
                 </Link>
               </div>
             </GlassCard>
@@ -537,9 +537,9 @@ function WorkspaceContent() {
                   All documents use AES-256-GCM encryption. Master keys are stored locally in your browser.
                 </p>
                 <Link href="/settings">
-                  <FruityButton variant="parchment" size="sm">
+                  <LeatherButton variant="parchment" size="sm">
                     Security Settings
-                  </FruityButton>
+                  </LeatherButton>
                 </Link>
               </div>
             </GlassCard>
@@ -554,13 +554,13 @@ function WorkspaceContent() {
                   Your data is yours. Export as Markdown or ZIP files whenever you want.
                 </p>
                 {documents.length > 0 ? (
-                  <FruityButton variant="parchment" size="sm" onClick={handleExportWorkspace}>
+                  <LeatherButton variant="parchment" size="sm" onClick={handleExportWorkspace}>
                     Export Workspace
-                  </FruityButton>
+                  </LeatherButton>
                 ) : (
-                  <FruityButton variant="parchment" size="sm" disabled>
+                  <LeatherButton variant="parchment" size="sm" disabled>
                     No Documents Yet
-                  </FruityButton>
+                  </LeatherButton>
                 )}
               </div>
             </GlassCard>
@@ -593,7 +593,7 @@ export default function WorkspacePage() {
     <Suspense
       fallback={
         <div className="min-h-screen relative flex items-center justify-center">
-          <FruityBackground />
+          <LeatherBackground />
           <GlassCard className="relative z-10">
             <div className="p-8 text-center">
               <div className="text-4xl mb-4">⏳</div>

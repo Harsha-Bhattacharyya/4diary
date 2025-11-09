@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import FruityBackground from "@/components/ui/FruityBackground";
+import LeatherBackground from "@/components/ui/LeatherBackground";
 import GlassCard from "@/components/ui/GlassCard";
-import FruityButton from "@/components/ui/FruityButton";
+import LeatherButton from "@/components/ui/LeatherButton";
 import TopMenu from "@/components/ui/TopMenu";
 
 /**
@@ -117,7 +117,7 @@ This will start:
 
   return (
     <div className="min-h-screen relative">
-      <FruityBackground />
+      <LeatherBackground />
 
       {/* Top Menu */}
       <div className="relative z-10">
@@ -152,16 +152,16 @@ This will start:
           <div className="flex justify-between items-center fade-in-delay-2">
             <div>
               {currentSectionIndex > 0 && (
-                <FruityButton variant="parchment" onClick={goToPrevious}>
+                <LeatherButton variant="parchment" onClick={goToPrevious}>
                   ← Previous — {sections[currentSectionIndex - 1].title}
-                </FruityButton>
+                </LeatherButton>
               )}
             </div>
             <div>
               {currentSectionIndex < sections.length - 1 && (
-                <FruityButton variant="parchment" onClick={goToNext}>
+                <LeatherButton variant="parchment" onClick={goToNext}>
                   Next — {sections[currentSectionIndex + 1].title} →
-                </FruityButton>
+                </LeatherButton>
               )}
             </div>
           </div>

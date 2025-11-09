@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import FruityButton from "./FruityButton";
+import LeatherButton from "./LeatherButton";
 
 interface TopMenuProps {
   currentPage?: string;
@@ -42,9 +42,9 @@ export default function TopMenu({ currentPage = "Home" }: TopMenuProps) {
           </button>
           
           <Link href="/workspace">
-            <FruityButton variant="parchment" size="sm">
+            <LeatherButton variant="parchment" size="sm">
               Log in
-            </FruityButton>
+            </LeatherButton>
           </Link>
         </div>
 

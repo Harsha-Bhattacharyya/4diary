@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import FruityBackground from "@/components/ui/FruityBackground";
-import FruityButton from "@/components/ui/FruityButton";
+import LeatherBackground from "@/components/ui/LeatherBackground";
+import LeatherButton from "@/components/ui/LeatherButton";
 import TopMenu from "@/components/ui/TopMenu";
 import Image from "next/image";
 
@@ -16,7 +16,7 @@ import Image from "next/image";
 export default function Home() {
   return (
     <div className="min-h-screen relative">
-      <FruityBackground />
+      <LeatherBackground />
       
       {/* Top Menu */}
       <div className="relative z-[100]">
@@ -45,14 +45,14 @@ export default function Home() {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-20 fade-in-delay-2">
             <Link href="/workspace">
-              <FruityButton variant="gradient" size="lg">
+              <LeatherButton variant="gradient" size="lg">
                 Get Started
-              </FruityButton>
+              </LeatherButton>
             </Link>
             <Link href="/docs">
-              <FruityButton variant="parchment" size="lg">
+              <LeatherButton variant="parchment" size="lg">
                 View Docs
-              </FruityButton>
+              </LeatherButton>
             </Link>
           </div>
 
