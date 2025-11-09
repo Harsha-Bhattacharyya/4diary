@@ -9,6 +9,8 @@ import { attachDatabasePool } from '@vercel/functions';
 const uri = process.env.MONGODB_URI;
 
 const options: MongoClientOptions = {
+  tls: true,
+  tlsAllowInvalidCertificates: true,
   appName: "devrel.vercel.integration",
   maxIdleTimeMS: 5000
 };
