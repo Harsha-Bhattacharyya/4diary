@@ -103,7 +103,7 @@ export default function TopMenu({ currentPage = "Home" }: TopMenuProps) {
       {/* Backdrop - outside the relative container */}
       {menuOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-30 z-[9998]"
+          className="fixed inset-0"
           onClick={() => setMenuOpen(false)}
         />
       )}
