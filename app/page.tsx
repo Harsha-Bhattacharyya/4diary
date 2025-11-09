@@ -19,7 +19,7 @@ export default function Home() {
       <FruityBackground />
       
       {/* Top Menu */}
-      <div className="relative z-10">
+      <div className="relative z-[100]">
         <TopMenu currentPage="Home" />
       </div>
       
