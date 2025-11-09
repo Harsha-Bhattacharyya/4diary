@@ -16,7 +16,7 @@ export default function TopMenu({ currentPage = "Home" }: TopMenuProps) {
 
   return (
     <>
-      <div className="relative z-50">
+      <div className="relative z-[9999]">
         {/* Top Bar */}
         <div className="flex justify-between items-center px-6 py-4">
           <button
@@ -50,7 +50,7 @@ export default function TopMenu({ currentPage = "Home" }: TopMenuProps) {
 
         {/* Dropdown Menu */}
         {menuOpen && (
-          <div className="absolute top-full left-4 mt-2 bg-leather-500 rounded-lg shadow-lg border-2 border-leather-400 py-2 min-w-[200px] z-50">
+          <div className="absolute top-full left-4 mt-2 bg-leather-500 rounded-lg shadow-lg border-2 border-leather-400 py-2 min-w-[200px] z-[9999]">
             <Link href="/">
               <button
                 type="button"
@@ -103,7 +103,7 @@ export default function TopMenu({ currentPage = "Home" }: TopMenuProps) {
       {/* Backdrop - outside the relative container */}
       {menuOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-30 z-40"
+          className="fixed inset-0 bg-black bg-opacity-30 z-[9998]"
           onClick={() => setMenuOpen(false)}
         />
       )}
