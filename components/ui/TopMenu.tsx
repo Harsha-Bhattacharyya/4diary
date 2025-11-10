@@ -9,7 +9,13 @@ interface TopMenuProps {
 }
 
 /**
- * Top navigation menu component with hamburger menu and navigation links
+ * Top navigation bar with a hamburger toggle, current page label, login button, and a dropdown of navigation links.
+ *
+ * Renders a top bar button that toggles a dropdown menu with links to Home, Workspace, Templates, Docs, and About.
+ * Selecting any menu item or clicking the backdrop closes the dropdown.
+ *
+ * @param currentPage - Label shown next to the hamburger icon; defaults to "Home"
+ * @returns A JSX element representing the top navigation bar and its dropdown
  */
 export default function TopMenu({ currentPage = "Home" }: TopMenuProps) {
   const [menuOpen, setMenuOpen] = useState(false);

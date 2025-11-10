@@ -2,7 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDatabase } from "@/lib/mongodb";
 import { randomBytes } from "crypto";
 
-// Generate temporary share link
+/**
+ * Creates a temporary, time-limited share link for provided document content and stores the share record.
+ *
+ * @returns `{ success: true, shareUrl: string, shareId: string, expiresAt: Date }` on success (status 201); `{ error: string }` with status 400 for missing input or status 500 for server errors.
+ */
 export async function POST(request: NextRequest) {
   try {
     const { documentId, title, content } = await request.json();
@@ -56,7 +60,12 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Get shared document
+/**
+ * Retrieve a shared document by shareId and increment its view count.
+ *
+ * @param request - NextRequest whose URL search parameter `id` contains the shareId to retrieve.
+ * @returns An HTTP JSON response. On success returns status 200 with the share's `title`, `content`, `createdAt`, and `expiresAt`. Possible error responses: 400 if the `id` query parameter is missing, 404 if the share is not found, 410 if the share has expired, and 500 on internal error.
+ */
 export async function GET(request: NextRequest) {
   try {
     const shareId = request.nextUrl.searchParams.get("id");

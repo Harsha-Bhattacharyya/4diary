@@ -3,6 +3,14 @@
 import LeatherBackground from "@/components/ui/LeatherBackground";
 import TopMenu from "@/components/ui/TopMenu";
 
+/**
+ * Renders the About page for the application.
+ *
+ * Displays a leather-styled background, the top navigation with the "About" page active,
+ * and centered page content including the page heading and a brief privacy-focused description.
+ *
+ * @returns The About page JSX element.
+ */
 export default function About() {
   return (
     <div className="min-h-screen relative">

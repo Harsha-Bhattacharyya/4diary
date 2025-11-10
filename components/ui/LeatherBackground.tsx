@@ -10,6 +10,15 @@ const TEXTURE_MARKS = Array.from({ length: 20 }, (_, i) => ({
   borderRadius: i % 2 === 0 ? '50%' : '0%',
 }));
 
+/**
+ * Renders a layered, leather-themed fullscreen background positioned behind page content.
+ *
+ * The background combines a gradient base, a subtle repeating texture overlay, two animated
+ * parchment-like gradients for gentle motion, multiple pulsing texture marks for aging effects,
+ * and a radial vignette for depth.
+ *
+ * @returns A JSX element containing the leather-styled background positioned fixed behind other content.
+ */
 export default function LeatherBackground() {
   return (
     <div className="fixed inset-0 -z-10 overflow-hidden">
