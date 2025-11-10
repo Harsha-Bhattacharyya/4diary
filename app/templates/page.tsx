@@ -1,8 +1,11 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
-import FruityBackground from "@/components/ui/FruityBackground";
+import LeatherBackground from "@/components/ui/LeatherBackground";
 import GlassCard from "@/components/ui/GlassCard";
-import FruityButton from "@/components/ui/FruityButton";
+import LeatherButton from "@/components/ui/LeatherButton";
+import TopMenu from "@/components/ui/TopMenu";
 import { builtInTemplates, getTemplateCategories } from "@/lib/templates";
 
 export default function TemplatesPage() {
@@ -10,40 +13,33 @@ export default function TemplatesPage() {
 
   return (
     <div className="min-h-screen relative">
-      <FruityBackground />
+      <LeatherBackground />
+      
+      {/* Top Menu */}
+      <div className="relative z-10">
+        <TopMenu currentPage="Templates" />
+      </div>
 
       <main className="relative z-10 px-6 py-12">
         {/* Header */}
         <div className="max-w-6xl mx-auto mb-12 fade-in">
-          <Link href="/">
-            <FruityButton variant="parchment" size="sm">
-              ← Back to Home
-            </FruityButton>
-          </Link>
-
-          <h1 className="text-5xl font-bold mt-8 mb-4 text-leather-100">
+          <h1 className="text-5xl font-bold mb-4 text-leather-100">
             Document Templates
           </h1>
-          <p className="text-lg text-leather-300">
+          <p className="text-leather-300">
             Start quickly with pre-built templates for your notes, journals, and projects.
           </p>
         </div>
 
         {/* Categories */}
         <div className="max-w-6xl mx-auto">
-          {categories.map((category, idx) => {
+          {categories.map((category) => {
             const categoryTemplates = builtInTemplates.filter(
               (t) => t.category === category
             );
             
-            // Determine fade-in class based on index
-            let fadeClass = 'fade-in';
-            if (idx === 1) fadeClass = 'fade-in-delay-1';
-            else if (idx === 2) fadeClass = 'fade-in-delay-2';
-            else if (idx >= 3) fadeClass = 'fade-in-delay-3';
-
             return (
-              <div key={category} className={`mb-12 ${fadeClass}`}>
+              <div key={category} className="mb-12 fade-in-delay-1">
                 <h2 className="text-2xl font-bold mb-6 capitalize text-leather-100">
                   {category}
                 </h2>
@@ -60,9 +56,9 @@ export default function TemplatesPage() {
                             {template.description}
                           </p>
                           <Link href={`/workspace?template=${template.id}`}>
-                            <FruityButton variant="leather" size="sm">
+                            <LeatherButton variant="leather" size="sm">
                               Use Template
-                            </FruityButton>
+                            </LeatherButton>
                           </Link>
                         </div>
                       </div>
@@ -85,9 +81,9 @@ export default function TemplatesPage() {
                 Design custom templates that fit your unique workflow
               </p>
               <Link href="/workspace">
-                <FruityButton variant="leather" size="md">
+                <LeatherButton variant="leather" size="md">
                   Create Custom Template
-                </FruityButton>
+                </LeatherButton>
               </Link>
             </div>
           </GlassCard>

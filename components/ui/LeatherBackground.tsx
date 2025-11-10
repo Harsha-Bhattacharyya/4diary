@@ -10,7 +10,7 @@ const TEXTURE_MARKS = Array.from({ length: 20 }, (_, i) => ({
   borderRadius: i % 2 === 0 ? '50%' : '0%',
 }));
 
-export default function FruityBackground() {
+export default function LeatherBackground() {
   return (
     <div className="fixed inset-0 -z-10 overflow-hidden">
       {/* Base leather background with texture */}

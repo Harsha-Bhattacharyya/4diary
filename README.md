@@ -1,4 +1,5 @@
-# 4diary
+# 4Diary
+> 🏆 **Hack This Fall 2025 Project** - A privacy-focused, end-to-end encrypted note-taking application built with Next.js.
 
 A privacy-focused, end-to-end encrypted note-taking application built with Next.js. Think Notion, but with military-grade encryption and complete privacy.
 
@@ -8,7 +9,6 @@ A privacy-focused, end-to-end encrypted note-taking application built with Next.
 - ✍️ **Notion-like Editor**: Rich text editing with BlockNote
 - 📁 **Smart Organization**: Folders, tags, favorites, and archives
 - 📥 **Export Freedom**: Export as Markdown or ZIP files
-- 🎨 **Frutiger Aero Design**: Beautiful glass morphism UI
 - 📦 **Self-Hostable**: Docker-ready deployment
 - 🔐 **Zero Knowledge**: Server never sees unencrypted content
 - 📄 **Templates**: Pre-built templates for various use cases
@@ -51,7 +51,7 @@ npm run dev
 ### Using Docker Compose (Recommended)
 
 1. Clone the repository
-2. Create `.env.local` with your configuration
+2. Export your MongoDB URI,Redis,port
 3. Run:
 
 ```bash

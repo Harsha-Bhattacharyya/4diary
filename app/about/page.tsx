@@ -1,21 +1,28 @@
-import Link from "next/link";
+"use client";
+
+import LeatherBackground from "@/components/ui/LeatherBackground";
+import TopMenu from "@/components/ui/TopMenu";
 
 export default function About() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-center gap-8 py-32 px-16 bg-white dark:bg-black">
-        <h1 className="text-4xl font-bold text-black dark:text-white">
-          About 4diary
-        </h1>
-        <p className="text-lg text-zinc-600 dark:text-zinc-400 text-center max-w-2xl">
-          A privacy focused solution for the modern world.
-        </p>
-        <Link
-          href="/"
-          className="flex h-12 items-center justify-center rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc]"
-        >
-          Back to Home
-        </Link>
+    <div className="min-h-screen relative">
+      <LeatherBackground />
+      
+      {/* Top Menu */}
+      <div className="relative z-10">
+        <TopMenu currentPage="About" />
+      </div>
+
+      <main className="relative z-10 flex min-h-[calc(100vh-80px)] items-center justify-center px-6 py-12">
+        <div className="max-w-3xl mx-auto text-center fade-in">
+          <h1 className="text-4xl md:text-5xl font-bold text-leather-100 mb-6">
+            About 4diary
+          </h1>
+          <p className="text-lg md:text-xl text-leather-200 max-w-2xl mx-auto">
+            A privacy-focused solution for the modern world. Built with end-to-end encryption, 
+            zero-knowledge architecture, and open-source freedom.
+          </p>
+        </div>
       </main>
     </div>
   );
