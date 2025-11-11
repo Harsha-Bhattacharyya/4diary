@@ -3,7 +3,13 @@ import { getDatabase } from "@/lib/mongodb";
 import bcrypt from "bcrypt";
 import { SignJWT } from "jose";
 
-// Derive encryption key from password using PBKDF2
+/**
+ * Derives a deterministic 256-bit encryption key from a password and email.
+ *
+ * @param password - The user's password used as the derivation input.
+ * @param email - The user's email used as the PBKDF2 salt to ensure determinism.
+ * @returns A base64-encoded 32-byte (256-bit) encryption key.
+ */
 async function deriveKeyFromPassword(
   password: string,
   email: string
@@ -35,6 +41,18 @@ async function deriveKeyFromPassword(
   return Buffer.from(derivedBits).toString("base64");
 }
 
+/**
+ * Handle signup requests and create a new user account.
+ *
+ * Processes a JSON body with `email`, `password`, and optional `name`; creates and stores a new user record, issues a JWT session token, and sets an HTTP-only `session` cookie on success.
+ *
+ * @param request - Incoming request whose JSON body must include `email` and `password` (and may include `name`)
+ * @returns A NextResponse with:
+ *  - status 201 and a success JSON body and an HTTP-only `session` cookie when the account is created,
+ *  - status 400 and an error JSON body when `email` or `password` is missing,
+ *  - status 409 and an error JSON body when the email is already registered,
+ *  - status 500 and an error JSON body on internal failure.
+ */
 export async function POST(request: NextRequest) {
   try {
     const { email, password, name } = await request.json();

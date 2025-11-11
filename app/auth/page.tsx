@@ -7,6 +7,14 @@ import GlassCard from "@/components/ui/GlassCard";
 import LeatherButton from "@/components/ui/LeatherButton";
 import Link from "next/link";
 
+/**
+ * Authentication page component that displays and manages login and signup forms.
+ *
+ * Shows either a login or signup form (toggleable), validates inputs, displays server or client-side errors,
+ * and redirects to the workspace on successful authentication.
+ *
+ * @returns The rendered authentication page as a JSX.Element
+ */
 export default function AuthPage() {
   const router = useRouter();
   const [isLogin, setIsLogin] = useState(true);

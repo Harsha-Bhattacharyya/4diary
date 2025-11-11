@@ -27,11 +27,11 @@ const BlockEditor = dynamic(() => import("@/components/editor/BlockEditor"), {
 });
 
 /**
- * Render the workspace UI, initialize encryption keys, and manage workspace and document state including creation, opening, editing, title updates, and export.
+ * Render the workspace UI and manage encryption initialization, workspace lifecycle, and document operations.
  *
- * Renders a sidebar of documents, a toolbar with document and workspace actions, an editor for the active document (or a welcome grid when none is open), and informational banners. Handles initialization, loading, and error states.
+ * Manages authentication, initializes local encryption keys, loads or creates the default workspace, lists and opens documents, and provides handlers for creating, saving, sharing, renaming, and exporting documents or the entire workspace. Handles loading and error states and switches between a full-screen editor and a workspace overview.
  *
- * @returns The workspace content as a JSX element.
+ * @returns The rendered workspace UI as a JSX element
  */
 function WorkspaceContent() {
   const searchParams = useSearchParams();
@@ -52,6 +52,12 @@ function WorkspaceContent() {
 
   // Check authentication
   useEffect(() => {
+    /**
+     * Checks the current user session and redirects to the sign-in page if not authenticated.
+     *
+     * If the session is authenticated, updates the component state with the user's email.
+     * If the session is not authenticated or the request fails, navigates to `/auth`.
+     */
     async function checkAuth() {
       try {
         const response = await fetch("/api/auth/session");
@@ -76,6 +82,15 @@ function WorkspaceContent() {
   useEffect(() => {
     if (!userEmail) return;
 
+    /**
+     * Initializes encryption keys and the user's workspace, then loads documents.
+     *
+     * Performs client-side initialization: sets up the key manager, obtains or creates
+     * the default workspace for the current user, loads the workspace's documents,
+     * and — when a templateId is present in scope — creates a document from that template
+     * and opens it. Updates local component state (initialization flag, workspaceId,
+     * documents list, currentDocument, loading, and error) to reflect progress and failure.
+     */
     async function initialize() {
       try {
         // Initialize key manager
@@ -677,6 +692,11 @@ function WorkspaceContent() {
   );
 }
 
+/**
+ * Renders the workspace page wrapped in a Suspense boundary, providing a loading fallback UI.
+ *
+ * @returns The workspace page React element that displays a loading card until WorkspaceContent is ready.
+ */
 export default function WorkspacePage() {
   return (
     <Suspense

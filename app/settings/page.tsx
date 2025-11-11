@@ -6,6 +6,13 @@ import GlassCard from "@/components/ui/GlassCard";
 import LeatherButton from "@/components/ui/LeatherButton";
 import TopMenu from "@/components/ui/TopMenu";
 
+/**
+ * Render the application Settings page with security, export, privacy, and self-hosting sections.
+ *
+ * Includes an "Export Workspace" action that simulates exporting workspace data by toggling an in-progress state and showing a notification.
+ *
+ * @returns A React element representing the Settings page.
+ */
 export default function SettingsPage() {
   const [exportInProgress, setExportInProgress] = useState(false);
 

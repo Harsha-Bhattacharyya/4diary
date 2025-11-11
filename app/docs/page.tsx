@@ -7,9 +7,9 @@ import LeatherButton from "@/components/ui/LeatherButton";
 import TopMenu from "@/components/ui/TopMenu";
 
 /**
- * Render the documentation page with navigation and content sections.
+ * Renders the documentation page with navigation controls and content sections.
  *
- * @returns The React element representing the docs page layout.
+ * @returns The React element for the documentation page layout
  */
 export default function DocsPage() {
 

@@ -12,6 +12,18 @@ interface LeatherButtonProps {
   type?: "button" | "submit" | "reset";
 }
 
+/**
+ * Render a styled button with leather-themed variants and configurable size and behavior.
+ *
+ * @param children - Content displayed inside the button.
+ * @param onClick - Optional click handler invoked when the button is activated.
+ * @param className - Additional CSS classes appended to the button.
+ * @param variant - Visual style: "gradient", "leather", or "parchment".
+ * @param size - Size preset: "sm", "md", or "lg".
+ * @param disabled - When true, disables the button and reduces its opacity.
+ * @param type - Button type attribute ("button", "submit", or "reset").
+ * @returns The configured JSX button element.
+ */
 export default function LeatherButton({
   children,
   onClick,

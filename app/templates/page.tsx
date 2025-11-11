@@ -8,6 +8,11 @@ import LeatherButton from "@/components/ui/LeatherButton";
 import TopMenu from "@/components/ui/TopMenu";
 import { builtInTemplates, getTemplateCategories } from "@/lib/templates";
 
+/**
+ * Render the Templates page showing built-in template categories and a CTA for creating custom templates.
+ *
+ * @returns The page's React element containing a leather-themed background, top navigation, categorized template cards (each with an icon, name, description, and "Use Template" link), and a "Create Custom Template" call to action.
+ */
 export default function TemplatesPage() {
   const categories = getTemplateCategories();
 
