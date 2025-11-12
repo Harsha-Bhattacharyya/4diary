@@ -25,7 +25,7 @@ if (!uri) {
   clientPromise = Promise.reject(new Error("Please add your MongoDB URI to .env.local"));
 } else if (process.env.NODE_ENV === "development") {
   // In development mode, use a global variable so the client is preserved across module reloads
-  let globalWithMongo = global as typeof globalThis & {
+  const globalWithMongo = global as typeof globalThis & {
     _mongoClientPromise?: Promise<MongoClient>;
   };
 
