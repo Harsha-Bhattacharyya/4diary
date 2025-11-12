@@ -63,9 +63,16 @@ export async function POST(request: NextRequest) {
     await usersCollection.insertOne(user);
 
     // Create session token
-    const secret = new TextEncoder().encode(
-      process.env.JWT_SECRET || "fallback-secret-key"
-    );
+    const secretValue = process.env.JWT_SECRET;
+    if (!secretValue) {
+      console.error("JWT_SECRET not configured");
+      return NextResponse.json(
+        { error: "Internal server error" },
+        { status: 500 }
+      );
+    }
+
+    const secret = new TextEncoder().encode(secretValue);
     const token = await new SignJWT({ email, encryptionKey })
       .setProtectedHeader({ alg: "HS256" })
       .setExpirationTime("7d")
