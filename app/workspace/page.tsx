@@ -2,11 +2,11 @@
 
 import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import FruityBackground from "@/components/ui/FruityBackground";
+import { useSearchParams, useRouter } from "next/navigation";
+import LeatherBackground from "@/components/ui/LeatherBackground";
 import Sidebar from "@/components/ui/Sidebar";
 import GlassCard from "@/components/ui/GlassCard";
-import FruityButton from "@/components/ui/FruityButton";
+import LeatherButton from "@/components/ui/LeatherButton";
 import EditableTitle from "@/components/ui/EditableTitle";
 import dynamic from "next/dynamic";
 import { keyManager } from "@/lib/crypto/keyManager";
@@ -26,22 +26,16 @@ const BlockEditor = dynamic(() => import("@/components/editor/BlockEditor"), {
   ssr: false,
 });
 
-// Demo user ID - in production, this would come from auth
-// SECURITY NOTE: This is a demo implementation. In production:
-// 1. Implement proper authentication (e.g., NextAuth.js, Auth0, Clerk)
-// 2. Get user ID from authenticated session
-// 3. Never hard-code user identifiers
-const DEMO_USER_ID = "demo-user";
-
 /**
- * Render the workspace UI, initialize encryption keys, and manage workspace and document state including creation, opening, editing, title updates, and export.
+ * Render the workspace UI and manage encryption initialization, workspace lifecycle, and document operations.
  *
- * Renders a sidebar of documents, a toolbar with document and workspace actions, an editor for the active document (or a welcome grid when none is open), and informational banners. Handles initialization, loading, and error states.
+ * Manages authentication, initializes local encryption keys, loads or creates the default workspace, lists and opens documents, and provides handlers for creating, saving, sharing, renaming, and exporting documents or the entire workspace. Handles loading and error states and switches between a full-screen editor and a workspace overview.
  *
- * @returns The workspace content as a JSX element.
+ * @returns The rendered workspace UI as a JSX element
  */
 function WorkspaceContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const templateId = searchParams.get("template");
 
   const [initialized, setInitialized] = useState(false);
@@ -51,9 +45,52 @@ function WorkspaceContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [showShareToast, setShowShareToast] = useState(false);
+
+  // Check authentication
+  useEffect(() => {
+    /**
+     * Checks the current user session and redirects to the sign-in page if not authenticated.
+     *
+     * If the session is authenticated, updates the component state with the user's email.
+     * If the session is not authenticated or the request fails, navigates to `/auth`.
+     */
+    async function checkAuth() {
+      try {
+        const response = await fetch("/api/auth/session");
+        const data = await response.json();
+
+        if (!data.authenticated) {
+          router.push("/auth");
+          return;
+        }
+
+        setUserEmail(data.email);
+      } catch (err) {
+        console.error("Auth check error:", err);
+        router.push("/auth");
+      }
+    }
+
+    checkAuth();
+  }, [router]);
 
   // Initialize workspace and load documents
   useEffect(() => {
+    if (!userEmail) return;
+
+    /**
+     * Initializes encryption keys and the user's workspace, then loads documents.
+     *
+     * Performs client-side initialization: sets up the key manager, obtains or creates
+     * the default workspace for the current user, loads the workspace's documents,
+     * and — when a templateId is present in scope — creates a document from that template
+     * and opens it. Updates local component state (initialization flag, workspaceId,
+     * documents list, currentDocument, loading, and error) to reflect progress and failure.
+     */
     async function initialize() {
       try {
         // Initialize key manager
@@ -61,11 +98,11 @@ function WorkspaceContent() {
         setInitialized(true);
 
         // Get or create workspace
-        const workspace = await getOrCreateDefaultWorkspace(DEMO_USER_ID);
+        const workspace = await getOrCreateDefaultWorkspace(userEmail);
         setWorkspaceId(workspace.id);
 
         // Load documents
-        const docs = await listDocuments(workspace.id, DEMO_USER_ID);
+        const docs = await listDocuments(workspace.id, userEmail);
         setDocuments(docs);
 
         // If template is specified, create document from template
@@ -73,15 +110,15 @@ function WorkspaceContent() {
           const docId = await createDocumentFromTemplate({
             templateId,
             workspaceId: workspace.id,
-            userId: DEMO_USER_ID,
+            userId: userEmail,
           });
 
           // Load the newly created document
-          const doc = await getDocument(docId, DEMO_USER_ID);
+          const doc = await getDocument(docId, userEmail);
           setCurrentDocument(doc);
 
           // Reload documents list
-          const updatedDocs = await listDocuments(workspace.id, DEMO_USER_ID);
+          const updatedDocs = await listDocuments(workspace.id, userEmail);
           setDocuments(updatedDocs);
         }
 
@@ -94,7 +131,7 @@ function WorkspaceContent() {
     }
 
     initialize();
-  }, [templateId]);
+  }, [templateId, userEmail]);
 
   const handleSave = async (content: unknown[]) => {
     if (!currentDocument || !workspaceId) return;
@@ -102,7 +139,7 @@ function WorkspaceContent() {
     try {
       await updateDocument({
         id: currentDocument.id,
-        userId: DEMO_USER_ID,
+        userId: userEmail,
         content,
         metadata: currentDocument.metadata,
       });
@@ -118,13 +155,47 @@ function WorkspaceContent() {
     }
   };
 
+  const handleShareDocument = async () => {
+    if (!currentDocument) return;
+
+    try {
+      const response = await fetch("/api/share", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          documentId: currentDocument.id,
+          title: currentDocument.metadata.title,
+          content: currentDocument.content,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to create share link");
+      }
+
+      setShareUrl(data.shareUrl);
+      setShowShareToast(true);
+
+      // Copy to clipboard
+      await navigator.clipboard.writeText(data.shareUrl);
+
+      // Hide toast after 5 seconds
+      setTimeout(() => setShowShareToast(false), 5000);
+    } catch (err) {
+      console.error("Share error:", err);
+      setError(err instanceof Error ? err.message : "Failed to create share link");
+    }
+  };
+
   const handleCreateDocument = async () => {
     if (!workspaceId) return;
 
     try {
       const doc = await createDocument({
         workspaceId,
-        userId: DEMO_USER_ID,
+        userId: userEmail,
         content: [
           {
             type: "heading",
@@ -144,7 +215,7 @@ function WorkspaceContent() {
       setCurrentDocument(doc);
 
       // Reload documents list
-      const updatedDocs = await listDocuments(workspaceId, DEMO_USER_ID);
+      const updatedDocs = await listDocuments(workspaceId, userEmail);
       setDocuments(updatedDocs);
     } catch (err) {
       console.error("Create error:", err);
@@ -154,7 +225,7 @@ function WorkspaceContent() {
 
   const handleOpenDocument = async (docId: string) => {
     try {
-      const doc = await getDocument(docId, DEMO_USER_ID);
+      const doc = await getDocument(docId, userEmail);
       setCurrentDocument(doc);
     } catch (err) {
       console.error("Open error:", err);
@@ -173,7 +244,7 @@ function WorkspaceContent() {
 
       await updateDocument({
         id: currentDocument.id,
-        userId: DEMO_USER_ID,
+        userId: userEmail,
         content: currentDocument.content,
         metadata: updatedMetadata,
       });
@@ -186,7 +257,7 @@ function WorkspaceContent() {
 
       // Reload documents list to reflect the title change
       if (workspaceId) {
-        const updatedDocs = await listDocuments(workspaceId, DEMO_USER_ID);
+        const updatedDocs = await listDocuments(workspaceId, userEmail);
         setDocuments(updatedDocs);
       }
     } catch (err) {
@@ -202,7 +273,7 @@ function WorkspaceContent() {
     try {
       // Fetch the encrypted document data from API
       const response = await fetch(
-        `/api/documents/${currentDocument.id}?userId=${encodeURIComponent(DEMO_USER_ID)}`
+        `/api/documents/${currentDocument.id}?userId=${encodeURIComponent(userEmail)}`
       );
       const data = await response.json();
 
@@ -219,7 +290,7 @@ function WorkspaceContent() {
     try {
       // Fetch all encrypted documents
       const response = await fetch(
-        `/api/documents?workspaceId=${encodeURIComponent(workspaceId)}&userId=${encodeURIComponent(DEMO_USER_ID)}`
+        `/api/documents?workspaceId=${encodeURIComponent(workspaceId)}&userId=${encodeURIComponent(userEmail)}`
       );
       const data = await response.json();
 
@@ -233,7 +304,7 @@ function WorkspaceContent() {
   if (loading) {
     return (
       <div className="min-h-screen relative flex items-center justify-center">
-        <FruityBackground />
+        <LeatherBackground />
         <GlassCard className="relative z-10">
           <div className="p-8 text-center">
             <div className="text-4xl mb-4">🔐</div>
@@ -247,24 +318,237 @@ function WorkspaceContent() {
   if (error) {
     return (
       <div className="min-h-screen relative flex items-center justify-center">
-        <FruityBackground />
+        <LeatherBackground />
         <GlassCard className="relative z-10">
           <div className="p-8 text-center">
             <div className="text-4xl mb-4">⚠️</div>
             <h2 className="text-xl font-bold mb-2 text-leather-100">Error</h2>
             <p className="text-leather-300 mb-4">{error}</p>
-            <FruityButton variant="leather" onClick={() => window.location.reload()}>
+            <LeatherButton variant="leather" onClick={() => window.location.reload()}>
               Retry
-            </FruityButton>
+            </LeatherButton>
           </div>
         </GlassCard>
       </div>
     );
   }
 
+  const handleCloseDocument = () => {
+    setCurrentDocument(null);
+  };
+
+  // Full-screen editor mode when a document is open
+  if (currentDocument) {
+    return (
+      <div className="min-h-screen relative bg-white">
+        {/* Top Bar with Menu and Title */}
+        <div className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+          <div className="flex items-center justify-between px-6 py-4">
+            {/* Menu Button */}
+            <button
+              type="button"
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              aria-label="Toggle menu"
+            >
+              <svg
+                className="w-6 h-6 text-gray-700"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
+            </button>
+
+            {/* Title and Share Button */}
+            <div className="flex-1 mx-6 flex items-center justify-center gap-3">
+              <EditableTitle
+                title={currentDocument.metadata.title}
+                onSave={handleTitleChange}
+                className="text-2xl font-bold text-gray-900 text-center"
+              />
+              <button
+                type="button"
+                onClick={handleShareDocument}
+                className="px-3 py-1 text-sm bg-leather-300 hover:bg-leather-400 text-white rounded-lg transition-colors flex items-center gap-1"
+                title="Share this note (24h link)"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+                  />
+                </svg>
+                Share
+              </button>
+            </div>
+
+            {/* Close Button */}
+            <button
+              type="button"
+              onClick={handleCloseDocument}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              aria-label="Close document"
+            >
+              <svg
+                className="w-6 h-6 text-gray-700"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
+
+          {/* Dropdown Menu */}
+          {dropdownOpen && (
+            <div className="absolute top-full left-0 mt-2 ml-4 bg-white rounded-lg shadow-lg border border-gray-200 py-2 min-w-[200px] fade-in">
+              <button
+                type="button"
+                onClick={handleCreateDocument}
+                className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+              >
+                ➕ New Document
+              </button>
+              <Link href="/templates">
+                <button
+                  type="button"
+                  className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+                >
+                  📄 Templates
+                </button>
+              </Link>
+              <button
+                type="button"
+                onClick={handleExportDocument}
+                className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+              >
+                📥 Export
+              </button>
+              {documents.length > 0 && (
+                <button
+                  type="button"
+                  onClick={handleExportWorkspace}
+                  className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+                >
+                  📦 Export All
+                </button>
+              )}
+              <Link href="/settings">
+                <button
+                  type="button"
+                  className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+                >
+                  ⚙️ Settings
+                </button>
+              </Link>
+              <div className="border-t border-gray-200 my-2"></div>
+              <div className="px-4 py-2 text-sm text-gray-500">
+                🔐 End-to-end encrypted
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Editor Content */}
+        <div className="pt-20 pb-24 px-6 max-w-4xl mx-auto min-h-screen">
+          <BlockEditor
+            initialContent={currentDocument.content}
+            onSave={handleSave}
+            autoSave={true}
+            showToolbar={false}
+          />
+        </div>
+
+        {/* Bottom Formatting Toolbar - Scrollable */}
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-lg">
+          <div className="max-w-4xl mx-auto px-6 py-3 overflow-x-auto">
+            <div className="flex items-center justify-start gap-2 min-w-max">
+              {/* Text Formatting */}
+              <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors font-bold flex-shrink-0">
+                B
+              </button>
+              <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors italic flex-shrink-0">
+                I
+              </button>
+              <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors flex-shrink-0">
+                ⟨/⟩
+              </button>
+              <div className="h-6 w-px bg-gray-300 mx-2 flex-shrink-0"></div>
+              {/* Block Formatting */}
+              <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors text-sm flex-shrink-0">
+                H1
+              </button>
+              <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors text-sm flex-shrink-0">
+                H2
+              </button>
+              <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors text-sm flex-shrink-0">
+                H3
+              </button>
+              <div className="h-6 w-px bg-gray-300 mx-2 flex-shrink-0"></div>
+              <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors flex-shrink-0">
+                •
+              </button>
+              <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors flex-shrink-0">
+                1.
+              </button>
+              <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors flex-shrink-0">
+                ☑
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Share Toast Notification */}
+        {showShareToast && (
+          <div className="fixed bottom-20 right-6 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg animate-fade-in">
+            <div className="flex items-center gap-2">
+              <svg
+                aria-hidden="true"
+                focusable="false"
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+              <span>Share link copied to clipboard!</span>
+            </div>
+            <p className="text-xs mt-1 opacity-90">Link expires in 24 hours</p>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Workspace view when no document is open
   return (
     <div className="min-h-screen relative flex">
-      <FruityBackground />
+      <LeatherBackground />
 
       {/* Sidebar */}
       <div className="relative z-10 fade-in">
@@ -290,15 +574,7 @@ function WorkspaceContent() {
           <GlassCard className="mb-6 fade-in-delay-1">
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div className="flex items-center gap-4">
-                {currentDocument ? (
-                  <EditableTitle
-                    title={currentDocument.metadata.title}
-                    onSave={handleTitleChange}
-                    className="text-2xl font-bold text-leather-100"
-                  />
-                ) : (
-                  <h2 className="text-2xl font-bold text-leather-100">Workspace</h2>
-                )}
+                <h2 className="text-2xl font-bold text-leather-100">Workspace</h2>
                 {initialized && (
                   <span className="text-xs text-leather-300 px-2 py-1 rounded-full glass-card">
                     🔐 Encrypted
@@ -306,115 +582,100 @@ function WorkspaceContent() {
                 )}
               </div>
               <div className="flex items-center gap-2 flex-wrap">
-                <FruityButton variant="parchment" size="sm" onClick={handleCreateDocument}>
+                <LeatherButton variant="parchment" size="sm" onClick={handleCreateDocument}>
                   ➕ New Document
-                </FruityButton>
+                </LeatherButton>
                 <Link href="/templates">
-                  <FruityButton variant="parchment" size="sm">
+                  <LeatherButton variant="parchment" size="sm">
                     📄 Templates
-                  </FruityButton>
+                  </LeatherButton>
                 </Link>
-                {currentDocument && (
-                  <FruityButton variant="parchment" size="sm" onClick={handleExportDocument}>
-                    📥 Export
-                  </FruityButton>
-                )}
                 {documents.length > 0 && (
-                  <FruityButton variant="parchment" size="sm" onClick={handleExportWorkspace}>
+                  <LeatherButton variant="parchment" size="sm" onClick={handleExportWorkspace}>
                     📦 Export All
-                  </FruityButton>
+                  </LeatherButton>
                 )}
                 <Link href="/settings">
-                  <FruityButton variant="parchment" size="sm">
+                  <LeatherButton variant="parchment" size="sm">
                     ⚙️ Settings
-                  </FruityButton>
+                  </LeatherButton>
                 </Link>
               </div>
             </div>
           </GlassCard>
 
-          {/* Editor or Welcome */}
-          {currentDocument ? (
-            <GlassCard className="min-h-[600px] fade-in-delay-2">
-              <BlockEditor
-                initialContent={currentDocument.content}
-                onSave={handleSave}
-                autoSave={true}
-              />
+          {/* Welcome Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <GlassCard hover className="fade-in-delay-2">
+              <div className="p-4">
+                <div className="text-4xl mb-4">📝</div>
+                <h3 className="text-xl font-bold mb-2 text-leather-100">
+                  Create Your First Note
+                </h3>
+                <p className="text-leather-300 mb-4">
+                  Start writing with end-to-end encryption. Your notes are secure from the moment you type them.
+                </p>
+                <LeatherButton variant="leather" size="sm" onClick={handleCreateDocument}>
+                  Create Note
+                </LeatherButton>
+              </div>
             </GlassCard>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <GlassCard hover className="fade-in-delay-2">
-                <div className="p-4">
-                  <div className="text-4xl mb-4">📝</div>
-                  <h3 className="text-xl font-bold mb-2 text-leather-100">
-                    Create Your First Note
-                  </h3>
-                  <p className="text-leather-300 mb-4">
-                    Start writing with end-to-end encryption. Your notes are secure from the moment you type them.
-                  </p>
-                  <FruityButton variant="leather" size="sm" onClick={handleCreateDocument}>
-                    Create Note
-                  </FruityButton>
-                </div>
-              </GlassCard>
 
-              <GlassCard hover className="fade-in-delay-3">
-                <div className="p-4">
-                  <div className="text-4xl mb-4">📄</div>
-                  <h3 className="text-xl font-bold mb-2 text-leather-100">
-                    Use a Template
-                  </h3>
-                  <p className="text-leather-300 mb-4">
-                    Get started quickly with pre-built templates for journals, meetings, projects, and more.
-                  </p>
-                  <Link href="/templates">
-                    <FruityButton variant="leather" size="sm">
-                      Browse Templates
-                    </FruityButton>
-                  </Link>
-                </div>
-              </GlassCard>
+            <GlassCard hover className="fade-in-delay-3">
+              <div className="p-4">
+                <div className="text-4xl mb-4">📄</div>
+                <h3 className="text-xl font-bold mb-2 text-leather-100">
+                  Use a Template
+                </h3>
+                <p className="text-leather-300 mb-4">
+                  Get started quickly with pre-built templates for journals, meetings, projects, and more.
+                </p>
+                <Link href="/templates">
+                  <LeatherButton variant="leather" size="sm">
+                    Browse Templates
+                  </LeatherButton>
+                </Link>
+              </div>
+            </GlassCard>
 
-              <GlassCard hover className="fade-in">
-                <div className="p-4">
-                  <div className="text-4xl mb-4">🔒</div>
-                  <h3 className="text-xl font-bold mb-2 text-leather-100">
-                    Your Privacy Matters
-                  </h3>
-                  <p className="text-leather-300 mb-4">
-                    All documents use AES-256-GCM encryption. Master keys are stored locally in your browser.
-                  </p>
-                  <Link href="/settings">
-                    <FruityButton variant="parchment" size="sm">
-                      Security Settings
-                    </FruityButton>
-                  </Link>
-                </div>
-              </GlassCard>
+            <GlassCard hover className="fade-in">
+              <div className="p-4">
+                <div className="text-4xl mb-4">🔒</div>
+                <h3 className="text-xl font-bold mb-2 text-leather-100">
+                  Your Privacy Matters
+                </h3>
+                <p className="text-leather-300 mb-4">
+                  All documents use AES-256-GCM encryption. Master keys are stored locally in your browser.
+                </p>
+                <Link href="/settings">
+                  <LeatherButton variant="parchment" size="sm">
+                    Security Settings
+                  </LeatherButton>
+                </Link>
+              </div>
+            </GlassCard>
 
-              <GlassCard hover className="fade-in-delay-1">
-                <div className="p-4">
-                  <div className="text-4xl mb-4">📥</div>
-                  <h3 className="text-xl font-bold mb-2 text-leather-100">
-                    Export Anytime
-                  </h3>
-                  <p className="text-leather-300 mb-4">
-                    Your data is yours. Export as Markdown or ZIP files whenever you want.
-                  </p>
-                  {documents.length > 0 ? (
-                    <FruityButton variant="parchment" size="sm" onClick={handleExportWorkspace}>
-                      Export Workspace
-                    </FruityButton>
-                  ) : (
-                    <FruityButton variant="parchment" size="sm" disabled>
-                      No Documents Yet
-                    </FruityButton>
-                  )}
-                </div>
-              </GlassCard>
-            </div>
-          )}
+            <GlassCard hover className="fade-in-delay-1">
+              <div className="p-4">
+                <div className="text-4xl mb-4">📥</div>
+                <h3 className="text-xl font-bold mb-2 text-leather-100">
+                  Export Anytime
+                </h3>
+                <p className="text-leather-300 mb-4">
+                  Your data is yours. Export as Markdown or ZIP files whenever you want.
+                </p>
+                {documents.length > 0 ? (
+                  <LeatherButton variant="parchment" size="sm" onClick={handleExportWorkspace}>
+                    Export Workspace
+                  </LeatherButton>
+                ) : (
+                  <LeatherButton variant="parchment" size="sm" disabled>
+                    No Documents Yet
+                  </LeatherButton>
+                )}
+              </div>
+            </GlassCard>
+          </div>
 
           {/* Info Banner */}
           <GlassCard className="mt-6 fade-in-delay-2">
@@ -438,12 +699,17 @@ function WorkspaceContent() {
   );
 }
 
+/**
+ * Renders the workspace page wrapped in a Suspense boundary, providing a loading fallback UI.
+ *
+ * @returns The workspace page React element that displays a loading card until WorkspaceContent is ready.
+ */
 export default function WorkspacePage() {
   return (
     <Suspense
       fallback={
         <div className="min-h-screen relative flex items-center justify-center">
-          <FruityBackground />
+          <LeatherBackground />
           <GlassCard className="relative z-10">
             <div className="p-8 text-center">
               <div className="text-4xl mb-4">⏳</div>

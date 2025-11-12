@@ -1,11 +1,18 @@
 "use client";
 
 import React, { useState } from "react";
-import Link from "next/link";
-import FruityBackground from "@/components/ui/FruityBackground";
+import LeatherBackground from "@/components/ui/LeatherBackground";
 import GlassCard from "@/components/ui/GlassCard";
-import FruityButton from "@/components/ui/FruityButton";
+import LeatherButton from "@/components/ui/LeatherButton";
+import TopMenu from "@/components/ui/TopMenu";
 
+/**
+ * Render the application Settings page with security, export, privacy, and self-hosting sections.
+ *
+ * Includes an "Export Workspace" action that simulates exporting workspace data by toggling an in-progress state and showing a notification.
+ *
+ * @returns A React element representing the Settings page.
+ */
 export default function SettingsPage() {
   const [exportInProgress, setExportInProgress] = useState(false);
 
@@ -20,19 +27,18 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-screen relative">
-      <FruityBackground />
+      <LeatherBackground />
+      
+      {/* Top Menu */}
+      <div className="relative z-10">
+        <TopMenu currentPage="Settings" />
+      </div>
 
       <main className="relative z-10 px-6 py-12">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="mb-12 fade-in">
-            <Link href="/">
-              <FruityButton variant="parchment" size="sm">
-                ← Back to Home
-              </FruityButton>
-            </Link>
-
-            <h1 className="text-5xl font-bold mt-8 mb-4 text-leather-100">
+            <h1 className="text-5xl font-bold mb-4 text-leather-100">
               Settings
             </h1>
             <p className="text-lg text-leather-300">
@@ -41,7 +47,7 @@ export default function SettingsPage() {
           </div>
 
           {/* Security Settings */}
-          <GlassCard className="mb-6 fade-in-delay-1">
+          <GlassCard className="mb-6 settings-card">
             <h2 className="text-2xl font-bold mb-4 text-leather-100">
               🔒 Security
             </h2>
@@ -91,7 +97,7 @@ export default function SettingsPage() {
           </GlassCard>
 
           {/* Export Settings */}
-          <GlassCard className="mb-6 fade-in-delay-2">
+          <GlassCard className="mb-6 settings-card">
             <h2 className="text-2xl font-bold mb-4 text-leather-100">
               📥 Export & Backup
             </h2>
@@ -103,14 +109,14 @@ export default function SettingsPage() {
                 <p className="text-sm text-leather-300 mb-4">
                   Download all your documents as Markdown files in a ZIP archive
                 </p>
-                <FruityButton
+                <LeatherButton
                   variant="leather"
                   size="md"
                   onClick={handleExportWorkspace}
                   disabled={exportInProgress}
                 >
                   {exportInProgress ? "Exporting..." : "Export Workspace"}
-                </FruityButton>
+                </LeatherButton>
               </div>
 
               <div className="pt-4 border-t border-leather-700">
@@ -125,7 +131,7 @@ export default function SettingsPage() {
           </GlassCard>
 
           {/* Privacy Settings */}
-          <GlassCard className="mb-6 fade-in-delay-3">
+          <GlassCard className="mb-6 settings-card">
             <h2 className="text-2xl font-bold mb-4 text-leather-100">
               🕵️ Privacy
             </h2>

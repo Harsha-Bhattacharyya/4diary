@@ -882,7 +882,7 @@ test.describe('Home Page Tests', () => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
     
-    // Check that FruityBackground component rendered
+    // Check that LeatherBackground component rendered
     const background = page.locator('.fixed.inset-0.-z-10');
     
     if (await background.count() > 0) {
@@ -912,7 +912,7 @@ test.describe('Component Prop Variations', () => {
     }
   });
 
-  test('FruityButton should support different variants', async ({ page }) => {
+  test('LeatherButton should support different variants', async ({ page }) => {
     await page.goto('/workspace');
     await page.waitForLoadState('networkidle');
     

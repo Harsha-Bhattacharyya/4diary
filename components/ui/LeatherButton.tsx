@@ -2,7 +2,7 @@
 
 import React from "react";
 
-interface FruityButtonProps {
+interface LeatherButtonProps {
   children: React.ReactNode;
   onClick?: () => void;
   className?: string;
@@ -12,7 +12,19 @@ interface FruityButtonProps {
   type?: "button" | "submit" | "reset";
 }
 
-export default function FruityButton({
+/**
+ * Render a styled button with leather-themed variants and configurable size and behavior.
+ *
+ * @param children - Content displayed inside the button.
+ * @param onClick - Optional click handler invoked when the button is activated.
+ * @param className - Additional CSS classes appended to the button.
+ * @param variant - Visual style: "gradient", "leather", or "parchment".
+ * @param size - Size preset: "sm", "md", or "lg".
+ * @param disabled - When true, disables the button and reduces its opacity.
+ * @param type - Button type attribute ("button", "submit", or "reset").
+ * @returns The configured JSX button element.
+ */
+export default function LeatherButton({
   children,
   onClick,
   className = "",
@@ -20,7 +32,7 @@ export default function FruityButton({
   size = "md",
   disabled = false,
   type = "button",
-}: FruityButtonProps) {
+}: LeatherButtonProps) {
   const sizeClasses = {
     sm: "px-4 py-2 text-sm",
     md: "px-6 py-3 text-base",

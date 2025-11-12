@@ -1,0 +1,21 @@
+# Code Owners
+# These owners will be the default owners for everything in the repo.
+# Unless a later match takes precedence, they will be requested for
+# review when someone opens a pull request.
+
+* @Harsha-Bhattacharyya
+
+# Encryption and security related files
+/lib/crypto/ @Harsha-Bhattacharyya
+/app/api/ @Harsha-Bhattacharyya
+
+# Documentation
+*.md @Harsha-Bhattacharyya
+/docs/ @Harsha-Bhattacharyya
+
+# Configuration files
+*.json @Harsha-Bhattacharyya
+*.yml @Harsha-Bhattacharyya
+*.yaml @Harsha-Bhattacharyya
+Dockerfile @Harsha-Bhattacharyya
+docker-compose.yml @Harsha-Bhattacharyya
