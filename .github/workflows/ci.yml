@@ -35,4 +35,3 @@ jobs:
     
     - name: Run tests
       run: npm test || echo "No tests configured"
-      continue-on-error: true
