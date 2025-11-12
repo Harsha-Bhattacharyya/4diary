@@ -28,8 +28,14 @@ export async function POST(request: NextRequest) {
     }
 
     const db = await getDatabase();
-    const usersCollection = db.collection("users");
+    if (!db) {
+      return NextResponse.json(
+        { error: "Database unavailable" },
+        { status: 500 }
+      );
+    }
 
+    const usersCollection = db.collection("users");
     // Check if user already exists
     const existingUser = await usersCollection.findOne({ email });
     if (existingUser) {
