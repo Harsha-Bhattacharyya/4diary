@@ -14,7 +14,7 @@ export async function POST() {
   );
 
   // Clear session cookie
-  response.cookies.delete("session");
+  response.cookies.delete("session", { path: "/" });
 
   return response;
 }
