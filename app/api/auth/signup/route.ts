@@ -2,44 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDatabase } from "@/lib/mongodb";
 import bcrypt from "bcrypt";
 import { SignJWT } from "jose";
-
-/**
- * Derives a deterministic 256-bit encryption key from a password and email.
- *
- * @param password - The user's password used as the derivation input.
- * @param email - The user's email used as the PBKDF2 salt to ensure determinism.
- * @returns A base64-encoded 32-byte (256-bit) encryption key.
- */
-async function deriveKeyFromPassword(
-  password: string,
-  email: string
-): Promise<string> {
-  const encoder = new TextEncoder();
-  const passwordBuffer = encoder.encode(password);
-  const saltBuffer = encoder.encode(email); // Use email as salt for deterministic key
-
-  const key = await crypto.subtle.importKey(
-    "raw",
-    passwordBuffer,
-    "PBKDF2",
-    false,
-    ["deriveBits"]
-  );
-
-  const derivedBits = await crypto.subtle.deriveBits(
-    {
-      name: "PBKDF2",
-      salt: saltBuffer,
-      iterations: 100000,
-      hash: "SHA-256",
-    },
-    key,
-    256
-  );
-
-  // Convert to base64 for storage
-  return Buffer.from(derivedBits).toString("base64");
-}
+import { deriveKeyFromPassword } from "@/lib/crypto-utils";
 
 /**
  * Handle signup requests and create a new user account.
