@@ -81,9 +81,15 @@ export async function POST(request: NextRequest) {
     const encryptionKey = await deriveKeyFromPassword(password, email);
 
     // Create session token
-    const secret = new TextEncoder().encode(
-      process.env.JWT_SECRET || "fallback-secret-key"
-    );
+    if (!process.env.JWT_SECRET) {
+      console.error("JWT_SECRET environment variable is not configured");
+      return NextResponse.json(
+        { error: "Server configuration error" },
+        { status: 500 }
+      );
+    }
+    
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET);
     const token = await new SignJWT({ email, encryptionKey })
       .setProtectedHeader({ alg: "HS256" })
       .setExpirationTime("7d")
