@@ -173,6 +173,7 @@ This will start:
               <div className="flex flex-wrap gap-2">
                 {sections.map((section, index) => (
                   <button
+                    type="button"
                     key={section.id}
                     onClick={() => setCurrentSectionIndex(index)}
                     className={`px-3 py-1 rounded-full transition-colors ${
