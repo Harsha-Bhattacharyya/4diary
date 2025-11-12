@@ -108,10 +108,17 @@ export default function TopMenu({ currentPage = "Home" }: TopMenuProps) {
       
       {/* Backdrop - outside the relative container */}
       {menuOpen && (
-        <div
-          className="fixed inset-0"
+        <button
+          type="button"
+          aria-label="Close menu"
+          className="fixed inset-0 cursor-default"
           onClick={() => setMenuOpen(false)}
-        />
+          onKeyDown={(event) => {
+            if (event.key === "Escape" || event.key === "Enter" || event.key === " ") {
+              setMenuOpen(false);
+            }
+          }}
+        ></button>
       )}
     </>
   );
