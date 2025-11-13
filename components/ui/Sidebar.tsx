@@ -101,6 +101,7 @@ export default function Sidebar({
                 {/* Documents in Folder */}
                 {docs.map((doc) => (
                   <button
+                    type="button"
                     key={doc.id}
                     onClick={() => onDocumentClick(doc.id)}
                     className="w-full text-left px-3 py-2 rounded-md text-[#E8DCC4] hover:bg-[#3D3426] transition-colors flex items-center gap-2"
