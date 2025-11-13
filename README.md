@@ -5,13 +5,35 @@ A privacy-focused, end-to-end encrypted note-taking application built with Next.
 
 ## ✨ Features
 
+### Core Privacy & Security
 - 🔒 **End-to-End Encryption**: AES-256-GCM encryption using Web Crypto API
+- 🔐 **Zero Knowledge**: Server never sees unencrypted content
+- 🔑 **Email Authentication**: Secure sign-up and login with session cookies
+
+### Document Management
 - ✍️ **Notion-like Editor**: Rich text editing with BlockNote
 - 📁 **Smart Organization**: Folders, tags, favorites, and archives
+- 📄 **Templates**: Pre-built templates for various use cases
+- 😀 **Emoji Icons**: Visual identification with emoji document icons
+- ⚡ **Quick Note**: Lightning-fast note capture (Ctrl/Cmd + Q)
+- 📖 **Quick Read**: Distraction-free reader mode
+
+### Collaboration & Sharing
+- 🔗 **Ephemeral Share Links**: Secure, time-limited sharing (24-hour default)
+- 🔓 **Granular Permissions**: View or edit permissions for shared documents
+- 🚫 **Revocable Tokens**: Instantly revoke share access
+- 🔄 **Privacy-First**: Shared content remains encrypted end-to-end
+
+### Advanced Features
+- 📋 **Kanban Boards**: Drag-and-drop task management with encrypted boards
+- 🔗 **Embed Previews**: Rich URL previews with sanitized metadata
 - 📥 **Export Freedom**: Export as Markdown or ZIP files
 - 📦 **Self-Hostable**: Docker-ready deployment
-- 🔐 **Zero Knowledge**: Server never sees unencrypted content
-- 📄 **Templates**: Pre-built templates for various use cases
+
+### UI/UX
+- 🎨 **Leather Theme**: Rich, warm color palette inspired by leather journals
+- 🖥️ **Full-screen Editor**: Distraction-free editing experience
+- 🎯 **Keyboard Shortcuts**: Quick note (Ctrl/Cmd + Q) and more
 
 ## 🚀 Getting Started
 
@@ -19,6 +41,7 @@ A privacy-focused, end-to-end encrypted note-taking application built with Next.
 
 - Node.js 20+ 
 - MongoDB (local or MongoDB Atlas)
+- Redis (optional, for share tokens feature)
 - npm or yarn
 
 ### Development Setup
@@ -34,9 +57,20 @@ cd 4diary
 npm install
 ```
 
-3. Create enviroment variable with your MongoDB URI:
+3. Configure environment variables:
 ```bash
-export MONGODB_URI=mongodb://localhost:27017/4diary
+# Copy the example env file
+cp .env.example .env.local
+
+# Edit .env.local with your configuration
+# Required:
+MONGODB_URI=mongodb://localhost:27017/4diary
+
+# Optional (for share tokens feature):
+REDIS_URL=redis://localhost:6379
+
+# Optional:
+NEXT_PUBLIC_BASE_URL=http://localhost:3000
 ```
 
 4. Run the development server:
@@ -94,9 +128,10 @@ For production, update the `docker-compose.yml` with:
 ### Database Schema
 
 - **workspaces**: User workspaces with encrypted master keys
-- **documents**: Encrypted documents with searchable metadata
+- **documents**: Encrypted documents with searchable metadata (supports doc/board/quick types)
 - **templates**: Document templates
 - **analytics_events**: Privacy-respecting usage analytics
+- **shares** (Redis): Ephemeral share tokens with TTL
 
 ## 📚 Tech Stack
 
@@ -104,9 +139,12 @@ For production, update the `docker-compose.yml` with:
 - **Styling**: Tailwind CSS v4
 - **Editor**: BlockNote
 - **Database**: MongoDB
+- **Cache/Tokens**: Redis (optional)
 - **Encryption**: Web Crypto API
 - **Animation**: Framer Motion
 - **Export**: JSZip
+- **Kanban**: @asseinfo/react-kanban
+- **Emoji Picker**: emoji-picker-react
 
 ## 🔐 Security
 
@@ -116,6 +154,8 @@ For production, update the `docker-compose.yml` with:
 - Server has zero knowledge of content
 - PBKDF2 for password-based key derivation
 - 100,000 iterations for key strengthening
+- Rate limiting on share token creation
+- HTML sanitization for embed previews
 
 ## 📖 Usage
 
@@ -125,6 +165,29 @@ For production, update the `docker-compose.yml` with:
 2. Click "New Document" or choose a template
 3. Start writing - auto-save is enabled
 4. Content is encrypted automatically before saving
+
+### Quick Note (⚡ Fast Capture)
+
+1. Press `Ctrl+Q` (or `Cmd+Q` on Mac) anywhere
+2. Start typing - auto-saved locally
+3. Click "Save to Workspace" when ready
+4. Note is encrypted and synced to your workspace
+
+### Kanban Boards
+
+1. Create a new document with type "board"
+2. Organize tasks in columns (To Do, In Progress, Done)
+3. Drag and drop cards between columns
+4. Board data is fully encrypted like documents
+
+### Sharing Documents
+
+1. Open any document
+2. Click the "Share" button
+3. Configure permissions (view/edit) and expiry time
+4. Copy the generated link
+5. Share the link - it expires automatically after TTL
+6. Revoke access anytime from share settings
 
 ### Using Templates
 
@@ -139,6 +202,18 @@ For production, update the `docker-compose.yml` with:
 2. Click "Export Workspace"
 3. Downloads ZIP with all documents as Markdown files
 4. Maintains folder structure
+
+### Reader Mode (Quick Read)
+
+1. Open any document
+2. Click the "Reader Mode" button
+3. Adjust font size with A-/A+ buttons
+4. Press ESC or click ✕ to exit
+
+## ⌨️ Keyboard Shortcuts
+
+- `Ctrl+Q` / `Cmd+Q`: Toggle Quick Note modal
+- `ESC`: Close Quick Note or Reader Mode
 
 ## 🤝 Contributing
 
