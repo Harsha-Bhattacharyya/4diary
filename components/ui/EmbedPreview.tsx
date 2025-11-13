@@ -95,6 +95,8 @@ export function EmbedPreview({ url, onLoad }: EmbedPreviewProps) {
         <div className="p-2 bg-[#3D3426] flex items-center justify-between">
           <span className="text-sm text-[#C4B8A0]">Embedded: {url}</span>
           <button
+            type="button"
+            aria-label="Close full-page embed"
             onClick={() => setShowFullPage(false)}
             className="text-[#E8DCC4] hover:text-[#C4B8A0] transition-colors"
           >
