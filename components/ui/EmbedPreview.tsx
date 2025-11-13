@@ -126,52 +126,51 @@ export function EmbedPreview({ url, onLoad }: EmbedPreviewProps) {
   }
 
   return (
-    <a
-      href={url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="block border border-[#8B7355] rounded-lg overflow-hidden bg-[#2D2416] hover:border-[#A08465] transition-colors group"
-    >
-      {preview.image && (
-        <div className="aspect-video w-full overflow-hidden bg-[#3D3426]">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={preview.image}
-            alt={preview.title || "Preview"}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-          />
-        </div>
-      )}
-
-      <div className="p-4">
-        {preview.title && (
-          <h3 className="text-lg font-semibold text-[#E8DCC4] mb-2 line-clamp-2">
-            {preview.title}
-          </h3>
+    <div className="border border-[#8B7355] rounded-lg overflow-hidden bg-[#2D2416] hover:border-[#A08465] transition-colors group">
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block"
+      >
+        {preview.image && (
+          <div className="aspect-video w-full overflow-hidden bg-[#3D3426]">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={preview.image}
+              alt={preview.title || "Preview"}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+          </div>
         )}
 
-        {preview.description && (
-          <p className="text-sm text-[#C4B8A0] mb-2 line-clamp-3">
-            {preview.description}
-          </p>
-        )}
+        <div className="p-4">
+          {preview.title && (
+            <h3 className="text-lg font-semibold text-[#E8DCC4] mb-2 line-clamp-2">
+              {preview.title}
+            </h3>
+          )}
 
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-[#A08465]">
-            {preview.siteName || new URL(url).hostname}
-          </span>
-
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              setShowFullPage(true);
-            }}
-            className="text-xs text-[#8B7355] hover:text-[#A08465] underline"
-          >
-            Load full page
-          </button>
+          {preview.description && (
+            <p className="text-sm text-[#C4B8A0] mb-2 line-clamp-3">
+              {preview.description}
+            </p>
+          )}
         </div>
+      </a>
+
+      <div className="flex items-center justify-between px-4 pb-4">
+        <span className="text-xs text-[#A08465]">
+          {preview.siteName || new URL(url).hostname}
+        </span>
+
+        <button
+          type="button"
+          onClick={() => setShowFullPage(true)}
+          className="text-xs text-[#8B7355] hover:text-[#A08465] underline"
+        >
+          Load full page
+        </button>
       </div>
-    </a>
-  );
+    </div>
 }
