@@ -8,6 +8,7 @@ import Sidebar from "@/components/ui/Sidebar";
 import GlassCard from "@/components/ui/GlassCard";
 import LeatherButton from "@/components/ui/LeatherButton";
 import EditableTitle from "@/components/ui/EditableTitle";
+import { QuickNote } from "@/components/ui/QuickNote";
 import dynamic from "next/dynamic";
 import { keyManager } from "@/lib/crypto/keyManager";
 import {
@@ -301,6 +302,33 @@ function WorkspaceContent() {
     }
   };
 
+  const handleSaveQuickNote = async (content: string) => {
+    if (!workspaceId || !userEmail) {
+      throw new Error("Workspace not initialized");
+    }
+
+    try {
+      // Create a new document with the quick note content
+      const newDoc = await createDocument({
+        workspaceId,
+        userId: userEmail,
+        content: [{ type: "paragraph", content: [{ type: "text", text: content }] }],
+        metadata: {
+          title: "Quick Note",
+          type: "quick",
+        },
+      });
+
+      // Reload documents list
+      await loadDocuments(workspaceId, userEmail);
+
+      return newDoc;
+    } catch (err) {
+      console.error("Quick note save error:", err);
+      throw err;
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen relative flex items-center justify-center">
@@ -541,6 +569,13 @@ function WorkspaceContent() {
             <p className="text-xs mt-1 opacity-90">Link expires in 24 hours</p>
           </div>
         )}
+
+        {/* QuickNote Modal - Available globally with Ctrl+Q */}
+        <QuickNote
+          workspaceId={workspaceId}
+          userId={userEmail}
+          onSave={handleSaveQuickNote}
+        />
       </div>
     );
   }
@@ -695,6 +730,13 @@ function WorkspaceContent() {
           </GlassCard>
         </div>
       </main>
+
+      {/* QuickNote Modal - Available globally with Ctrl+Q */}
+      <QuickNote
+        workspaceId={workspaceId}
+        userId={userEmail}
+        onSave={handleSaveQuickNote}
+      />
     </div>
   );
 }
