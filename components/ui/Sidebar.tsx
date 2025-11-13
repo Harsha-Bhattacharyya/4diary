@@ -118,6 +118,7 @@ export default function Sidebar({
         <div className="p-2 flex flex-col items-center gap-2">
           {documents.slice(0, 5).map((doc) => (
             <button
+              type="button"
               key={doc.id}
               onClick={() => onDocumentClick(doc.id)}
               className="w-10 h-10 flex items-center justify-center rounded-md text-[#E8DCC4] hover:bg-[#3D3426] transition-colors"
@@ -125,7 +126,6 @@ export default function Sidebar({
             >
               📄
             </button>
-          ))}
         </div>
       )}
     </div>
