@@ -48,7 +48,6 @@ function WorkspaceContent() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(null);
-  const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [showShareToast, setShowShareToast] = useState(false);
 
   // Check authentication
@@ -176,7 +175,6 @@ function WorkspaceContent() {
         throw new Error(data.error || "Failed to create share link");
       }
 
-      setShareUrl(data.shareUrl);
       setShowShareToast(true);
 
       // Copy to clipboard
@@ -302,14 +300,14 @@ function WorkspaceContent() {
     }
   };
 
-  const handleSaveQuickNote = async (content: string) => {
+  const handleSaveQuickNote = async (content: string): Promise<void> => {
     if (!workspaceId || !userEmail) {
       throw new Error("Workspace not initialized");
     }
 
     try {
       // Create a new document with the quick note content
-      const newDoc = await createDocument({
+      await createDocument({
         workspaceId,
         userId: userEmail,
         content: [{ type: "paragraph", content: [{ type: "text", text: content }] }],
@@ -320,9 +318,8 @@ function WorkspaceContent() {
       });
 
       // Reload documents list
-      await loadDocuments(workspaceId, userEmail);
-
-      return newDoc;
+      const updatedDocs = await listDocuments(workspaceId, userEmail);
+      setDocuments(updatedDocs);
     } catch (err) {
       console.error("Quick note save error:", err);
       throw err;

@@ -14,7 +14,10 @@ export async function POST() {
   );
 
   // Clear session cookie
-  response.cookies.delete("session", { path: "/" });
+  response.cookies.set("session", "", {
+    path: "/",
+    maxAge: 0,
+  });
 
   return response;
 }

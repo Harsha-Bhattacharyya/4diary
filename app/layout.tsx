@@ -1,5 +1,20 @@
 import type { Metadata } from "next";
+import { IM_Fell_DW_Pica, IM_Fell_English } from "next/font/google";
 import "./globals.css";
+
+const imFellDWPica = IM_Fell_DW_Pica({
+  weight: ["400"],
+  style: ["normal", "italic"],
+  subsets: ["latin"],
+  variable: "--font-fell-dw-pica",
+});
+
+const imFellEnglish = IM_Fell_English({
+  weight: ["400"],
+  style: ["normal", "italic"],
+  subsets: ["latin"],
+  variable: "--font-fell-english",
+});
 
 export const metadata: Metadata = {
   title: "4diary - Privacy Focused Solution",
@@ -12,12 +27,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        <link href="https://fonts.googleapis.com/css2?family=IM+Fell+DW+Pica:ital@0;1&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet" />
-      </head>
+    <html lang="en" className={`${imFellDWPica.variable} ${imFellEnglish.variable}`}>
       <body className="antialiased">
         {children}
       </body>

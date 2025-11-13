@@ -6,7 +6,7 @@
 "use client";
 
 import React, { useState } from "react";
-import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
+import EmojiPicker, { EmojiClickData, Theme } from "emoji-picker-react";
 
 interface EmojiPickerComponentProps {
   selectedEmoji?: string;
@@ -47,7 +47,7 @@ export function EmojiPickerComponent({
           <div className="absolute z-50 mt-2 left-0">
             <EmojiPicker
               onEmojiClick={handleEmojiClick}
-              theme="dark"
+              theme={Theme.DARK}
               previewConfig={{ showPreview: false }}
             />
           </div>
