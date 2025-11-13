@@ -111,7 +111,11 @@ export function KanbanBoard({
 
       <Board
         initialBoard={board}
-        onCardDragEnd={(newBoard: KanbanBoardData) => !readOnly && handleBoardChange(newBoard)}
+        onCardDragEnd={(newBoard: KanbanBoardData) => {
+          if (!readOnly) {
+            handleBoardChange(newBoard);
+          }
+        }}
         disableColumnDrag
         renderCard={(card: KanbanCard) => (
           <div>
