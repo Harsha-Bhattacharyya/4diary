@@ -74,12 +74,53 @@ function parseMetaTags(html: string): Omit<EmbedPreview, "url"> {
 }
 
 /**
- * Validate URL
+ * Validate URL and prevent SSRF attacks
  */
 function isValidUrl(urlString: string): boolean {
   try {
     const url = new URL(urlString);
-    return url.protocol === "http:" || url.protocol === "https:";
+    
+    // Only allow http and https protocols
+    if (url.protocol !== "http:" && url.protocol !== "https:") {
+      return false;
+    }
+
+    // Block localhost and private IP ranges to prevent SSRF
+    const hostname = url.hostname.toLowerCase();
+    
+    // Block localhost variants
+    if (
+      hostname === "localhost" ||
+      hostname === "127.0.0.1" ||
+      hostname === "0.0.0.0" ||
+      hostname.startsWith("127.") ||
+      hostname === "::1" ||
+      hostname === "[::1]"
+    ) {
+      return false;
+    }
+
+    // Block private IP ranges (RFC 1918)
+    // 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16
+    const ipv4Pattern = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/;
+    const match = hostname.match(ipv4Pattern);
+    if (match) {
+      const [, a, b] = match.map(Number);
+      if (
+        a === 10 || // 10.0.0.0/8
+        (a === 172 && b >= 16 && b <= 31) || // 172.16.0.0/12
+        (a === 192 && b === 168) // 192.168.0.0/16
+      ) {
+        return false;
+      }
+    }
+
+    // Block link-local addresses (169.254.0.0/16)
+    if (hostname.startsWith("169.254.")) {
+      return false;
+    }
+
+    return true;
   } catch {
     return false;
   }
