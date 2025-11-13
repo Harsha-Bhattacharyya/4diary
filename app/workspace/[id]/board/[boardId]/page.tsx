@@ -22,12 +22,35 @@ export default function BoardPage() {
   const [boardData, setBoardData] = useState<KanbanBoardData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [pendingBoard, setPendingBoard] = useState<KanbanBoardData | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
 
-  // Get userId from session/auth (placeholder)
-  const userId = "user@example.com"; // TODO: Get from auth context
+  // Check authentication
+  useEffect(() => {
+    async function checkAuth() {
+      try {
+        const response = await fetch("/api/auth/session");
+        const data = await response.json();
+
+        if (!data.authenticated) {
+          router.push("/auth");
+          return;
+        }
+
+        setUserId(data.email);
+      } catch (err) {
+        console.error("Auth check error:", err);
+        router.push("/auth");
+      }
+    }
+
+    checkAuth();
+  }, [router]);
 
   const loadBoard = React.useCallback(async () => {
+    if (!userId) return;
+    
     setIsLoading(true);
     setError(null);
 
@@ -60,21 +83,39 @@ export default function BoardPage() {
   const handleBoardChange = async (newBoard: KanbanBoardData) => {
     setBoardData(newBoard);
 
-    // Auto-save with debounce
-    if (!isSaving) {
-      setIsSaving(true);
-      try {
+    // If a save is already in progress, store the latest board state
+    if (isSaving) {
+      setPendingBoard(newBoard);
+      return;
+    }
+
+    // Start saving
+    setIsSaving(true);
+    let boardToSave = newBoard;
+
+    try {
+      // Save the board
+      while (boardToSave) {
         await updateDocument({
           id: boardId,
-          userId,
-          content: [{ board: newBoard }],
+          userId: userId!,
+          content: [{ board: boardToSave }],
         });
-      } catch (err) {
-        console.error("Failed to save board:", err);
-        alert("Failed to save changes");
-      } finally {
-        setIsSaving(false);
+
+        // Check if there's a pending update
+        if (pendingBoard && pendingBoard !== boardToSave) {
+          boardToSave = pendingBoard;
+          setPendingBoard(null);
+        } else {
+          boardToSave = null;
+          setPendingBoard(null);
+        }
       }
+    } catch (err) {
+      console.error("Failed to save board:", err);
+      alert("Failed to save changes");
+    } finally {
+      setIsSaving(false);
     }
   };
 

@@ -6,18 +6,18 @@
 
 "use client";
 
-import React, { useState } from "react";
-import Board from "@asseinfo/react-kanban";
-import "@asseinfo/react-kanban/dist/styles.css";
+import React, { useState, useEffect } from "react";
+import { Board } from "@caldwell619/react-kanban";
+import "@caldwell619/react-kanban/dist/styles.css";
 
 export interface KanbanCard {
-  id: string;
+  id: string | number;
   title: string;
   description?: string;
 }
 
 export interface KanbanColumn {
-  id: string;
+  id: string | number;
   title: string;
   cards: KanbanCard[];
 }
@@ -39,7 +39,38 @@ export function KanbanBoard({
 }: KanbanBoardProps) {
   const [board, setBoard] = useState(initialData);
 
-  const handleBoardChange = (newBoard: KanbanBoardData) => {
+  useEffect(() => {
+    setBoard(initialData);
+  }, [initialData]);
+
+  const handleCardDragEnd = (
+    card: KanbanCard,
+    source?: { fromPosition: number; fromColumnId?: string | number },
+    destination?: { toPosition: number; toColumnId?: string | number }
+  ) => {
+    if (readOnly || !source?.fromColumnId || !destination?.toColumnId) return;
+
+    const newColumns = board.columns.map(col => ({
+      ...col,
+      cards: [...col.cards]
+    }));
+
+    // Find source and destination columns
+    const sourceCol = newColumns.find(col => col.id === source.fromColumnId);
+    const destCol = newColumns.find(col => col.id === destination.toColumnId);
+
+    if (!sourceCol || !destCol) return;
+
+    // Remove card from source
+    const cardIndex = sourceCol.cards.findIndex(c => c.id === card.id);
+    if (cardIndex > -1) {
+      sourceCol.cards.splice(cardIndex, 1);
+    }
+
+    // Add card to destination
+    destCol.cards.splice(destination.toPosition, 0, card);
+
+    const newBoard = { columns: newColumns };
     setBoard(newBoard);
     onBoardChange(newBoard);
   };
@@ -111,12 +142,9 @@ export function KanbanBoard({
 
       <Board
         initialBoard={board}
-        onCardDragEnd={(newBoard: KanbanBoardData) => {
-          if (!readOnly) {
-            handleBoardChange(newBoard);
-          }
-        }}
+        onCardDragEnd={handleCardDragEnd}
         disableColumnDrag
+        disableCardDrag={readOnly}
         renderCard={(card: KanbanCard) => (
           <div>
             <div className="react-kanban-card__title">{card.title}</div>

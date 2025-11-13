@@ -365,7 +365,8 @@ function WorkspaceContent() {
   // Full-screen editor mode when a document is open
   if (currentDocument) {
     return (
-      <div className="min-h-screen relative bg-white">
+      <>
+        <div className="min-h-screen relative bg-white">
         {/* Top Bar with Menu and Title */}
         <div className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm">
           <div className="flex items-center justify-between px-6 py-4">
@@ -566,20 +567,22 @@ function WorkspaceContent() {
             <p className="text-xs mt-1 opacity-90">Link expires in 24 hours</p>
           </div>
         )}
-
-        {/* QuickNote Modal - Available globally with Ctrl+Q */}
-        <QuickNote
-          workspaceId={workspaceId}
-          userId={userEmail}
-          onSave={handleSaveQuickNote}
-        />
       </div>
+
+      {/* QuickNote Modal - Available globally with Ctrl+Q */}
+      <QuickNote
+        workspaceId={workspaceId}
+        userId={userEmail}
+        onSave={handleSaveQuickNote}
+      />
+    </>
     );
   }
 
   // Workspace view when no document is open
   return (
-    <div className="min-h-screen relative flex">
+    <>
+      <div className="min-h-screen relative flex">
       <LeatherBackground />
 
       {/* Sidebar */}
@@ -727,14 +730,15 @@ function WorkspaceContent() {
           </GlassCard>
         </div>
       </main>
-
-      {/* QuickNote Modal - Available globally with Ctrl+Q */}
-      <QuickNote
-        workspaceId={workspaceId}
-        userId={userEmail}
-        onSave={handleSaveQuickNote}
-      />
     </div>
+
+    {/* QuickNote Modal - Available globally with Ctrl+Q */}
+    <QuickNote
+      workspaceId={workspaceId}
+      userId={userEmail}
+      onSave={handleSaveQuickNote}
+    />
+  </>
   );
 }
 

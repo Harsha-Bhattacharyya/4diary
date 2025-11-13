@@ -16,7 +16,7 @@
     "test:report": "playwright show-report"
   },
   "dependencies": {
-    "@asseinfo/react-kanban": "^2.2.0",
+    "@caldwell619/react-kanban": "^0.0.12",
     "@blocknote/core": "^0.41.1",
     "@blocknote/react": "^0.41.1",
     "@sentry/nextjs": "^10.23.0",

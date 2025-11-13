@@ -5,6 +5,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import sanitizeHtml from "sanitize-html";
+import { promises as dns } from "dns";
 
 interface EmbedPreview {
   url: string;
@@ -74,9 +75,59 @@ function parseMetaTags(html: string): Omit<EmbedPreview, "url"> {
 }
 
 /**
- * Validate URL and prevent SSRF attacks
+ * Check if an IP address is private/reserved
  */
-function isValidUrl(urlString: string): boolean {
+function isPrivateIP(ip: string): boolean {
+  // Check for localhost
+  if (ip === "127.0.0.1" || ip === "::1" || ip === "0.0.0.0") {
+    return true;
+  }
+
+  // IPv4 checks
+  const ipv4Pattern = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/;
+  const match = ip.match(ipv4Pattern);
+  if (match) {
+    const [, a, b, c] = match.map(Number);
+    
+    // Validate each octet is 0-255
+    if (a > 255 || b > 255 || c > 255) {
+      return true; // Invalid IP, treat as private
+    }
+
+    // Block private ranges (RFC 1918)
+    if (
+      a === 10 || // 10.0.0.0/8
+      (a === 172 && b >= 16 && b <= 31) || // 172.16.0.0/12
+      (a === 192 && b === 168) || // 192.168.0.0/16
+      a === 127 || // 127.0.0.0/8 loopback
+      (a === 169 && b === 254) || // 169.254.0.0/16 link-local
+      a === 0 || // 0.0.0.0/8 current network
+      a >= 224 // 224.0.0.0/4 multicast and reserved
+    ) {
+      return true;
+    }
+  }
+
+  // IPv6 checks
+  const ipv6Lower = ip.toLowerCase();
+  if (
+    ipv6Lower.startsWith("::1") || // loopback
+    ipv6Lower.startsWith("::ffff:127.") || // IPv4-mapped loopback
+    ipv6Lower.startsWith("fc") || // Unique local address fc00::/7
+    ipv6Lower.startsWith("fd") || // Unique local address fd00::/8
+    ipv6Lower.startsWith("fe80:") || // Link-local fe80::/10
+    ipv6Lower === "::" // Unspecified
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Validate URL and prevent SSRF attacks by resolving DNS
+ */
+async function isValidUrl(urlString: string): Promise<boolean> {
   try {
     const url = new URL(urlString);
     
@@ -85,10 +136,9 @@ function isValidUrl(urlString: string): boolean {
       return false;
     }
 
-    // Block localhost and private IP ranges to prevent SSRF
     const hostname = url.hostname.toLowerCase();
     
-    // Block localhost variants
+    // Block localhost variants immediately
     if (
       hostname === "localhost" ||
       hostname === "127.0.0.1" ||
@@ -100,23 +150,27 @@ function isValidUrl(urlString: string): boolean {
       return false;
     }
 
-    // Block private IP ranges (RFC 1918)
-    // 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16
+    // If hostname is already an IP, check it directly
     const ipv4Pattern = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/;
-    const match = hostname.match(ipv4Pattern);
-    if (match) {
-      const [, a, b] = match.map(Number);
-      if (
-        a === 10 || // 10.0.0.0/8
-        (a === 172 && b >= 16 && b <= 31) || // 172.16.0.0/12
-        (a === 192 && b === 168) // 192.168.0.0/16
-      ) {
-        return false;
-      }
+    const ipv6Pattern = /^[0-9a-f:]+$/i;
+    
+    if (ipv4Pattern.test(hostname) || ipv6Pattern.test(hostname)) {
+      return !isPrivateIP(hostname);
     }
 
-    // Block link-local addresses (169.254.0.0/16)
-    if (hostname.startsWith("169.254.")) {
+    // Resolve hostname to IP addresses
+    try {
+      const addresses = await dns.resolve(hostname);
+      
+      // Check all resolved IPs - reject if any are private
+      for (const address of addresses) {
+        if (isPrivateIP(address)) {
+          return false;
+        }
+      }
+    } catch (dnsError) {
+      // DNS resolution failed - reject the URL
+      console.error("DNS resolution failed for", hostname, dnsError);
       return false;
     }
 
@@ -139,19 +193,29 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "URL is required" }, { status: 400 });
     }
 
-    // Validate URL and prevent SSRF
-    if (!isValidUrl(url)) {
+    // Validate URL and prevent SSRF (DNS resolution included)
+    const urlValid = await isValidUrl(url);
+    if (!urlValid) {
       return NextResponse.json({ error: "Invalid URL" }, { status: 400 });
     }
 
-    // Fetch page (SSRF risk mitigated by isValidUrl blocking localhost and private IPs)
-    // This is the intended functionality of the embed preview feature
+    // Fetch page (SSRF risk mitigated by DNS resolution and IP blocking)
+    // Disable redirects to prevent redirect-based SSRF bypass
     const response = await fetch(url, {
       headers: {
         "User-Agent": "4diary-embed-bot/1.0",
       },
       signal: AbortSignal.timeout(5000), // 5 second timeout
+      redirect: "manual", // Don't follow redirects automatically
     });
+
+    // Check for redirects and reject them
+    if (response.status >= 300 && response.status < 400) {
+      return NextResponse.json(
+        { error: "Redirects are not allowed" },
+        { status: 400 }
+      );
+    }
 
     if (!response.ok) {
       return NextResponse.json(

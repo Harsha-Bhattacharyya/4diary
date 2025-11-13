@@ -173,4 +173,5 @@ export function EmbedPreview({ url, onLoad }: EmbedPreviewProps) {
         </button>
       </div>
     </div>
+  );
 }
