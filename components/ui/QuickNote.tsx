@@ -98,6 +98,7 @@ export function QuickNote({ onSave }: QuickNoteProps) {
               </h2>
             </div>
             <button
+              type="button"
               onClick={handleClose}
               className="text-[#C4B8A0] hover:text-[#E8DCC4] transition-colors"
               aria-label="Close"
