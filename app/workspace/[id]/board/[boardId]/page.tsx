@@ -92,6 +92,7 @@ export default function BoardPage() {
         <div className="text-center">
           <div className="text-[#E8DCC4] text-xl mb-4">{error}</div>
           <button
+            type="button"
             onClick={() => router.back()}
             className="px-4 py-2 bg-[#8B7355] text-[#E8DCC4] rounded-md hover:bg-[#A08465] transition-colors"
           >
@@ -109,6 +110,7 @@ export default function BoardPage() {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
+              type="button"
               onClick={() => router.back()}
               className="text-[#E8DCC4] hover:text-[#C4B8A0] transition-colors"
             >
