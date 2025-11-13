@@ -126,9 +126,11 @@ export default function Sidebar({
               onClick={() => onDocumentClick(doc.id)}
               className="w-10 h-10 flex items-center justify-center rounded-md text-[#E8DCC4] hover:bg-[#3D3426] transition-colors"
               title={doc.title}
+              aria-label={doc.title}
             >
               📄
             </button>
+          ))}
         </div>
       )}
     </div>
