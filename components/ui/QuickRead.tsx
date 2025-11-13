@@ -58,6 +58,7 @@ export function QuickRead({
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
+              type="button"
               onClick={onClose}
               className="text-[#E8DCC4] hover:text-[#C4B8A0] transition-colors"
               aria-label="Close reader mode"
@@ -84,6 +85,7 @@ export function QuickRead({
           <div className="flex items-center gap-2">
             {/* Font size controls */}
             <button
+              type="button"
               onClick={decreaseFontSize}
               className="px-3 py-1 bg-[#3D3426] text-[#E8DCC4] rounded-md hover:bg-[#4D4436] transition-colors"
               aria-label="Decrease font size"
@@ -94,6 +96,7 @@ export function QuickRead({
               {fontSize}px
             </span>
             <button
+              type="button"
               onClick={increaseFontSize}
               className="px-3 py-1 bg-[#3D3426] text-[#E8DCC4] rounded-md hover:bg-[#4D4436] transition-colors"
               aria-label="Increase font size"
@@ -104,6 +107,7 @@ export function QuickRead({
             {/* Summarizer */}
             {enableSummarizer && (
               <button
+                type="button"
                 onClick={generateSummary}
                 disabled={isGeneratingSummary}
                 className="ml-4 px-4 py-1 bg-[#8B7355] text-[#E8DCC4] rounded-md hover:bg-[#A08465] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
