@@ -33,6 +33,10 @@ export default function BoardPage() {
 
     try {
       const doc = await getDocument(boardId, userId);
+      if (!doc) {
+        setError("Board not found");
+        return;
+      }
 
       // Parse board data from document content
       if (Array.isArray(doc.content) && doc.content.length > 0) {
