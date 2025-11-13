@@ -52,6 +52,7 @@ export default function Sidebar({
           <h2 className="text-lg font-semibold text-[#E8DCC4]">Workspace</h2>
         )}
         <button
+          type="button"
           onClick={() => onToggle(!collapsed)}
           className="text-[#E8DCC4] hover:text-[#C4B8A0] transition-colors p-2"
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
@@ -61,6 +62,7 @@ export default function Sidebar({
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
+            aria-hidden="true"
           >
             {collapsed ? (
               <path
