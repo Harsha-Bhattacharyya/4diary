@@ -42,9 +42,7 @@ export default function Sidebar({
 
   return (
     <div
-      className={`h-screen bg-[#2D2416] border-r border-[#8B7355] transition-all duration-300 ${
-        collapsed ? "w-16" : "w-64"
-      }`}
+      className={`h-screen bg-[#2D2416] border-r border-[#8B7355] transition-all duration-300 ${ collapsed ? "w-16" : "w-64" } ${collapsed ? "z-16" : "z-[1000]" }`}
     >
       {/* Header */}
       <div className="p-4 border-b border-[#8B7355] flex items-center justify-between">
