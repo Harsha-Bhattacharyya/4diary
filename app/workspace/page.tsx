@@ -570,11 +570,7 @@ function WorkspaceContent() {
       </div>
 
       {/* QuickNote Modal - Available globally with Ctrl+Q */}
-      <QuickNote
-        workspaceId={workspaceId}
-        userId={userEmail}
-        onSave={handleSaveQuickNote}
-      />
+      <QuickNote onSave={handleSaveQuickNote} />
     </>
     );
   }
@@ -733,11 +729,7 @@ function WorkspaceContent() {
     </div>
 
     {/* QuickNote Modal - Available globally with Ctrl+Q */}
-    <QuickNote
-      workspaceId={workspaceId}
-      userId={userEmail}
-      onSave={handleSaveQuickNote}
-    />
+    <QuickNote onSave={handleSaveQuickNote} />
   </>
   );
 }

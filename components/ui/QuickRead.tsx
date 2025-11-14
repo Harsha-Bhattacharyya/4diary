@@ -6,7 +6,7 @@
 
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 
 interface QuickReadProps {
   content: string;
@@ -15,18 +15,54 @@ interface QuickReadProps {
   enableSummarizer?: boolean; // Disabled by default for privacy
 }
 
+const FONT_SIZE_KEY = "quickread-fontsize";
+const DEFAULT_FONT_SIZE = 16;
+const MIN_FONT_SIZE = 12;
+const MAX_FONT_SIZE = 32;
+
 export function QuickRead({
   content,
   title,
   onClose,
   enableSummarizer = false,
 }: QuickReadProps) {
-  const [fontSize, setFontSize] = useState(16);
+  // Load font size from localStorage with lazy initialization
+  const [fontSize, setFontSize] = useState(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem(FONT_SIZE_KEY);
+      if (saved) {
+        const parsed = parseInt(saved, 10);
+        if (!isNaN(parsed) && parsed >= MIN_FONT_SIZE && parsed <= MAX_FONT_SIZE) {
+          return parsed;
+        }
+      }
+    }
+    return DEFAULT_FONT_SIZE;
+  });
   const [summary, setSummary] = useState<string | null>(null);
   const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
 
-  const increaseFontSize = () => setFontSize((s) => Math.min(s + 2, 32));
-  const decreaseFontSize = () => setFontSize((s) => Math.max(s - 2, 12));
+  const increaseFontSize = useCallback(() => {
+    setFontSize((s) => {
+      const newSize = Math.min(s + 2, MAX_FONT_SIZE);
+      if (typeof window !== "undefined") {
+        localStorage.setItem(FONT_SIZE_KEY, String(newSize));
+      }
+      return newSize;
+    });
+  }, []);
+
+  const decreaseFontSize = useCallback(() => {
+    setFontSize((s) => {
+      const newSize = Math.max(s - 2, MIN_FONT_SIZE);
+      if (typeof window !== "undefined") {
+        localStorage.setItem(FONT_SIZE_KEY, String(newSize));
+      }
+      return newSize;
+    });
+  }, []);
 
   const generateSummary = async () => {
     if (!enableSummarizer) {
@@ -51,13 +87,51 @@ export function QuickRead({
     }
   };
 
+  // ESC key handler
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape" || event.code === "Escape") {
+        onClose();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [onClose]);
+
+  // Focus management - move focus to close button on open and restore on close
+  useEffect(() => {
+    // Store the previously focused element
+    previousFocusRef.current = document.activeElement as HTMLElement;
+
+    // Move focus to the close button
+    if (closeButtonRef.current) {
+      closeButtonRef.current.focus();
+    }
+
+    // Restore focus on unmount
+    return () => {
+      if (previousFocusRef.current) {
+        previousFocusRef.current.focus();
+      }
+    };
+  }, []);
+
   return (
-    <div className="fixed inset-0 bg-[#1A1410] z-50 overflow-auto">
+    <div
+      className="fixed inset-0 bg-[#1A1410] z-50 overflow-auto"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="reader-mode-label"
+    >
       {/* Header */}
       <div className="sticky top-0 bg-[#2D2416] border-b border-[#8B7355] z-10">
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
+              ref={closeButtonRef}
               type="button"
               onClick={onClose}
               className="text-[#E8DCC4] hover:text-[#C4B8A0] transition-colors"
@@ -79,7 +153,9 @@ export function QuickRead({
                 />
               </svg>
             </button>
-            <span className="text-xl text-[#E8DCC4]">📖 Reader Mode</span>
+            <span id="reader-mode-label" className="text-xl text-[#E8DCC4]">
+              📖 Reader Mode
+            </span>
           </div>
 
           <div className="flex items-center gap-2">

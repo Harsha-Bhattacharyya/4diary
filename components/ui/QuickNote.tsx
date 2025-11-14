@@ -10,8 +10,6 @@ import React, { useState, useEffect } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 
 interface QuickNoteProps {
-  workspaceId?: string;
-  userId?: string;
   onSave?: (content: string) => Promise<void>;
 }
 
