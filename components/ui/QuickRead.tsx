@@ -136,7 +136,7 @@ export function QuickRead({
         )}
 
         <div
-          className="text-[#E8DCC4] leading-relaxed"
+          className="text-[#E8DCC4] leading-relaxed whitespace-pre-wrap"
           style={{ fontSize: `${fontSize}px` }}
         >
           {content}
