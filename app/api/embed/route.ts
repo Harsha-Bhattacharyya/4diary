@@ -20,6 +20,10 @@ interface EmbedPreview {
  * Extract meta tag content
  */
 function extractMetaContent(html: string, property: string): string | undefined {
+  // Validate property contains only safe characters
+  if (!/^[a-zA-Z0-9:_-]+$/.test(property)) {
+    return undefined;
+  }
   const patterns = [
     new RegExp(`<meta\\s+property=["']${property}["']\\s+content=["']([^"']+)["']`, "i"),
     new RegExp(`<meta\\s+content=["']([^"']+)["']\\s+property=["']${property}["']`, "i"),
