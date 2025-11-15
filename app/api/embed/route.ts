@@ -17,7 +17,11 @@ interface EmbedPreview {
 }
 
 /**
- * Extract meta tag content
+ * Retrieve the value of a meta tag's `content` attribute that matches the given property or name.
+ *
+ * @param html - HTML source to search for the meta tag
+ * @param property - Meta `property` or `name` to match (for example `og:title` or `description`)
+ * @returns The matched `content` value if present, `undefined` otherwise
  */
 function extractMetaContent(html: string, property: string): string | undefined {
   // Validate property contains only safe characters
@@ -42,7 +46,10 @@ function extractMetaContent(html: string, property: string): string | undefined 
 }
 
 /**
- * Extract title from HTML
+ * Retrieve the document title from an HTML string.
+ *
+ * @param html - The HTML source to search for a `<title>` element
+ * @returns The text content of the first `<title>` element, or `undefined` if none is found
  */
 function extractTitle(html: string): string | undefined {
   const match = html.match(/<title>([^<]+)<\/title>/i);
@@ -50,7 +57,16 @@ function extractTitle(html: string): string | undefined {
 }
 
 /**
- * Parse OG and meta tags from HTML
+ * Extracts Open Graph, Twitter, and basic meta information from provided HTML and returns a preview object excluding the URL.
+ *
+ * The returned fields prefer Open Graph values, then Twitter card values, then generic meta/title fallbacks where applicable.
+ *
+ * @returns An object with extracted preview fields:
+ * - `title` — the best available title (OG title, then Twitter title, then the document `<title>`), or `undefined` if none found.
+ * - `description` — the best available description (OG description, then Twitter description, then generic `description` meta), or `undefined`.
+ * - `image` — the preview image URL from OG or Twitter tags, or `undefined`.
+ * - `siteName` — the site name from `og:site_name`, or `undefined`.
+ * - `type` — the content type from `og:type`, or `undefined`.
  */
 function parseMetaTags(html: string): Omit<EmbedPreview, "url"> {
   // Sanitize HTML first (only keep meta tags and title)
@@ -79,7 +95,10 @@ function parseMetaTags(html: string): Omit<EmbedPreview, "url"> {
 }
 
 /**
- * Check if an IP address is private/reserved
+ * Determine whether an IP address is private, reserved, loopback, link-local, unspecified, multicast, or otherwise non-routable.
+ *
+ * @param ip - The IP address string to test (IPv4 or IPv6 representation)
+ * @returns `true` if the address is private, reserved, loopback, link-local, unspecified, multicast, or invalid; `false` otherwise.
  */
 function isPrivateIP(ip: string): boolean {
   // Check for localhost
@@ -129,7 +148,10 @@ function isPrivateIP(ip: string): boolean {
 }
 
 /**
- * Validate URL and prevent SSRF attacks by resolving DNS
+ * Validate a candidate URL and guard against SSRF by enforcing allowed schemes and ensuring resolved addresses are publicly routable.
+ *
+ * @param urlString - The URL to validate (as a string).
+ * @returns `true` if the URL uses `http`/`https`, does not use localhost or other reserved hostnames, and does not resolve to any private or non-routable IP address; `false` otherwise.
  */
 async function isValidUrl(urlString: string): Promise<boolean> {
   try {
@@ -185,9 +207,10 @@ async function isValidUrl(urlString: string): Promise<boolean> {
 }
 
 /**
- * GET - Fetch URL preview
- * Query: ?url=...
- * Returns: { url, title?, description?, image?, siteName?, type? }
+ * Handle GET requests and return an embed preview for the URL given in the `url` query parameter.
+ *
+ * @param request - NextRequest containing a `url` query parameter pointing to the target page to preview.
+ * @returns JSON response: on success (200) an object with `url` and optional `title`, `description`, `image`, `siteName`, and `type`; on client errors (400) an `{ error }` message for missing/invalid URL, non-HTML content, or redirects; on timeout (408) an `{ error: "Request timeout" }`; on server errors (500) an `{ error }` message.
  */
 export async function GET(request: NextRequest) {
   try {

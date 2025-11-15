@@ -5,8 +5,11 @@ import path from 'path';
 export const dynamic = 'force-dynamic';
 
 /**
- * GET /api/docs
- * Returns the documentation structure (categories and files)
+ * Produces the documentation index derived from the project's `docs/` directory.
+ *
+ * Top-level directories inside `docs/` are treated as categories; each category aggregates `.md` files and extracts a title from the first H1 or falls back to the filename.
+ *
+ * @returns A JSON response containing a `categories` array. Each category includes `name`, `slug`, and `files` (each file has `name`, `slug`, and `title`). If the `docs` directory is missing or empty, `categories` is an empty array. On failure, returns a 500 JSON response with an `error` message.
  */
 export async function GET() {
   try {

@@ -42,6 +42,11 @@ export default function DocsPage() {
 
   // Load documentation structure
   useEffect(() => {
+    /**
+     * Loads the documentation structure from the API and initializes local state, including selecting the first category/file when available.
+     *
+     * On success, updates `docsStructure` and, if the structure contains at least one file, sets `currentCategory`, `currentFile`, and `expandedCategories` to the first category/file. On failure, logs the error to the console. Always clears the `loading` flag when finished.
+     */
     async function loadStructure() {
       try {
         const response = await fetch('/api/docs');
@@ -69,6 +74,14 @@ export default function DocsPage() {
   useEffect(() => {
     if (!currentCategory || !currentFile) return;
 
+    /**
+     * Load the markdown content and title for the currently selected document into component state.
+     *
+     * Fetches document data from the docs content API using the current category and file slugs,
+     * sets the loading state while the request is in progress, and updates `content` and `title`
+     * on success. On failure, logs the error to the console and replaces `content` with a
+     * markdown-formatted error message. Always clears the loading state when finished.
+     */
     async function loadContent() {
       setLoading(true);
       try {

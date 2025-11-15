@@ -20,6 +20,17 @@ const DEFAULT_FONT_SIZE = 16;
 const MIN_FONT_SIZE = 12;
 const MAX_FONT_SIZE = 32;
 
+/**
+ * Displays content in a distraction-free reader UI with adjustable, persisted font size and an optional privacy-preserving summarizer.
+ *
+ * The component renders a full-screen reader-mode dialog with controls to increase/decrease font size (persisted to localStorage), keyboard support to exit via Escape, focus management on open/close, and an optional summarizer action.
+ *
+ * @param content - The main text content to display in reader mode
+ * @param title - Optional title shown above the content
+ * @param onClose - Callback invoked to exit reader mode
+ * @param enableSummarizer - When true, shows a "Summarize" button to generate a privacy-preserving summary; defaults to `false`
+ * @returns The QuickRead reader-mode React element
+ */
 export function QuickRead({
   content,
   title,

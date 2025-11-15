@@ -5,8 +5,18 @@ import path from 'path';
 export const dynamic = 'force-dynamic';
 
 /**
- * GET /api/docs/content?category=getting-started&file=introduction
- * Returns the markdown content of a specific documentation file
+ * Serve markdown content and metadata for a documentation file specified by query parameters.
+ *
+ * Expects `category` and `file` query parameters (e.g., ?category=getting-started&file=introduction).
+ * Returns specific error responses for missing parameters (400), paths outside the docs directory (403),
+ * missing files (404), and internal failures (500).
+ *
+ * @returns A JSON object with:
+ *  - `content`: the full markdown text of the file
+ *  - `title`: the first H1 heading if present, otherwise the provided file name
+ *  - `category`: the requested category
+ *  - `file`: the requested file name
+ * On error, returns an object with an `error` message and an appropriate HTTP status code.
  */
 export async function GET(request: Request) {
   try {

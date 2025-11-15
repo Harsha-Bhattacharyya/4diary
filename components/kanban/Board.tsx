@@ -32,6 +32,18 @@ interface KanbanBoardProps {
   readOnly?: boolean;
 }
 
+/**
+ * Render an interactive Kanban board and synchronize its state with external data.
+ *
+ * The component maintains local board state initialized from `initialData`, updates the state
+ * when `initialData` changes, and invokes `onBoardChange` with the updated board when cards
+ * are moved (unless `readOnly` is true).
+ *
+ * @param initialData - Initial Kanban board data used to populate columns and cards; updates to this prop replace the local board state.
+ * @param onBoardChange - Called with the new `KanbanBoardData` after a card is moved between columns.
+ * @param readOnly - When `true`, disables card dragging and applies read-only styling.
+ * @returns The Kanban board React element.
+ */
 export function KanbanBoard({
   initialData,
   onBoardChange,
@@ -164,7 +176,11 @@ export function KanbanBoard({
 }
 
 /**
- * Default empty board structure
+ * Create a default Kanban board with three empty columns.
+ *
+ * The board contains columns titled "To Do", "In Progress", and "Done", each with no cards.
+ *
+ * @returns A `KanbanBoardData` object with the three empty columns
  */
 export function createEmptyBoard(): KanbanBoardData {
   return {

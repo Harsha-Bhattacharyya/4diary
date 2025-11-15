@@ -15,6 +15,14 @@ interface QuickNoteProps {
 
 const QUICK_NOTE_KEY = "4diary_quick_note";
 
+/**
+ * Provides a modal quick-note UI with local autosave and an optional server save action.
+ *
+ * The component toggles open with the platform modifier + Q hotkey, auto-loads and auto-saves content to localStorage under `QUICK_NOTE_KEY`, and exposes an optional `onSave` callback to persist the note to a server/workspace.
+ *
+ * @param onSave - Optional callback invoked with the current note content to persist it to a remote workspace; when provided the UI shows a "Save to Workspace" action.
+ * @returns The modal UI when open, or `null` when closed.
+ */
 export function QuickNote({ onSave }: QuickNoteProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [content, setContent] = useState("");

@@ -21,6 +21,18 @@ interface SidebarProps {
   onToggle: (collapsed: boolean) => void;
 }
 
+/**
+ * Render a workspace sidebar that displays documents grouped by folder and supports collapse/expand.
+ *
+ * When expanded, the component shows folder headers with document rows; when collapsed, it shows up to five document icon buttons.
+ * Clicking a document calls `onDocumentClick` with that document's id. Toggling the header button calls `onToggle` with the new collapsed state.
+ *
+ * @param documents - The list of documents to display. Each document may specify a `folder`; documents without one appear under "Unfiled".
+ * @param onDocumentClick - Called with a document's `id` when the user selects that document.
+ * @param collapsed - Whether the sidebar is currently collapsed.
+ * @param onToggle - Called with the updated `collapsed` value when the user toggles the sidebar.
+ * @returns A React element rendering the sidebar UI.
+ */
 export default function Sidebar({
   documents,
   onDocumentClick,
