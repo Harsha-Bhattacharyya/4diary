@@ -1,122 +1,116 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeHighlight from 'rehype-highlight';
+import rehypeRaw from 'rehype-raw';
+import 'highlight.js/styles/github-dark.css';
 import LeatherBackground from "@/components/ui/LeatherBackground";
 import GlassCard from "@/components/ui/GlassCard";
-import LeatherButton from "@/components/ui/LeatherButton";
 import TopMenu from "@/components/ui/TopMenu";
 
+interface DocFile {
+  name: string;
+  slug: string;
+  title: string;
+}
+
+interface DocCategory {
+  name: string;
+  slug: string;
+  files: DocFile[];
+}
+
+interface DocsStructure {
+  categories: DocCategory[];
+}
+
 /**
- * Renders the documentation page with navigation controls and content sections.
- *
- * @returns The React element for the documentation page layout
+ * Renders a dynamic documentation page that reads markdown files from the docs directory
+ * and displays them with a sidebar navigation
  */
 export default function DocsPage() {
+  const [docsStructure, setDocsStructure] = useState<DocsStructure | null>(null);
+  const [currentCategory, setCurrentCategory] = useState<string | null>(null);
+  const [currentFile, setCurrentFile] = useState<string | null>(null);
+  const [content, setContent] = useState<string>("");
+  const [title, setTitle] = useState<string>("Documentation");
+  const [loading, setLoading] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
 
-  const sections = [
-    {
-      id: "getting-started",
-      title: "Getting Started",
-      content: `Welcome to 4Diary! This guide will help you get started with our privacy-focused note-taking application.
-
-**What is 4Diary?**
-
-4Diary is an end-to-end encrypted note-taking application that prioritizes your privacy. All your notes are encrypted on your device before being sent to the server, ensuring that no one but you can read your content.
-
-**Key Features:**
-- End-to-end encryption with AES-256-GCM
-- Zero-knowledge architecture
-- Self-hostable
-- Free and open-source (FLOSS)`,
-    },
-    {
-      id: "installation",
-      title: "Installation",
-      content: `**Prerequisites:**
-- Node.js 20+
-- MongoDB (local or MongoDB Atlas)
-- npm or yarn
-
-**Development Setup:**
-
-1. Clone the repository:
-   \`git clone https://github.com/Harsha-Bhattacharyya/4diary.git\`
-   \`cd 4diary\`
-
-2. Install dependencies:
-   \`npm install\`
-
-3. Create environment variable with your MongoDB URI:
-   \`export MONGODB_URI=mongodb://localhost:27017/4diary\`
-
-4. Run the development server:
-   \`npm run dev\`
-
-5. Open http://localhost:3000 in your browser`,
-    },
-    {
-      id: "encryption",
-      title: "Encryption & Security",
-      content: `**How Encryption Works:**
-
-1. **Master Key Generation**: A master encryption key is generated in your browser and stored securely in IndexedDB.
-
-2. **Document Keys**: Each document has its own unique encryption key.
-
-3. **Key Encryption**: Document keys are encrypted with your master key.
-
-4. **Content Encryption**: Document content is encrypted with the document key using AES-256-GCM.
-
-5. **Zero Knowledge**: Only encrypted data reaches the server. The server never has access to your unencrypted content or keys.
-
-**Security Best Practices:**
-- Never share your encryption keys
-- Regularly export your data as backup
-- Use a secure password manager
-- Keep your browser and device secure`,
-    },
-    {
-      id: "self-hosting",
-      title: "Self-Hosting",
-      content: `**Docker Deployment:**
-
-4Diary can be easily self-hosted using Docker:
-
-1. Clone the repository
-2. Create \`.env.local\` with your configuration
-3. Run: \`docker-compose up -d\`
-
-This will start:
-- Next.js app on port 3000
-- MongoDB on port 27017
-- Redis on port 6379
-
-**Production Considerations:**
-- Update MongoDB credentials
-- Configure SSL/TLS certificates
-- Set up reverse proxy (nginx/Caddy)
-- Configure environment variables
-- Enable monitoring and logging`,
-    },
-  ];
-
-  const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
-  const currentSection = sections[currentSectionIndex];
-
-  const goToPrevious = () => {
-    if (currentSectionIndex > 0) {
-      setCurrentSectionIndex(currentSectionIndex - 1);
+  // Load documentation structure
+  useEffect(() => {
+    async function loadStructure() {
+      try {
+        const response = await fetch('/api/docs');
+        const data: DocsStructure = await response.json();
+        setDocsStructure(data);
+        
+        // Auto-select first document
+        if (data.categories.length > 0 && data.categories[0].files.length > 0) {
+          const firstCategory = data.categories[0];
+          const firstFile = firstCategory.files[0];
+          setCurrentCategory(firstCategory.slug);
+          setCurrentFile(firstFile.slug);
+          setExpandedCategories(new Set([firstCategory.slug]));
+        }
+      } catch (error) {
+        console.error('Error loading docs structure:', error);
+      } finally {
+        setLoading(false);
+      }
     }
+    loadStructure();
+  }, []);
+
+  // Load document content when selection changes
+  useEffect(() => {
+    if (!currentCategory || !currentFile) return;
+
+    async function loadContent() {
+      setLoading(true);
+      try {
+        const response = await fetch(
+          `/api/docs/content?category=${currentCategory}&file=${currentFile}`
+        );
+        const data = await response.json();
+        setContent(data.content || '');
+        setTitle(data.title || 'Documentation');
+      } catch (error) {
+        console.error('Error loading document:', error);
+        setContent('# Error\n\nFailed to load documentation.');
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadContent();
+  }, [currentCategory, currentFile]);
+
+  const toggleCategory = (categorySlug: string) => {
+    setExpandedCategories((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(categorySlug)) {
+        newSet.delete(categorySlug);
+      } else {
+        newSet.add(categorySlug);
+      }
+      return newSet;
+    });
   };
 
-  const goToNext = () => {
-    if (currentSectionIndex < sections.length - 1) {
-      setCurrentSectionIndex(currentSectionIndex + 1);
+  const selectDocument = (categorySlug: string, fileSlug: string) => {
+    setCurrentCategory(categorySlug);
+    setCurrentFile(fileSlug);
+    // Auto-expand category when selecting a file
+    if (!expandedCategories.has(categorySlug)) {
+      setExpandedCategories((prev) => new Set([...prev, categorySlug]));
     }
   };
 
   return (
-    <div className="min-h-screen relative">
+    <div className="min-h-screen relative flex flex-col">
       <LeatherBackground />
 
       {/* Top Menu */}
@@ -124,72 +118,199 @@ This will start:
         <TopMenu currentPage="Docs" />
       </div>
 
-      {/* Header */}
-      <div className="relative z-10 px-6 py-6 fade-in">
-        <div className="max-w-4xl mx-auto">
-          <div className="mb-4">
-            <h1 className="text-4xl font-bold text-leather-100 mb-2">Documentation</h1>
-            <div className="h-1 w-20 bg-leather-300 rounded"></div>
+      {/* Main Container */}
+      <div className="relative z-10 flex-1 flex overflow-hidden">
+        {/* Sidebar */}
+        <aside
+          className={`${
+            sidebarOpen ? 'w-80' : 'w-0'
+          } transition-all duration-300 overflow-hidden flex-shrink-0`}
+        >
+          <div className="h-full p-4 overflow-y-auto">
+            <GlassCard className="h-full">
+              <div className="p-4">
+                <h2 className="text-xl font-bold text-leather-100 mb-4">
+                  Documentation
+                </h2>
+                
+                {!docsStructure || docsStructure.categories.length === 0 ? (
+                  <p className="text-leather-300 text-sm">No documentation found</p>
+                ) : (
+                  <nav className="space-y-2">
+                    {docsStructure.categories.map((category) => (
+                      <div key={category.slug}>
+                        <button
+                          type="button"
+                          onClick={() => toggleCategory(category.slug)}
+                          className="w-full flex items-center justify-between px-3 py-2 text-left text-leather-100 hover:bg-leather-900/30 rounded-md transition-colors"
+                        >
+                          <span className="font-semibold text-sm">{category.name}</span>
+                          <span className="text-leather-400">
+                            {expandedCategories.has(category.slug) ? '▼' : '▶'}
+                          </span>
+                        </button>
+                        
+                        {expandedCategories.has(category.slug) && (
+                          <div className="ml-4 mt-1 space-y-1">
+                            {category.files.map((file) => (
+                              <button
+                                type="button"
+                                key={file.slug}
+                                onClick={() => selectDocument(category.slug, file.slug)}
+                                className={`w-full text-left px-3 py-2 text-sm rounded-md transition-colors ${
+                                  currentCategory === category.slug && currentFile === file.slug
+                                    ? 'bg-leather-300 text-leather-900 font-medium'
+                                    : 'text-leather-300 hover:bg-leather-900/20 hover:text-leather-100'
+                                }`}
+                              >
+                                {file.title}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </nav>
+                )}
+              </div>
+            </GlassCard>
           </div>
-        </div>
+        </aside>
+
+        {/* Main Content */}
+        <main className="flex-1 overflow-y-auto">
+          <div className="max-w-4xl mx-auto p-6">
+            {/* Toggle Sidebar Button */}
+            <button
+              type="button"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="mb-4 px-4 py-2 bg-leather-900/30 hover:bg-leather-900/50 text-leather-100 rounded-md transition-colors text-sm"
+            >
+              {sidebarOpen ? '← Hide Sidebar' : '→ Show Sidebar'}
+            </button>
+
+            {/* Header */}
+            <div className="mb-6 fade-in">
+              <h1 className="text-4xl font-bold text-leather-100 mb-2">{title}</h1>
+              <div className="h-1 w-20 bg-leather-300 rounded"></div>
+            </div>
+
+            {/* Content */}
+            <GlassCard className="fade-in-delay-1">
+              <div className="p-6 sm:p-8">
+                {loading ? (
+                  <div className="text-leather-300 text-center py-8">
+                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-leather-300"></div>
+                    <p className="mt-4">Loading documentation...</p>
+                  </div>
+                ) : (
+                  <div className="prose prose-invert max-w-none docs-content">
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      rehypePlugins={[rehypeHighlight, rehypeRaw]}
+                      components={{
+                        h1: ({ children }) => (
+                          <h1 className="text-3xl font-bold text-leather-100 mt-8 mb-4 first:mt-0">
+                            {children}
+                          </h1>
+                        ),
+                        h2: ({ children }) => (
+                          <h2 className="text-2xl font-bold text-leather-100 mt-6 mb-3">
+                            {children}
+                          </h2>
+                        ),
+                        h3: ({ children }) => (
+                          <h3 className="text-xl font-semibold text-leather-100 mt-5 mb-2">
+                            {children}
+                          </h3>
+                        ),
+                        p: ({ children }) => (
+                          <p className="text-leather-300 leading-relaxed mb-4">
+                            {children}
+                          </p>
+                        ),
+                        a: ({ href, children }) => (
+                          <a
+                            href={href}
+                            className="text-leather-200 hover:text-leather-100 underline"
+                            target={href?.startsWith('http') ? '_blank' : undefined}
+                            rel={href?.startsWith('http') ? 'noopener noreferrer' : undefined}
+                          >
+                            {children}
+                          </a>
+                        ),
+                        code: ({ inline, className, children, ...props }: {
+                          inline?: boolean;
+                          className?: string;
+                          children?: React.ReactNode;
+                        }) => {
+                          if (inline) {
+                            return (
+                              <code className="px-1.5 py-0.5 bg-leather-900/50 text-leather-200 rounded text-sm font-mono">
+                                {children}
+                              </code>
+                            );
+                          }
+                          return (
+                            <code className={className} {...props}>
+                              {children}
+                            </code>
+                          );
+                        },
+                        pre: ({ children }) => (
+                          <pre className="bg-[#0d1117] p-4 rounded-lg overflow-x-auto my-4">
+                            {children}
+                          </pre>
+                        ),
+                        ul: ({ children }) => (
+                          <ul className="list-disc list-inside text-leather-300 space-y-2 mb-4">
+                            {children}
+                          </ul>
+                        ),
+                        ol: ({ children }) => (
+                          <ol className="list-decimal list-inside text-leather-300 space-y-2 mb-4">
+                            {children}
+                          </ol>
+                        ),
+                        li: ({ children }) => (
+                          <li className="text-leather-300">{children}</li>
+                        ),
+                        blockquote: ({ children }) => (
+                          <blockquote className="border-l-4 border-leather-300 pl-4 italic text-leather-300 my-4">
+                            {children}
+                          </blockquote>
+                        ),
+                        table: ({ children }) => (
+                          <div className="overflow-x-auto my-4">
+                            <table className="min-w-full border-collapse border border-leather-700">
+                              {children}
+                            </table>
+                          </div>
+                        ),
+                        th: ({ children }) => (
+                          <th className="border border-leather-700 px-4 py-2 bg-leather-900/30 text-leather-100 font-semibold text-left">
+                            {children}
+                          </th>
+                        ),
+                        td: ({ children }) => (
+                          <td className="border border-leather-700 px-4 py-2 text-leather-300">
+                            {children}
+                          </td>
+                        ),
+                        hr: () => (
+                          <hr className="border-t border-leather-700 my-6" />
+                        ),
+                      }}
+                    >
+                      {content}
+                    </ReactMarkdown>
+                  </div>
+                )}
+              </div>
+            </GlassCard>
+          </div>
+        </main>
       </div>
-
-      {/* Main Content */}
-      <main className="relative z-10 px-6 pb-12">
-        <div className="max-w-4xl mx-auto">
-          <GlassCard className="mb-6 fade-in-delay-1">
-            <div className="p-8">
-              <h2 className="text-3xl font-bold text-leather-100 mb-6">
-                {currentSection.title}
-              </h2>
-              <div className="text-leather-300 prose prose-invert max-w-none whitespace-pre-line">
-                {currentSection.content}
-              </div>
-            </div>
-          </GlassCard>
-
-          {/* Navigation */}
-          <div className="flex justify-between items-center fade-in-delay-2">
-            <div>
-              {currentSectionIndex > 0 && (
-                <LeatherButton variant="parchment" onClick={goToPrevious}>
-                  ← Previous — {sections[currentSectionIndex - 1].title}
-                </LeatherButton>
-              )}
-            </div>
-            <div>
-              {currentSectionIndex < sections.length - 1 && (
-                <LeatherButton variant="parchment" onClick={goToNext}>
-                  Next — {sections[currentSectionIndex + 1].title} →
-                </LeatherButton>
-              )}
-            </div>
-          </div>
-
-          {/* Section Navigation */}
-          <GlassCard className="mt-6 fade-in-delay-3">
-            <div className="p-4">
-              <h3 className="text-lg font-bold text-leather-100 mb-3">All Sections</h3>
-              <div className="flex flex-wrap gap-2">
-                {sections.map((section, index) => (
-                  <button
-                    type="button"
-                    key={section.id}
-                    onClick={() => setCurrentSectionIndex(index)}
-                    className={`px-3 py-1 rounded-full transition-colors ${
-                      index === currentSectionIndex
-                        ? "bg-leather-300 text-leather-100"
-                        : "text-leather-300 hover:text-leather-100"
-                    }`}
-                  >
-                    {section.title}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </GlassCard>
-        </div>
-      </main>
     </div>
   );
 }

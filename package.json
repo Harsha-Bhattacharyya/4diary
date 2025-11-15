@@ -16,9 +16,9 @@
     "test:report": "playwright show-report"
   },
   "dependencies": {
-    "@caldwell619/react-kanban": "^0.0.12",
     "@blocknote/core": "^0.41.1",
     "@blocknote/react": "^0.41.1",
+    "@caldwell619/react-kanban": "^0.0.12",
     "@sentry/nextjs": "^10.23.0",
     "@tiptap/extensions": "^3.10.7",
     "@vercel/functions": "^3.3.0",
@@ -33,6 +33,10 @@
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "react-hotkeys-hook": "^5.2.1",
+    "react-markdown": "^10.1.0",
+    "rehype-highlight": "^7.0.2",
+    "rehype-raw": "^7.0.0",
+    "remark-gfm": "^4.0.1",
     "sanitize-html": "^2.17.0",
     "uuid": "^13.0.0"
   },
