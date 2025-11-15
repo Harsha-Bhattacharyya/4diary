@@ -140,6 +140,15 @@ export interface DocumentType {
     title: string; // Unencrypted for search
     tags?: string[];
     folder?: string;
+    emojiIcon?: string; // Emoji icon for the document
+    type?: "doc" | "board" | "quick"; // Document type
+    embedPreviews?: Array<{
+      url: string;
+      title?: string;
+      description?: string;
+      image?: string;
+    }>; // Cached embed previews
+    isQuickReadSaved?: boolean; // Whether quick read mode was saved
   };
   favorite: boolean;
   archived: boolean;

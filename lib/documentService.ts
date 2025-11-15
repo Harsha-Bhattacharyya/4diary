@@ -10,6 +10,15 @@ export interface DocumentMetadata {
   title: string;
   tags?: string[];
   folder?: string;
+  emojiIcon?: string;
+  type?: "doc" | "board" | "quick";
+  embedPreviews?: Array<{
+    url: string;
+    title?: string;
+    description?: string;
+    image?: string;
+  }>;
+  isQuickReadSaved?: boolean;
 }
 
 export interface Document {
