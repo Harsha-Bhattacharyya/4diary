@@ -17,6 +17,14 @@ import {
 // Rate limiting map (in-memory, simple approach)
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 
+/**
+ * Enforces a per-IP rate limit and updates the in-memory counters.
+ *
+ * Uses a 60-second window and allows up to 10 requests per IP within that window. If the window has expired for the IP, the counter and window are reset.
+ *
+ * @param ip - Client IP address used as the rate-limit key
+ * @returns `true` if the request is allowed and the counter is incremented (or reset), `false` if the IP has reached 10 requests within the current 60-second window
+ */
 function checkRateLimit(ip: string): boolean {
   const now = Date.now();
   const limit = rateLimitMap.get(ip);
@@ -36,9 +44,11 @@ function checkRateLimit(ip: string): boolean {
 }
 
 /**
- * POST - Create a new share token
- * Body: { docId, encryptedDocKey, permissions?, ttl? }
- * Returns: { success, token, shareUrl, expiresAt }
+ * Create a new ephemeral share token for a document.
+ *
+ * Requires `docId`, `encryptedDocKey`, and `userId` in the request JSON. Applies default permissions (view allowed, edit disabled unless provided) and a default TTL of 24 hours when not specified, persists the token, and returns a shareable URL and expiration.
+ *
+ * @returns An object with `success: true`, the generated `token`, the `shareUrl`, and `expiresAt` indicating when the token will expire.
  */
 export async function POST(request: NextRequest) {
   try {
@@ -116,9 +126,10 @@ export async function POST(request: NextRequest) {
 }
 
 /**
- * GET - Retrieve a share token
- * Query: ?token=...
- * Returns: { documentId, encryptedDocumentKey, permissions }
+ * Retrieve a share token's payload by token query parameter.
+ *
+ * @param request - Incoming request. Query parameter `token` must contain the share token to retrieve.
+ * @returns The share payload: `documentId`, `encryptedDocumentKey`, `permissions`, and `createdAt`.
  */
 export async function GET(request: NextRequest) {
   try {
@@ -159,9 +170,10 @@ export async function GET(request: NextRequest) {
 }
 
 /**
- * DELETE - Revoke a share token
- * Query: ?token=...&userId=...
- * Returns: { success }
+ * Revokes an existing share token identified by the `token` query parameter if the requester matches `userId`.
+ *
+ * @param request - Incoming request; query must include `token` and `userId` to identify the share and verify ownership.
+ * @returns An object with `success: true` when the share token was revoked.
  */
 export async function DELETE(request: NextRequest) {
   try {
@@ -211,9 +223,13 @@ export async function DELETE(request: NextRequest) {
 }
 
 /**
- * PUT - Update share token (extend TTL or change permissions)
- * Body: { token, userId, ttl?, permissions? }
- * Returns: { success }
+ * Update an existing share token's time-to-live and/or permissions.
+ *
+ * @param body.token - The share token identifier to update
+ * @param body.userId - The ID of the user performing the update; must match the token's creator
+ * @param body.ttl - Optional TTL extension in seconds to apply to the token
+ * @param body.permissions - Optional permissions object to replace the token's current permissions
+ * @returns An object with `success: true` when the update completes successfully
  */
 export async function PUT(request: NextRequest) {
   try {

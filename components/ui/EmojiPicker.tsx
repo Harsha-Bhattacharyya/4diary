@@ -13,6 +13,13 @@ interface EmojiPickerComponentProps {
   onEmojiSelect: (emoji: string) => void;
 }
 
+/**
+ * Render an emoji selection button that opens a dark-themed emoji picker dropdown.
+ *
+ * @param selectedEmoji - Optional emoji character to display on the button; shows a default smiley when omitted
+ * @param onEmojiSelect - Callback invoked with the selected emoji string when the user picks an emoji
+ * @returns A UI element containing the emoji button and, when open, a fullscreen backdrop and a positioned dark-themed emoji picker dropdown
+ */
 export function EmojiPickerComponent({
   selectedEmoji,
   onEmojiSelect,

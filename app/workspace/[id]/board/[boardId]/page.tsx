@@ -14,6 +14,15 @@ import {
 } from "@/components/kanban/Board";
 import { getDocument, updateDocument } from "@/lib/documentService";
 
+/**
+ * Renders the client-side Kanban board page and manages authentication, loading, and saving of board data.
+ *
+ * The component verifies the user session and redirects to /auth if unauthenticated, loads the board document
+ * for the current route and user, displays loading and error states, and renders the KanbanBoard when data is ready.
+ * Changes to the board are persisted via updateDocument with a queued save flow that coalesces updates while a save is in progress.
+ *
+ * @returns The page's JSX element containing the header, status indicators, and the Kanban board UI
+ */
 export default function BoardPage() {
   const params = useParams();
   const router = useRouter();

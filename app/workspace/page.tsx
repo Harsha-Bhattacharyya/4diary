@@ -28,9 +28,9 @@ const BlockEditor = dynamic(() => import("@/components/editor/BlockEditor"), {
 });
 
 /**
- * Render the workspace UI and manage encryption initialization, workspace lifecycle, and document operations.
+ * Render the workspace and coordinate encryption initialization, authentication, workspace lifecycle, and document operations.
  *
- * Manages authentication, initializes local encryption keys, loads or creates the default workspace, lists and opens documents, and provides handlers for creating, saving, sharing, renaming, and exporting documents or the entire workspace. Handles loading and error states and switches between a full-screen editor and a workspace overview.
+ * Handles user session checking, key manager initialization, loading or creating the default workspace, listing and opening documents, and providing handlers for creating, saving, sharing, renaming, and exporting documents or the entire workspace. Switches between a full-screen editor for an open document and the workspace overview when no document is open.
  *
  * @returns The rendered workspace UI as a JSX element
  */

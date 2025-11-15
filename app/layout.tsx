@@ -22,6 +22,15 @@ export const metadata: Metadata = {
   description: "A privacy focused solution for the modern world",
 };
 
+/**
+ * Root layout component that applies the configured global fonts and renders the application content.
+ *
+ * Applies the IM Fell font CSS variable classes to the `<html>` element and wraps `children` inside a
+ * `<body>` with antialiasing enabled.
+ *
+ * @param children - The React nodes to render as the application's page content.
+ * @returns The root HTML structure (`<html>` and `<body>`) that wraps the provided `children`.
+ */
 export default function RootLayout({
   children,
 }: Readonly<{

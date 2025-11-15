@@ -21,6 +21,15 @@ interface EmbedPreviewProps {
   onLoad?: (preview: EmbedPreview) => void;
 }
 
+/**
+ * Renders an embeddable preview card for a URL with an option to open the original page in a full-page iframe.
+ *
+ * Fetches preview metadata from `/api/embed?url=...`, displays a loading skeleton while fetching, shows an error block on failure, and renders either a compact preview card or a full-page sandboxed iframe when requested.
+ *
+ * @param url - The target URL to fetch preview metadata for and to use as the link/iframe source.
+ * @param onLoad - Optional callback invoked with the fetched preview object once it is successfully loaded.
+ * @returns The preview UI element or `null` when no preview data is available.
+ */
 export function EmbedPreview({ url, onLoad }: EmbedPreviewProps) {
   const [preview, setPreview] = useState<EmbedPreview | null>(null);
   const [isLoading, setIsLoading] = useState(true);
