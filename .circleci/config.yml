@@ -1,0 +1,47 @@
+version: 2.1
+
+orbs:
+  node: circleci/node@5.1.0
+
+jobs:
+  test:
+    docker:
+      - image: cimg/node:20.11-browsers
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: Run linter
+          command: npm run lint
+      - run:
+          name: Run tests
+          command: npm run test
+      - store_test_results:
+          path: test-results
+      - store_artifacts:
+          path: playwright-report
+
+  build:
+    docker:
+      - image: cimg/node:20.11
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: Build application
+          command: npm run build
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .next
+
+workflows:
+  version: 2
+  test-and-build:
+    jobs:
+      - test
+      - build:
+          requires:
+            - test
