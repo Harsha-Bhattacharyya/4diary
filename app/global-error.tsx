@@ -152,7 +152,7 @@ export default function GlobalError({ error }: { error: Error & { digest?: strin
           <h1>Something Went Wrong</h1>
           <p>
             We encountered an unexpected error while processing your request. 
-            The issue has been logged and we'll look into it.
+            The issue has been logged and we will look into it.
           </p>
           
           {error.message && (

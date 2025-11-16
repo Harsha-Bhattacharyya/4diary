@@ -44,7 +44,7 @@ export default function NotFound() {
               Page Not Found
             </h2>
             <p className="text-leather-300 text-lg mb-8 max-w-md mx-auto">
-              The page you're looking for has vanished into the leather-bound archives. 
+              The page you are looking for has vanished into the leather-bound archives. 
               It might have been moved, deleted, or never existed.
             </p>
           </motion.div>
