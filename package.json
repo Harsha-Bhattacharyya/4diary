@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@blocknote/core": "^0.41.1",
-    "@blocknote/react": "^0.41.1",
+    "@blocknote/react": "^0.42.0",
     "framer-motion": "^12.23.24",
     "jszip": "^3.10.1",
     "mongodb": "^6.20.0",
