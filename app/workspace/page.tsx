@@ -8,6 +8,7 @@ import Sidebar from "@/components/ui/Sidebar";
 import GlassCard from "@/components/ui/GlassCard";
 import LeatherButton from "@/components/ui/LeatherButton";
 import EditableTitle from "@/components/ui/EditableTitle";
+import { QuickNote } from "@/components/ui/QuickNote";
 import dynamic from "next/dynamic";
 import { keyManager } from "@/lib/crypto/keyManager";
 import {
@@ -27,9 +28,9 @@ const BlockEditor = dynamic(() => import("@/components/editor/BlockEditor"), {
 });
 
 /**
- * Render the workspace UI and manage encryption initialization, workspace lifecycle, and document operations.
+ * Render the workspace and coordinate encryption initialization, authentication, workspace lifecycle, and document operations.
  *
- * Manages authentication, initializes local encryption keys, loads or creates the default workspace, lists and opens documents, and provides handlers for creating, saving, sharing, renaming, and exporting documents or the entire workspace. Handles loading and error states and switches between a full-screen editor and a workspace overview.
+ * Handles user session checking, key manager initialization, loading or creating the default workspace, listing and opening documents, and providing handlers for creating, saving, sharing, renaming, and exporting documents or the entire workspace. Switches between a full-screen editor for an open document and the workspace overview when no document is open.
  *
  * @returns The rendered workspace UI as a JSX element
  */
@@ -47,7 +48,6 @@ function WorkspaceContent() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(null);
-  const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [showShareToast, setShowShareToast] = useState(false);
 
   // Check authentication
@@ -175,7 +175,6 @@ function WorkspaceContent() {
         throw new Error(data.error || "Failed to create share link");
       }
 
-      setShareUrl(data.shareUrl);
       setShowShareToast(true);
 
       // Copy to clipboard
@@ -301,6 +300,32 @@ function WorkspaceContent() {
     }
   };
 
+  const handleSaveQuickNote = async (content: string): Promise<void> => {
+    if (!workspaceId || !userEmail) {
+      throw new Error("Workspace not initialized");
+    }
+
+    try {
+      // Create a new document with the quick note content
+      await createDocument({
+        workspaceId,
+        userId: userEmail,
+        content: [{ type: "paragraph", content: [{ type: "text", text: content }] }],
+        metadata: {
+          title: "Quick Note",
+          type: "quick",
+        },
+      });
+
+      // Reload documents list
+      const updatedDocs = await listDocuments(workspaceId, userEmail);
+      setDocuments(updatedDocs);
+    } catch (err) {
+      console.error("Quick note save error:", err);
+      throw err;
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen relative flex items-center justify-center">
@@ -340,7 +365,8 @@ function WorkspaceContent() {
   // Full-screen editor mode when a document is open
   if (currentDocument) {
     return (
-      <div className="min-h-screen relative bg-white">
+      <>
+        <div className="min-h-screen relative bg-white">
         {/* Top Bar with Menu and Title */}
         <div className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm">
           <div className="flex items-center justify-between px-6 py-4">
@@ -542,12 +568,17 @@ function WorkspaceContent() {
           </div>
         )}
       </div>
+
+      {/* QuickNote Modal - Available globally with Ctrl+Q */}
+      <QuickNote onSave={handleSaveQuickNote} />
+    </>
     );
   }
 
   // Workspace view when no document is open
   return (
-    <div className="min-h-screen relative flex">
+    <>
+      <div className="min-h-screen relative flex">
       <LeatherBackground />
 
       {/* Sidebar */}
@@ -566,136 +597,330 @@ function WorkspaceContent() {
       </div>
 
       {/* Main Content */}
-      <main className={`relative z-10 flex-1 p-8 overflow-y-auto transition-all duration-300 ${
+      <main className={`relative z-10 flex-1 overflow-y-auto transition-all duration-300 ${
         sidebarCollapsed ? 'ml-0' : ''
       }`}>
-        <div className="max-w-5xl mx-auto">
-          {/* Toolbar */}
-          <GlassCard className="mb-6 fade-in-delay-1">
-            <div className="flex items-center justify-between flex-wrap gap-4">
-              <div className="flex items-center gap-4">
-                <h2 className="text-2xl font-bold text-leather-100">Workspace</h2>
-                {initialized && (
-                  <span className="text-xs text-leather-300 px-2 py-1 rounded-full glass-card">
-                    🔐 Encrypted
-                  </span>
-                )}
+        <div className="max-w-7xl mx-auto p-6 sm:p-8">
+          {/* Header Section */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h1 className="text-3xl sm:text-4xl font-bold text-leather-100 mb-2">
+                  My Workspace
+                </h1>
+                <p className="text-leather-300 text-sm sm:text-base">
+                  {userEmail && `Welcome back, ${userEmail.split('@')[0]}`}
+                  {initialized && " • All data encrypted"}
+                </p>
               </div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <LeatherButton variant="parchment" size="sm" onClick={handleCreateDocument}>
-                  ➕ New Document
+              <div className="flex items-center gap-2">
+                <LeatherButton variant="leather" size="sm" onClick={handleCreateDocument}>
+                  <span className="hidden sm:inline">➕ New Document</span>
+                  <span className="sm:hidden">➕</span>
                 </LeatherButton>
                 <Link href="/templates">
                   <LeatherButton variant="parchment" size="sm">
-                    📄 Templates
-                  </LeatherButton>
-                </Link>
-                {documents.length > 0 && (
-                  <LeatherButton variant="parchment" size="sm" onClick={handleExportWorkspace}>
-                    📦 Export All
-                  </LeatherButton>
-                )}
-                <Link href="/settings">
-                  <LeatherButton variant="parchment" size="sm">
-                    ⚙️ Settings
+                    <span className="hidden sm:inline">📄 Templates</span>
+                    <span className="sm:hidden">📄</span>
                   </LeatherButton>
                 </Link>
               </div>
             </div>
-          </GlassCard>
 
-          {/* Welcome Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <GlassCard hover className="fade-in-delay-2">
-              <div className="p-4">
-                <div className="text-4xl mb-4">📝</div>
-                <h3 className="text-xl font-bold mb-2 text-leather-100">
-                  Create Your First Note
-                </h3>
-                <p className="text-leather-300 mb-4">
-                  Start writing with end-to-end encryption. Your notes are secure from the moment you type them.
-                </p>
-                <LeatherButton variant="leather" size="sm" onClick={handleCreateDocument}>
-                  Create Note
-                </LeatherButton>
-              </div>
-            </GlassCard>
-
-            <GlassCard hover className="fade-in-delay-3">
-              <div className="p-4">
-                <div className="text-4xl mb-4">📄</div>
-                <h3 className="text-xl font-bold mb-2 text-leather-100">
-                  Use a Template
-                </h3>
-                <p className="text-leather-300 mb-4">
-                  Get started quickly with pre-built templates for journals, meetings, projects, and more.
-                </p>
-                <Link href="/templates">
-                  <LeatherButton variant="leather" size="sm">
-                    Browse Templates
-                  </LeatherButton>
-                </Link>
-              </div>
-            </GlassCard>
-
-            <GlassCard hover className="fade-in">
-              <div className="p-4">
-                <div className="text-4xl mb-4">🔒</div>
-                <h3 className="text-xl font-bold mb-2 text-leather-100">
-                  Your Privacy Matters
-                </h3>
-                <p className="text-leather-300 mb-4">
-                  All documents use AES-256-GCM encryption. Master keys are stored locally in your browser.
-                </p>
-                <Link href="/settings">
-                  <LeatherButton variant="parchment" size="sm">
-                    Security Settings
-                  </LeatherButton>
-                </Link>
-              </div>
-            </GlassCard>
-
-            <GlassCard hover className="fade-in-delay-1">
-              <div className="p-4">
-                <div className="text-4xl mb-4">📥</div>
-                <h3 className="text-xl font-bold mb-2 text-leather-100">
-                  Export Anytime
-                </h3>
-                <p className="text-leather-300 mb-4">
-                  Your data is yours. Export as Markdown or ZIP files whenever you want.
-                </p>
-                {documents.length > 0 ? (
-                  <LeatherButton variant="parchment" size="sm" onClick={handleExportWorkspace}>
-                    Export Workspace
-                  </LeatherButton>
-                ) : (
-                  <LeatherButton variant="parchment" size="sm" disabled>
-                    No Documents Yet
-                  </LeatherButton>
-                )}
-              </div>
-            </GlassCard>
+            {/* Stats Cards */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+              <GlassCard className="p-4">
+                <div className="text-2xl sm:text-3xl font-bold text-leather-100 mb-1">
+                  {documents.length}
+                </div>
+                <div className="text-xs sm:text-sm text-leather-300">
+                  Total Documents
+                </div>
+              </GlassCard>
+              
+              <GlassCard className="p-4">
+                <div className="text-2xl sm:text-3xl font-bold text-leather-100 mb-1">
+                  {documents.filter(d => {
+                    const lastWeek = Date.now() - 7 * 24 * 60 * 60 * 1000;
+                    return d.updatedAt && new Date(d.updatedAt).getTime() > lastWeek;
+                  }).length}
+                </div>
+                <div className="text-xs sm:text-sm text-leather-300">
+                  Active This Week
+                </div>
+              </GlassCard>
+              
+              <GlassCard className="p-4">
+                <div className="text-2xl sm:text-3xl font-bold text-leather-100 mb-1">
+                  {new Set(documents.map(d => d.metadata.folder).filter(Boolean)).size}
+                </div>
+                <div className="text-xs sm:text-sm text-leather-300">
+                  Folders
+                </div>
+              </GlassCard>
+              
+              <GlassCard className="p-4">
+                <div className="text-2xl sm:text-3xl font-bold text-leather-100 mb-1">
+                  {initialized ? '🔐' : '⚠️'}
+                </div>
+                <div className="text-xs sm:text-sm text-leather-300">
+                  {initialized ? 'Encrypted' : 'Demo Mode'}
+                </div>
+              </GlassCard>
+            </div>
           </div>
 
-          {/* Info Banner */}
-          <GlassCard className="mt-6 fade-in-delay-2">
-            <div className="flex items-center gap-4">
-              <div className="text-3xl">{initialized ? "✅" : "ℹ️"}</div>
-              <div className="flex-1">
-                <h4 className="font-bold text-leather-100">
-                  {initialized ? "Encryption Active" : "Demo Mode"}
-                </h4>
-                <p className="text-sm text-leather-300">
-                  {initialized
-                    ? "All documents are encrypted with AES-256-GCM. Master key stored in IndexedDB."
-                    : "Configure MONGODB_URI environment variable to enable full functionality."}
-                </p>
-              </div>
+          {/* Quick Actions */}
+          <GlassCard className="mb-8 p-4 sm:p-6">
+            <h2 className="text-lg sm:text-xl font-bold text-leather-100 mb-4">
+              Quick Actions
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+              <button
+                onClick={handleCreateDocument}
+                className="flex flex-col items-center justify-center p-4 rounded-lg bg-leather-900/30 hover:bg-leather-900/50 transition-all border border-leather-700/30 hover:border-leather-600"
+              >
+                <span className="text-3xl mb-2">📝</span>
+                <span className="text-xs sm:text-sm text-leather-200 text-center">New Note</span>
+              </button>
+              
+              <Link href="/templates" className="flex flex-col items-center justify-center p-4 rounded-lg bg-leather-900/30 hover:bg-leather-900/50 transition-all border border-leather-700/30 hover:border-leather-600">
+                <span className="text-3xl mb-2">📄</span>
+                <span className="text-xs sm:text-sm text-leather-200 text-center">Templates</span>
+              </Link>
+              
+              <button
+                onClick={() => router.push('/workspace?new=kanban')}
+                className="flex flex-col items-center justify-center p-4 rounded-lg bg-leather-900/30 hover:bg-leather-900/50 transition-all border border-leather-700/30 hover:border-leather-600"
+              >
+                <span className="text-3xl mb-2">📊</span>
+                <span className="text-xs sm:text-sm text-leather-200 text-center">Kanban</span>
+              </button>
+              
+              {documents.length > 0 && (
+                <button
+                  onClick={handleExportWorkspace}
+                  className="flex flex-col items-center justify-center p-4 rounded-lg bg-leather-900/30 hover:bg-leather-900/50 transition-all border border-leather-700/30 hover:border-leather-600"
+                >
+                  <span className="text-3xl mb-2">📦</span>
+                  <span className="text-xs sm:text-sm text-leather-200 text-center">Export</span>
+                </button>
+              )}
+              
+              <Link href="/settings" className="flex flex-col items-center justify-center p-4 rounded-lg bg-leather-900/30 hover:bg-leather-900/50 transition-all border border-leather-700/30 hover:border-leather-600">
+                <span className="text-3xl mb-2">⚙️</span>
+                <span className="text-xs sm:text-sm text-leather-200 text-center">Settings</span>
+              </Link>
+              
+              <Link href="/docs" className="flex flex-col items-center justify-center p-4 rounded-lg bg-leather-900/30 hover:bg-leather-900/50 transition-all border border-leather-700/30 hover:border-leather-600">
+                <span className="text-3xl mb-2">📚</span>
+                <span className="text-xs sm:text-sm text-leather-200 text-center">Help</span>
+              </Link>
             </div>
           </GlassCard>
+
+          {/* Documents Section */}
+          {documents.length > 0 ? (
+            <div className="space-y-6">
+              {/* Recent Documents */}
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl sm:text-2xl font-bold text-leather-100">
+                    Recent Documents
+                  </h2>
+                  <LeatherButton 
+                    variant="parchment" 
+                    size="sm"
+                    onClick={() => {
+                      const sorted = [...documents].sort((a, b) => 
+                        new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime()
+                      );
+                      setDocuments(sorted);
+                    }}
+                  >
+                    Sort by Date
+                  </LeatherButton>
+                </div>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {documents
+                    .sort((a, b) => 
+                      new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime()
+                    )
+                    .slice(0, 6)
+                    .map((doc) => (
+                      <div 
+                        key={doc.id}
+                        onClick={() => handleOpenDocument(doc.id)}
+                        className="cursor-pointer group"
+                      >
+                        <GlassCard 
+                          hover
+                          className="p-4 h-full"
+                        >
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex-1 min-w-0">
+                              <h3 className="text-base sm:text-lg font-semibold text-leather-100 mb-1 truncate group-hover:text-leather-50 transition-colors">
+                                {doc.metadata.title || "Untitled"}
+                              </h3>
+                              {doc.metadata.folder && (
+                                <span className="text-xs text-leather-400 px-2 py-1 rounded-full bg-leather-900/40">
+                                  📁 {doc.metadata.folder}
+                                </span>
+                              )}
+                            </div>
+                            <span className="text-2xl ml-2">
+                              {doc.metadata.emojiIcon || "📄"}
+                            </span>
+                          </div>
+                          
+                          <div className="text-xs sm:text-sm text-leather-300 mb-3 line-clamp-2">
+                            {doc.content && doc.content.length > 0 
+                              ? JSON.stringify(doc.content).substring(0, 100).replace(/[{}"[\]]/g, '') 
+                              : "No content yet..."}
+                          </div>
+                          
+                          <div className="flex items-center justify-between text-xs text-leather-400">
+                            <span>
+                              {doc.updatedAt 
+                                ? new Date(doc.updatedAt).toLocaleDateString()
+                                : "Today"}
+                            </span>
+                            <span className="opacity-0 group-hover:opacity-100 transition-opacity">
+                              Open →
+                            </span>
+                          </div>
+                        </GlassCard>
+                      </div>
+                    ))}
+                </div>
+              </div>
+
+              {/* All Documents List */}
+              {documents.length > 6 && (
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-bold text-leather-100 mb-4">
+                    All Documents ({documents.length})
+                  </h2>
+                  
+                  <GlassCard className="overflow-hidden">
+                    <div className="divide-y divide-leather-700/30">
+                      {documents.map((doc) => (
+                        <div
+                          key={doc.id}
+                          onClick={() => handleOpenDocument(doc.id)}
+                          className="p-4 hover:bg-leather-900/30 cursor-pointer transition-colors group"
+                        >
+                          <div className="flex items-center gap-4">
+                            <span className="text-2xl">
+                              {doc.metadata.emojiIcon || "📄"}
+                            </span>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-1">
+                                <h3 className="text-sm sm:text-base font-semibold text-leather-100 truncate group-hover:text-leather-50 transition-colors">
+                                  {doc.metadata.title || "Untitled"}
+                                </h3>
+                                {doc.metadata.type === 'board' && (
+                                  <span className="text-xs bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded-full">
+                                    Kanban
+                                  </span>
+                                )}
+                                {doc.metadata.type === 'quick' && (
+                                  <span className="text-xs bg-yellow-500/20 text-yellow-300 px-2 py-0.5 rounded-full">
+                                    Quick Note
+                                  </span>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-3 text-xs text-leather-400">
+                                {doc.metadata.folder && (
+                                  <span>📁 {doc.metadata.folder}</span>
+                                )}
+                                <span>
+                                  {doc.updatedAt 
+                                    ? new Date(doc.updatedAt).toLocaleDateString()
+                                    : "Today"}
+                                </span>
+                              </div>
+                            </div>
+                            <span className="text-leather-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                              →
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </GlassCard>
+                </div>
+              )}
+            </div>
+          ) : (
+            /* Empty State */
+            <div className="text-center py-12">
+              <GlassCard className="max-w-2xl mx-auto p-8 sm:p-12">
+                <div className="text-6xl sm:text-7xl mb-6">📝</div>
+                <h2 className="text-2xl sm:text-3xl font-bold text-leather-100 mb-4">
+                  Welcome to 4diary
+                </h2>
+                <p className="text-base sm:text-lg text-leather-300 mb-8">
+                  Your private, encrypted note-taking workspace. Start by creating your first document or choose from our templates.
+                </p>
+                
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-8">
+                  <LeatherButton 
+                    variant="leather" 
+                    onClick={handleCreateDocument}
+                    className="w-full sm:w-auto"
+                  >
+                    ➕ Create First Document
+                  </LeatherButton>
+                  <Link href="/templates" className="w-full sm:w-auto">
+                    <LeatherButton variant="parchment" className="w-full">
+                      📄 Browse Templates
+                    </LeatherButton>
+                  </Link>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-left">
+                  <div className="p-4 rounded-lg bg-leather-900/20 border border-leather-700/20">
+                    <div className="text-3xl mb-2">🔐</div>
+                    <h3 className="font-semibold text-leather-100 mb-1 text-sm">
+                      End-to-End Encrypted
+                    </h3>
+                    <p className="text-xs text-leather-300">
+                      AES-256-GCM encryption keeps your notes private
+                    </p>
+                  </div>
+                  
+                  <div className="p-4 rounded-lg bg-leather-900/20 border border-leather-700/20">
+                    <div className="text-3xl mb-2">⚡</div>
+                    <h3 className="font-semibold text-leather-100 mb-1 text-sm">
+                      Quick Capture
+                    </h3>
+                    <p className="text-xs text-leather-300">
+                      Press Ctrl+Q anytime for instant note-taking
+                    </p>
+                  </div>
+                  
+                  <div className="p-4 rounded-lg bg-leather-900/20 border border-leather-700/20">
+                    <div className="text-3xl mb-2">📊</div>
+                    <h3 className="font-semibold text-leather-100 mb-1 text-sm">
+                      Powerful Features
+                    </h3>
+                    <p className="text-xs text-leather-300">
+                      Kanban boards, templates, and export options
+                    </p>
+                  </div>
+                </div>
+              </GlassCard>
+            </div>
+          )}
         </div>
       </main>
     </div>
+
+    {/* QuickNote Modal - Available globally with Ctrl+Q */}
+    <QuickNote onSave={handleSaveQuickNote} />
+  </>
   );
 }
 
