@@ -8,10 +8,10 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
-  KanbanBoard,
   KanbanBoardData,
   createEmptyBoard,
 } from "@/components/kanban/Board";
+import { KanbanEditor } from "@/components/kanban/KanbanEditor";
 import { getDocument, updateDocument } from "@/lib/documentService";
 
 /**
@@ -179,7 +179,7 @@ export default function BoardPage() {
 
       {/* Board */}
       {boardData && (
-        <KanbanBoard
+        <KanbanEditor
           initialData={boardData}
           onBoardChange={handleBoardChange}
         />

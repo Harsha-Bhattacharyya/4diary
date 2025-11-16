@@ -8,7 +8,9 @@ import Sidebar from "@/components/ui/Sidebar";
 import GlassCard from "@/components/ui/GlassCard";
 import LeatherButton from "@/components/ui/LeatherButton";
 import EditableTitle from "@/components/ui/EditableTitle";
+import { EmojiPickerComponent } from "@/components/ui/EmojiPicker";
 import { QuickNote } from "@/components/ui/QuickNote";
+import SaveTemplateModal from "@/components/ui/SaveTemplateModal";
 import dynamic from "next/dynamic";
 import { keyManager } from "@/lib/crypto/keyManager";
 import {
@@ -49,6 +51,7 @@ function WorkspaceContent() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [showShareToast, setShowShareToast] = useState(false);
+  const [showSaveTemplateModal, setShowSaveTemplateModal] = useState(false);
 
   // Check authentication
   useEffect(() => {
@@ -266,6 +269,39 @@ function WorkspaceContent() {
     }
   };
 
+  const handleEmojiChange = async (newEmoji: string) => {
+    if (!currentDocument) return;
+
+    try {
+      const updatedMetadata = {
+        ...currentDocument.metadata,
+        emojiIcon: newEmoji,
+      };
+
+      await updateDocument({
+        id: currentDocument.id,
+        userId: userEmail,
+        content: currentDocument.content,
+        metadata: updatedMetadata,
+      });
+
+      // Update local state
+      setCurrentDocument({
+        ...currentDocument,
+        metadata: updatedMetadata,
+      });
+
+      // Reload documents list to reflect the emoji change
+      if (workspaceId) {
+        const updatedDocs = await listDocuments(workspaceId, userEmail);
+        setDocuments(updatedDocs);
+      }
+    } catch (err) {
+      console.error("Emoji update error:", err);
+      setError(err instanceof Error ? err.message : "Failed to update emoji");
+    }
+  };
+
   const handleExportDocument = async () => {
     if (!currentDocument) return;
 
@@ -322,6 +358,44 @@ function WorkspaceContent() {
       setDocuments(updatedDocs);
     } catch (err) {
       console.error("Quick note save error:", err);
+      throw err;
+    }
+  };
+
+  const handleSaveAsTemplate = async (templateData: {
+    name: string;
+    description: string;
+    category: string;
+    isPublic: boolean;
+  }) => {
+    if (!currentDocument || !userEmail) {
+      throw new Error("No document open or user not authenticated");
+    }
+
+    try {
+      const response = await fetch("/api/templates", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: userEmail,
+          name: templateData.name,
+          description: templateData.description,
+          category: templateData.category,
+          content: currentDocument.content,
+          variables: [],
+          isPublic: templateData.isPublic,
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to save template");
+      }
+
+      // Show success message
+      alert("Template saved successfully!");
+    } catch (err) {
+      console.error("Save template error:", err);
       throw err;
     }
   };
@@ -394,8 +468,12 @@ function WorkspaceContent() {
               </svg>
             </button>
 
-            {/* Title and Share Button */}
+            {/* Title, Emoji and Share Button */}
             <div className="flex-1 mx-6 flex items-center justify-center gap-3">
+              <EmojiPickerComponent
+                selectedEmoji={currentDocument.metadata.emojiIcon || "📄"}
+                onEmojiSelect={handleEmojiChange}
+              />
               <EditableTitle
                 title={currentDocument.metadata.title}
                 onSave={handleTitleChange}
@@ -473,6 +551,16 @@ function WorkspaceContent() {
                 className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
               >
                 📥 Export
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowSaveTemplateModal(true);
+                  setDropdownOpen(false);
+                }}
+                className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+              >
+                💾 Save as Template
               </button>
               {documents.length > 0 && (
                 <button
@@ -568,6 +656,14 @@ function WorkspaceContent() {
           </div>
         )}
       </div>
+
+      {/* Save Template Modal */}
+      <SaveTemplateModal
+        isOpen={showSaveTemplateModal}
+        onClose={() => setShowSaveTemplateModal(false)}
+        onSave={handleSaveAsTemplate}
+        initialTitle={currentDocument.metadata.title}
+      />
 
       {/* QuickNote Modal - Available globally with Ctrl+Q */}
       <QuickNote onSave={handleSaveQuickNote} />
