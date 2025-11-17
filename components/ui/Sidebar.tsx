@@ -1,157 +1,148 @@
+/**
+ * Sidebar component for workspace navigation
+ * Displays list of documents with folders
+ */
+
 "use client";
 
-import React, { useState, useEffect } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import React from "react";
 
-interface NavItem {
-  label: string;
-  href: string;
-  icon?: string;
+interface Document {
+  id: string;
+  title: string;
+  folder?: string;
 }
 
 interface SidebarProps {
   workspaceId?: string;
-  documents?: Array<{ id: string; title: string; folder?: string }>;
-  onDocumentClick?: (docId: string) => void;
-  collapsed?: boolean;
-  onToggle?: (collapsed: boolean) => void;
+  documents: Document[];
+  onDocumentClick: (docId: string) => void;
+  collapsed: boolean;
+  onToggle: (collapsed: boolean) => void;
 }
 
 /**
- * Render the application sidebar with navigation links, optional workspace documents, and collapsible layout.
+ * Render a workspace sidebar that displays documents grouped by folder and supports collapse/expand.
  *
- * @param workspaceId - Optional workspace identifier; when present and documents are provided, shows the Recent Documents section.
- * @param documents - Array of recent documents to display when inside a workspace; at most the first 10 documents are rendered.
- * @param onDocumentClick - Callback invoked with a document `id` when a document entry is clicked.
- * @param controlledCollapsed - If provided, controls the sidebar's collapsed state; when omitted the component manages collapse internally.
- * @param onToggle - Optional callback called with the new collapsed state whenever the sidebar is toggled (including automatic collapse on small screens).
- * @returns The rendered sidebar React element.
+ * When expanded, the component shows folder headers with document rows; when collapsed, it shows up to five document icon buttons.
+ * Clicking a document calls `onDocumentClick` with that document's id. Toggling the header button calls `onToggle` with the new collapsed state.
+ *
+ * @param documents - The list of documents to display. Each document may specify a `folder`; documents without one appear under "Unfiled".
+ * @param onDocumentClick - Called with a document's `id` when the user selects that document.
+ * @param collapsed - Whether the sidebar is currently collapsed.
+ * @param onToggle - Called with the updated `collapsed` value when the user toggles the sidebar.
+ * @returns A React element rendering the sidebar UI.
  */
-export default function Sidebar({ 
-  workspaceId, 
-  documents = [], 
+export default function Sidebar({
+  documents,
   onDocumentClick,
-  collapsed: controlledCollapsed,
-  onToggle 
+  collapsed,
+  onToggle,
 }: SidebarProps) {
-  const pathname = usePathname();
-  const [internalCollapsed, setInternalCollapsed] = useState(false);
-  
-  // Use controlled state if provided, otherwise use internal state
-  const collapsed = controlledCollapsed !== undefined ? controlledCollapsed : internalCollapsed;
-  
-  // Auto-collapse on mobile
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 768 && !collapsed) {
-        const newCollapsed = true;
-        setInternalCollapsed(newCollapsed);
-        onToggle?.(newCollapsed);
+  // Group documents by folder
+  const groupedDocs = documents.reduce(
+    (acc, doc) => {
+      const folder = doc.folder || "Unfiled";
+      if (!acc[folder]) {
+        acc[folder] = [];
       }
-    };
-    
-    handleResize(); // Check on mount
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [collapsed, onToggle]);
-
-  const handleToggle = () => {
-    const newCollapsed = !collapsed;
-    setInternalCollapsed(newCollapsed);
-    onToggle?.(newCollapsed);
-  };
-
-  const navItems: NavItem[] = [
-    { label: "🏠 Home", href: "/" },
-    { label: "📚 Workspaces", href: workspaceId ? `/workspace/${workspaceId}` : "/workspace" },
-    { label: "📄 Templates", href: "/templates" },
-    { label: "⚙️ Settings", href: "/settings" },
-  ];
+      acc[folder].push(doc);
+      return acc;
+    },
+    {} as Record<string, Document[]>
+  );
 
   return (
-    <aside 
-      className={`leather-card h-screen p-4 flex flex-col gap-4 sticky top-0 fade-in transition-all duration-300 ${
-        collapsed ? 'w-16' : 'w-64'
-      }`}
+    <div
+      className={`h-screen bg-[#2D2416] border-r border-[#8B7355] transition-all duration-300 ${ collapsed ? "w-16" : "w-64" } ${collapsed ? "z-16" : "z-[1000]" }`}
     >
-      {/* Toggle Button */}
-      <button
-        onClick={handleToggle}
-        className="absolute -right-3 top-8 z-20 w-6 h-6 bg-leather-600 hover:bg-leather-500 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg border border-leather-400"
-        title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-      >
-        <span className="text-xs">{collapsed ? '→' : '←'}</span>
-      </button>
-
-      {/* Logo */}
-      <div className="mb-4">
-        <h1 className={`text-2xl font-bold text-leather-100 transition-all duration-300 ${collapsed ? 'text-center' : ''}`}>
-          {collapsed ? '4D' : '4diary'}
-        </h1>
+      {/* Header */}
+      <div className="p-4 border-b border-[#8B7355] flex items-center justify-between">
         {!collapsed && (
-          <p className="text-xs text-leather-300 mt-1">
-            Privacy-first notes
-          </p>
+          <h2 className="text-lg font-semibold text-[#E8DCC4]">Workspace</h2>
         )}
+        <button
+          type="button"
+          onClick={() => onToggle(!collapsed)}
+          className="text-[#E8DCC4] hover:text-[#C4B8A0] transition-colors p-2"
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+        >
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            {collapsed ? (
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
+            ) : (
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
+            )}
+          </svg>
+        </button>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex flex-col gap-2">
-        {navItems.map((item) => {
-          const isActive = pathname === item.href;
-          const emoji = item.label.split(' ')[0];
-          
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`px-4 py-2 transition-all duration-200 ${
-                isActive
-                  ? "bg-leather-600 text-leather-100 font-bold border-l-4 border-leather-400"
-                  : "hover:bg-leather-700 text-leather-200 border-l-4 border-transparent"
-              } ${collapsed ? 'flex justify-center' : ''}`}
-              title={collapsed ? item.label : undefined}
-            >
-              {collapsed ? emoji : item.label}
-            </Link>
-          );
-        })}
-      </nav>
+      {/* Documents List */}
+      {!collapsed && (
+        <div className="overflow-y-auto h-[calc(100vh-5rem)] p-2">
+          {Object.keys(groupedDocs).length === 0 ? (
+            <div className="p-4 text-center text-[#A08465]">
+              <p className="text-sm">No documents yet</p>
+            </div>
+          ) : (
+            Object.entries(groupedDocs).map(([folder, docs]) => (
+              <div key={folder} className="mb-4">
+                {/* Folder Header */}
+                <div className="px-2 py-1 text-xs font-semibold text-[#A08465] uppercase">
+                  {folder}
+                </div>
 
-      {/* Documents list (if in workspace) */}
-      {workspaceId && documents.length > 0 && !collapsed && (
-        <div className="flex-1 overflow-y-auto mt-4">
-          <h3 className="text-sm font-bold text-leather-200 mb-2">
-            Recent Documents
-          </h3>
-          <div className="flex flex-col gap-1">
-            {documents.slice(0, 10).map((doc) => (
-              <button
-                key={doc.id}
-                onClick={() => onDocumentClick?.(doc.id)}
-                className="px-3 py-2 text-sm hover:bg-leather-700 text-leather-300 truncate transition-all duration-200 text-left w-full"
-                title={doc.title}
-              >
-                📄 {doc.title}
-              </button>
-            ))}
-          </div>
+                {/* Documents in Folder */}
+                {docs.map((doc) => (
+                  <button
+                    type="button"
+                    key={doc.id}
+                    onClick={() => onDocumentClick(doc.id)}
+                    className="w-full text-left px-3 py-2 rounded-md text-[#E8DCC4] hover:bg-[#3D3426] transition-colors flex items-center gap-2"
+                  >
+                    <span className="text-sm">📄</span>
+                    <span className="text-sm truncate">{doc.title}</span>
+                  </button>
+                ))}
+              </div>
+            ))
+          )}
         </div>
       )}
 
-      {/* Footer */}
-      <div className="mt-auto pt-4 border-t border-leather-700">
-        {!collapsed ? (
-          <p className="text-xs text-center text-leather-400">
-            End-to-end encrypted
-          </p>
-        ) : (
-          <p className="text-xs text-center text-leather-400" title="End-to-end encrypted">
-            🔐
-          </p>
-        )}
-      </div>
-    </aside>
+      {/* Collapsed view - just icons */}
+      {collapsed && (
+        <div className="p-2 flex flex-col items-center gap-2">
+          {documents.slice(0, 5).map((doc) => (
+            <button
+              type="button"
+              key={doc.id}
+              onClick={() => onDocumentClick(doc.id)}
+              className="w-10 h-10 flex items-center justify-center rounded-md text-[#E8DCC4] hover:bg-[#3D3426] transition-colors"
+              title={doc.title}
+              aria-label={doc.title}
+            >
+              📄
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
