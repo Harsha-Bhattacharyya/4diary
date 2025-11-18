@@ -106,6 +106,7 @@ This is the first alpha release of 4diary, featuring core privacy-first E2EE fun
 - Summarizer endpoint is disabled by default (privacy-first approach)
 - Quick note sync requires active workspace session
 - Some edge cases in kanban board drag-and-drop may need refinement
+- Master key storage uses base64 encoding; post-alpha will implement PBKDF2-based password encryption
 
 ### Upcoming Features (Post-Alpha)
 - Real-time collaboration
