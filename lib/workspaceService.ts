@@ -34,10 +34,10 @@ export async function createWorkspace(
   // Export and encrypt the master key for storage
   const masterKeyData = await exportKey(masterKey);
 
-  // TODO: In production, encrypt this with user's password using PBKDF2
-  // For demo purposes, we're using base64 encoding
-  // SECURITY NOTE: This is NOT secure and should be replaced with proper
-  // password-based encryption in production
+  // ALPHA LIMITATION: Master key is stored with base64 encoding only.
+  // Post-alpha, this will be encrypted with user's password using PBKDF2
+  // with 100,000+ iterations for proper password-based key derivation.
+  // Current implementation allows for quick alpha testing without password management.
   const encryptedMasterKey = btoa(masterKeyData);
   const salt = btoa(
     String.fromCharCode(...crypto.getRandomValues(new Uint8Array(16)))

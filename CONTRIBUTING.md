@@ -8,6 +8,10 @@ By participating in this project, you are expected to uphold our [Code of Conduc
 
 ## How Can I Contribute?
 
+### Reporting Security Vulnerabilities
+
+**Please do not report security vulnerabilities through public GitHub issues.** Instead, please refer to our [Security Policy](SECURITY.md) for instructions on how to responsibly disclose security issues.
+
 ### Reporting Bugs
 
 Before creating bug reports, please check the existing issues as you might find out that you don't need to create one. When you are creating a bug report, please include as many details as possible:
