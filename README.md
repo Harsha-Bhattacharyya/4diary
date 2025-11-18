@@ -157,6 +157,8 @@ For production, update the `docker-compose.yml` with:
 - Rate limiting on share token creation
 - HTML sanitization for embed previews
 
+For information about reporting security vulnerabilities, supported versions, and security best practices, please see our [Security Policy](SECURITY.md).
+
 ## 📖 Usage
 
 ### Creating Documents
