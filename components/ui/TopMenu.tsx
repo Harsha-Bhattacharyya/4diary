@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import LeatherButton from "./LeatherButton";
 
 interface TopMenuProps {
@@ -18,7 +19,27 @@ interface TopMenuProps {
  * @returns A JSX element representing the top navigation bar and its dropdown
  */
 export default function TopMenu({ currentPage = "Home" }: TopMenuProps) {
+  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function checkAuth() {
+      try {
+        const response = await fetch("/api/auth/session");
+        const data = await response.json();
+        setIsAuthenticated(data.authenticated);
+        if (data.authenticated) {
+          setUserEmail(data.email);
+        }
+      } catch (err) {
+        console.error("Auth check error:", err);
+        setIsAuthenticated(false);
+      }
+    }
+    checkAuth();
+  }, []);
 
   return (
     <>
@@ -47,11 +68,31 @@ export default function TopMenu({ currentPage = "Home" }: TopMenuProps) {
             <span className="font-semibold">{currentPage}</span>
           </button>
           
-          <Link href="/workspace">
-            <LeatherButton variant="parchment" size="sm">
-              Log in
-            </LeatherButton>
-          </Link>
+          {isAuthenticated ? (
+            <div className="flex items-center gap-3">
+              <span className="text-leather-200 text-sm">
+                {userEmail?.split('@')[0]}
+              </span>
+              <button
+                type="button"
+                onClick={async () => {
+                  await fetch("/api/auth/logout", { method: "POST" });
+                  setIsAuthenticated(false);
+                  setUserEmail(null);
+                  router.push("/auth");
+                }}
+                className="text-leather-300 hover:text-leather-100 text-sm transition-colors"
+              >
+                Logout
+              </button>
+            </div>
+          ) : (
+            <Link href="/auth">
+              <LeatherButton variant="parchment" size="sm">
+                Log in
+              </LeatherButton>
+            </Link>
+          )}
         </div>
 
         {/* Dropdown Menu */}

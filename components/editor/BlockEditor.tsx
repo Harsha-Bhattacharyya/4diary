@@ -42,23 +42,37 @@ export default function BlockEditor({
 }: BlockEditorProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [hasChanges, setHasChanges] = useState(false);
+  const [lastContent, setLastContent] = useState<string>("");
 
   // Create editor instance
   const editor = useCreateBlockNote({
     initialContent: initialContent || undefined,
   });
 
-  // Auto-save functionality
+  // Initialize lastContent when editor is ready
   useEffect(() => {
-    if (!autoSave || !onSave) return;
+    const content = JSON.stringify(editor.document);
+    setLastContent(content);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Auto-save functionality - only save when there are changes
+  useEffect(() => {
+    if (!autoSave || !onSave || !hasChanges) return;
 
     const timeoutId = setTimeout(async () => {
       const content = editor.document;
-      if (content && content.length > 0) {
+      const currentContent = JSON.stringify(content);
+      
+      // Only save if content has actually changed
+      if (content && content.length > 0 && currentContent !== lastContent) {
         setIsSaving(true);
         try {
           await onSave(content);
           setLastSaved(new Date());
+          setLastContent(currentContent);
+          setHasChanges(false);
         } catch (error) {
           console.error("Failed to save:", error);
         } finally {
@@ -68,11 +82,18 @@ export default function BlockEditor({
     }, autoSaveInterval);
 
     return () => clearTimeout(timeoutId);
-  }, [editor.document, autoSave, onSave, autoSaveInterval]);
+  }, [hasChanges, autoSave, onSave, autoSaveInterval, editor.document, lastContent]);
 
   // Handle changes
   const handleChange = () => {
     const content = editor.document;
+    const currentContent = JSON.stringify(content);
+    
+    // Mark that there are changes if content differs from last saved
+    if (currentContent !== lastContent) {
+      setHasChanges(true);
+    }
+    
     if (onChange) {
       onChange(content);
     }

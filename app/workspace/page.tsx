@@ -674,11 +674,11 @@ function WorkspaceContent() {
   // Workspace view when no document is open
   return (
     <>
-      <div className="min-h-screen relative flex">
+      <div className="min-h-screen relative">
       <LeatherBackground />
 
-      {/* Sidebar */}
-      <div className="relative z-10 fade-in">
+      {/* Sidebar - Overlay */}
+      <div className="fade-in">
         <Sidebar
           workspaceId={workspaceId || "demo"}
           documents={documents.map((doc) => ({
@@ -692,10 +692,8 @@ function WorkspaceContent() {
         />
       </div>
 
-      {/* Main Content */}
-      <main className={`relative z-10 flex-1 overflow-y-auto transition-all duration-300 ${
-        sidebarCollapsed ? 'ml-0' : ''
-      }`}>
+      {/* Main Content - No margin adjustment needed as sidebar overlays */}
+      <main className="relative z-0 flex-1 overflow-y-auto">
         <div className="max-w-7xl mx-auto p-6 sm:p-8">
           {/* Header Section */}
           <div className="mb-8">
