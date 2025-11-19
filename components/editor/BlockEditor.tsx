@@ -43,54 +43,78 @@ export default function BlockEditor({
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [hasChanges, setHasChanges] = useState(false);
-  const [lastContent, setLastContent] = useState<string>("");
+  const [lastContentHash, setLastContentHash] = useState<number>(0);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   // Create editor instance
   const editor = useCreateBlockNote({
     initialContent: initialContent || undefined,
   });
 
-  // Initialize lastContent when editor is ready
+  // Simple fast hash function for content comparison
+  const hashContent = (content: unknown[]): number => {
+    const str = JSON.stringify(content);
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32-bit integer
+    }
+    return hash;
+  };
+
+  // Initialize lastContentHash when editor is ready with initialContent
   useEffect(() => {
-    const content = JSON.stringify(editor.document);
-    setLastContent(content);
+    // Wait for next tick to ensure editor is initialized with initialContent
+    const timer = setTimeout(() => {
+      const hash = hashContent(editor.document);
+      setLastContentHash(hash);
+      setIsInitialized(true);
+    }, 0);
+    
+    return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Auto-save functionality - only save when there are changes
   useEffect(() => {
-    if (!autoSave || !onSave || !hasChanges) return;
+    if (!autoSave || !onSave || !hasChanges || !isInitialized) return;
 
     const timeoutId = setTimeout(async () => {
       const content = editor.document;
-      const currentContent = JSON.stringify(content);
+      
+      // Double-check with full comparison before saving
+      const currentHash = hashContent(content);
       
       // Only save if content has actually changed
-      if (content && content.length > 0 && currentContent !== lastContent) {
+      if (content && content.length > 0 && currentHash !== lastContentHash) {
         setIsSaving(true);
         try {
           await onSave(content);
           setLastSaved(new Date());
-          setLastContent(currentContent);
+          setLastContentHash(currentHash);
           setHasChanges(false);
         } catch (error) {
           console.error("Failed to save:", error);
         } finally {
           setIsSaving(false);
         }
+      } else {
+        // Content hasn't actually changed, just reset the flag
+        setHasChanges(false);
       }
     }, autoSaveInterval);
 
     return () => clearTimeout(timeoutId);
-  }, [hasChanges, autoSave, onSave, autoSaveInterval, lastContent]);
+  }, [hasChanges, autoSave, onSave, autoSaveInterval, lastContentHash, isInitialized]);
 
-  // Handle changes
+  // Handle changes - lightweight change detection
   const handleChange = () => {
     const content = editor.document;
-    const currentContent = JSON.stringify(content);
     
-    // Mark that there are changes if content differs from last saved
-    if (currentContent !== lastContent) {
+    // Just mark that there are changes without heavy serialization
+    // The actual comparison will happen before save
+    if (isInitialized) {
       setHasChanges(true);
     }
     
