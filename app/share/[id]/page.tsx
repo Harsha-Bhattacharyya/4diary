@@ -21,7 +21,21 @@ const BlockEditor = dynamic(() => import("@/components/editor/BlockEditor"), {
  */
 export default function SharePage() {
   const params = useParams();
-  const shareId = params.id as string;
+  const shareId = Array.isArray(params.id) ? params.id[0] : params.id;
+
+  if (!shareId) {
+    return (
+      <div className="min-h-screen relative flex items-center justify-center">
+        <LeatherBackground />
+        <GlassCard className="relative z-10">
+          <div className="p-8 text-center">
+            <div className="text-4xl mb-4">⚠️</div>
+            <p className="text-leather-300">Invalid share link</p>
+          </div>
+        </GlassCard>
+      </div>
+    );
+  }
   
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
