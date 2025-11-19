@@ -40,6 +40,7 @@ function WorkspaceContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const templateId = searchParams.get("template");
+  const newType = searchParams.get("new");
 
   const [initialized, setInitialized] = useState(false);
   const [workspaceId, setWorkspaceId] = useState<string | null>(null);
@@ -125,6 +126,23 @@ function WorkspaceContent() {
           setDocuments(updatedDocs);
         }
 
+        // If new=kanban, create a kanban board
+        if (newType === 'kanban') {
+          const doc = await createDocument({
+            workspaceId: workspace.id,
+            userId: userEmail,
+            content: [{ board: { columns: [], cards: {} } }],
+            metadata: {
+              title: "New Kanban Board",
+              type: "board",
+            },
+          });
+
+          // Navigate to the board page
+          router.push(`/workspace/${workspace.id}/board/${doc.id}`);
+          return;
+        }
+
         setLoading(false);
       } catch (err) {
         console.error("Initialization error:", err);
@@ -134,7 +152,7 @@ function WorkspaceContent() {
     }
 
     initialize();
-  }, [templateId, userEmail]);
+  }, [templateId, newType, userEmail, router]);
 
   const handleSave = async (content: unknown[]) => {
     if (!currentDocument || !workspaceId) return;
