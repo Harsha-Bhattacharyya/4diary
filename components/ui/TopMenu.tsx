@@ -10,13 +10,10 @@ interface TopMenuProps {
 }
 
 /**
- * Top navigation bar with a hamburger toggle, current page label, login button, and a dropdown of navigation links.
+ * Render the top navigation bar with a hamburger toggle, current page label, authentication controls, and a dropdown menu.
  *
- * Renders a top bar button that toggles a dropdown menu with links to Home, Workspace, Templates, Docs, and About.
- * Selecting any menu item or clicking the backdrop closes the dropdown.
- *
- * @param currentPage - Label shown next to the hamburger icon; defaults to "Home"
- * @returns A JSX element representing the top navigation bar and its dropdown
+ * @param currentPage - Label displayed next to the hamburger icon; defaults to `"Home"`
+ * @returns A JSX element containing the top navigation bar and its dropdown menu
  */
 export default function TopMenu({ currentPage = "Home" }: TopMenuProps) {
   const router = useRouter();
@@ -25,6 +22,13 @@ export default function TopMenu({ currentPage = "Home" }: TopMenuProps) {
   const [userEmail, setUserEmail] = useState<string | null>(null);
 
   useEffect(() => {
+    /**
+     * Checks the current authentication session and updates component authentication state.
+     *
+     * Fetches the session endpoint and sets `isAuthenticated` based on the response.
+     * When authenticated, stores the user's email in `userEmail`. On error, logs the failure
+     * and sets `isAuthenticated` to `false`.
+     */
     async function checkAuth() {
       try {
         const response = await fetch("/api/auth/session");
