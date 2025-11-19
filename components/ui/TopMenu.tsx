@@ -74,7 +74,7 @@ export default function TopMenu({ currentPage = "Home" }: TopMenuProps) {
           {isAuthenticated ? (
             <div className="flex items-center gap-3">
               <span className="text-leather-200 text-sm">
-                {userEmail?.split('@')[0]}
+                {userEmail?.split('@')[0] || 'User'}
               </span>
               <button
                 type="button"
