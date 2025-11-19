@@ -82,7 +82,7 @@ export default function BlockEditor({
     }, autoSaveInterval);
 
     return () => clearTimeout(timeoutId);
-  }, [hasChanges, autoSave, onSave, autoSaveInterval, editor.document, lastContent]);
+  }, [hasChanges, autoSave, onSave, autoSaveInterval, lastContent]);
 
   // Handle changes
   const handleChange = () => {
