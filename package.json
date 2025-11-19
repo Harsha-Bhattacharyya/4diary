@@ -20,7 +20,7 @@
     "@blocknote/react": "^0.42.0",
     "@caldwell619/react-kanban": "^0.0.12",
     "@sentry/nextjs": "^10.23.0",
-    "@tiptap/extensions": "^3.10.7",
+    "@tiptap/extensions": "^3.11.0",
     "@vercel/functions": "^3.3.0",
     "bcrypt": "^6.0.0",
     "emoji-picker-react": "^4.15.0",
