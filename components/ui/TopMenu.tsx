@@ -23,11 +23,10 @@ export default function TopMenu({ currentPage = "Home" }: TopMenuProps) {
 
   useEffect(() => {
     /**
-     * Checks the current authentication session and updates component authentication state.
+     * Check the current authentication session and update the component's authentication state.
      *
-     * Fetches the session endpoint and sets `isAuthenticated` based on the response.
-     * When authenticated, stores the user's email in `userEmail`. On error, logs the failure
-     * and sets `isAuthenticated` to `false`.
+     * Updates `isAuthenticated` to reflect the session; when authenticated, sets `userEmail` to the session email.
+     * If the session check fails, sets `isAuthenticated` to `false`.
      */
     async function checkAuth() {
       try {

@@ -34,9 +34,9 @@ export default function SharePage() {
 
   useEffect(() => {
     /**
-     * Fetches the shared document identified by `shareId` and updates component state.
+     * Load the shared document for the current `shareId` and update component state.
      *
-     * On success, stores the retrieved data in `shareData`. On failure, stores an error
+     * On success, stores the retrieved share data in `shareData`. On failure, stores an error
      * message in `error`. Always clears the `loading` flag when finished.
      */
     async function fetchShare() {
