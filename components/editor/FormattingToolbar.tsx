@@ -117,7 +117,7 @@ export default function FormattingToolbar({ editor }: FormattingToolbarProps) {
   ];
 
   return (
-    <div className="sticky top-0 z-20 glass-card p-2 mb-4 rounded-lg shadow-md touch-manipulation">
+    <div className="sticky top-0 z-20 glass-card p-2 mb-4 rounded-lg shadow-md touch-manipulation overflow-x-auto scrollbar-hide">
       <div className="flex flex-wrap items-center gap-1">
         {/* Text Formatting */}
         <div className="flex items-center gap-1 pr-2 border-r border-leather-500">

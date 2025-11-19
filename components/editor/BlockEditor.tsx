@@ -148,6 +148,7 @@ export default function BlockEditor({
           onChange={handleChange}
           editable={editable}
           theme="light"
+          sideMenu={false}
         />
       </div>
     </div>

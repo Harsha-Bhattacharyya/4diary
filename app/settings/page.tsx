@@ -30,11 +30,11 @@ export default function SettingsPage() {
       <LeatherBackground />
       
       {/* Top Menu */}
-      <div className="relative z-10">
+      <div className="relative z-[9999]">
         <TopMenu currentPage="Settings" />
       </div>
 
-      <main className="relative z-10 px-6 py-12">
+      <main className="relative z-0 px-6 py-12">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="mb-12 fade-in">
