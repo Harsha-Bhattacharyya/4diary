@@ -124,8 +124,7 @@ export default function FormattingToolbar({ editor }: FormattingToolbarProps) {
           {toolbarButtons.map((button, index) => (
             <button
               key={index}
-              onClick={button.action}
-              onTouchStart={(e) => {
+              onPointerDown={(e) => {
                 e.preventDefault();
                 button.action();
               }}
@@ -134,6 +133,7 @@ export default function FormattingToolbar({ editor }: FormattingToolbarProps) {
                 ${button.style}`}
               title={button.title}
               type="button"
+              style={{ touchAction: 'none' }}
             >
               {button.icon}
             </button>
@@ -145,8 +145,7 @@ export default function FormattingToolbar({ editor }: FormattingToolbarProps) {
           {blockButtons.map((button, index) => (
             <button
               key={index}
-              onClick={button.action}
-              onTouchStart={(e) => {
+              onPointerDown={(e) => {
                 e.preventDefault();
                 button.action();
               }}
@@ -154,6 +153,7 @@ export default function FormattingToolbar({ editor }: FormattingToolbarProps) {
                 hover:bg-leather-600 hover:text-leather-100 text-leather-200 active:bg-leather-700"
               title={button.title}
               type="button"
+              style={{ touchAction: 'none' }}
             >
               {button.icon}
             </button>

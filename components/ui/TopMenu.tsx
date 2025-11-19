@@ -79,10 +79,22 @@ export default function TopMenu({ currentPage = "Home" }: TopMenuProps) {
               <button
                 type="button"
                 onClick={async () => {
-                  await fetch("/api/auth/logout", { method: "POST" });
-                  setIsAuthenticated(false);
-                  setUserEmail(null);
-                  router.push("/auth");
+                  try {
+                    const response = await fetch("/api/auth/logout", { method: "POST" });
+                    
+                    if (!response.ok) {
+                      const data = await response.json().catch(() => ({}));
+                      throw new Error(data.error || "Logout failed");
+                    }
+                    
+                    // Only clear state and redirect on successful logout
+                    setIsAuthenticated(false);
+                    setUserEmail(null);
+                    router.push("/auth");
+                  } catch (err) {
+                    console.error("Logout error:", err);
+                    alert(err instanceof Error ? err.message : "Failed to logout. Please try again.");
+                  }
                 }}
                 className="text-leather-300 hover:text-leather-100 text-sm transition-colors"
               >

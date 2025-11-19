@@ -56,7 +56,7 @@ export default function Sidebar({
       className={`fixed left-0 top-0 h-screen transition-all duration-300 ${
         collapsed ? "w-16" : "w-64"
       } ${
-        collapsed ? "z-10" : "z-[1000]"
+        collapsed ? "z-10" : "z-40"
       } bg-[#2D2416]/80 backdrop-blur-md border-r border-[#8B7355]/30 shadow-2xl`}
     >
       {/* Header */}
