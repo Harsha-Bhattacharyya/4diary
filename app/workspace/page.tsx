@@ -111,19 +111,56 @@ function WorkspaceContent() {
 
         // If template is specified, create document from template
         if (templateId) {
-          const docId = await createDocumentFromTemplate({
-            templateId,
-            workspaceId: workspace.id,
-            userId: userEmail,
-          });
+          try {
+            // First try as a built-in template
+            const docId = await createDocumentFromTemplate({
+              templateId,
+              workspaceId: workspace.id,
+              userId: userEmail,
+            });
 
-          // Load the newly created document
-          const doc = await getDocument(docId, userEmail);
-          setCurrentDocument(doc);
+            // Load the newly created document
+            const doc = await getDocument(docId, userEmail);
+            setCurrentDocument(doc);
 
-          // Reload documents list
-          const updatedDocs = await listDocuments(workspace.id, userEmail);
-          setDocuments(updatedDocs);
+            // Reload documents list
+            const updatedDocs = await listDocuments(workspace.id, userEmail);
+            setDocuments(updatedDocs);
+          } catch {
+            // If it fails, try as a custom template from database
+            try {
+              const templateResponse = await fetch(`/api/templates?userId=${encodeURIComponent(userEmail)}`);
+              const templateData = await templateResponse.json();
+              
+              const customTemplate = templateData.templates.find(
+                (t: { _id: string }) => t._id === templateId
+              );
+
+              if (customTemplate) {
+                // Create document from custom template
+                const doc = await createDocument({
+                  workspaceId: workspace.id,
+                  userId: userEmail,
+                  content: customTemplate.content || [],
+                  metadata: {
+                    title: customTemplate.name || "Untitled",
+                    tags: [customTemplate.category],
+                  },
+                });
+
+                setCurrentDocument(doc);
+
+                // Reload documents list
+                const updatedDocs = await listDocuments(workspace.id, userEmail);
+                setDocuments(updatedDocs);
+              } else {
+                throw new Error("Template not found");
+              }
+            } catch (customErr) {
+              console.error("Failed to load custom template:", customErr);
+              setError("Failed to load template");
+            }
+          }
         }
 
         // If new=kanban, create a kanban board
