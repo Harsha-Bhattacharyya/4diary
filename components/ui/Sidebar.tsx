@@ -22,16 +22,15 @@ interface SidebarProps {
 }
 
 /**
- * Render a workspace sidebar that displays documents grouped by folder and supports collapse/expand.
+ * Render the workspace sidebar that groups documents by folder and provides document selection and collapse/expand controls.
  *
- * When expanded, the component shows folder headers with document rows; when collapsed, it shows up to five document icon buttons.
- * Clicking a document calls `onDocumentClick` with that document's id. Toggling the header button calls `onToggle` with the new collapsed state.
+ * When a document has no `folder` it appears under "Unfiled". In the expanded state the sidebar shows folder headers with document rows; in the collapsed state it displays up to five document icon buttons.
  *
- * @param documents - The list of documents to display. Each document may specify a `folder`; documents without one appear under "Unfiled".
+ * @param documents - The list of documents to display; each document may include an optional `folder` property.
  * @param onDocumentClick - Called with a document's `id` when the user selects that document.
  * @param collapsed - Whether the sidebar is currently collapsed.
  * @param onToggle - Called with the updated `collapsed` value when the user toggles the sidebar.
- * @returns A React element rendering the sidebar UI.
+ * @returns The React element rendering the sidebar UI.
  */
 export default function Sidebar({
   documents,
@@ -54,7 +53,11 @@ export default function Sidebar({
 
   return (
     <div
-      className={`h-screen bg-[#2D2416] border-r border-[#8B7355] transition-all duration-300 ${ collapsed ? "w-16" : "w-64" } ${collapsed ? "z-16" : "z-[1000]" }`}
+      className={`fixed left-0 top-0 h-screen transition-all duration-300 ${
+        collapsed ? "w-16" : "w-64"
+      } ${
+        collapsed ? "z-10" : "z-40"
+      } bg-[#2D2416]/80 backdrop-blur-md border-r border-[#8B7355]/30 shadow-2xl`}
     >
       {/* Header */}
       <div className="p-4 border-b border-[#8B7355] flex items-center justify-between">
