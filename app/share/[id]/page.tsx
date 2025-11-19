@@ -22,20 +22,6 @@ const BlockEditor = dynamic(() => import("@/components/editor/BlockEditor"), {
 export default function SharePage() {
   const params = useParams();
   const shareId = Array.isArray(params.id) ? params.id[0] : params.id;
-
-  if (!shareId) {
-    return (
-      <div className="min-h-screen relative flex items-center justify-center">
-        <LeatherBackground />
-        <GlassCard className="relative z-10">
-          <div className="p-8 text-center">
-            <div className="text-4xl mb-4">⚠️</div>
-            <p className="text-leather-300">Invalid share link</p>
-          </div>
-        </GlassCard>
-      </div>
-    );
-  }
   
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -54,6 +40,12 @@ export default function SharePage() {
      * message in `error`. Always clears the `loading` flag when finished.
      */
     async function fetchShare() {
+      if (!shareId) {
+        setError("Invalid share link");
+        setLoading(false);
+        return;
+      }
+
       try {
         const response = await fetch(`/api/share?id=${encodeURIComponent(shareId)}`);
         const data = await response.json();
@@ -71,9 +63,7 @@ export default function SharePage() {
       }
     }
 
-    if (shareId) {
-      fetchShare();
-    }
+    fetchShare();
   }, [shareId]);
 
   if (loading) {
@@ -112,8 +102,19 @@ export default function SharePage() {
     return null;
   }
 
+  // Safely parse dates with validation
   const expiresDate = new Date(shareData.expiresAt);
   const createdDate = new Date(shareData.createdAt);
+  
+  const isValidExpiresDate = !isNaN(expiresDate.getTime());
+  const isValidCreatedDate = !isNaN(createdDate.getTime());
+  
+  const expiresDateString = isValidExpiresDate 
+    ? expiresDate.toLocaleDateString() 
+    : 'Unknown date';
+  const createdDateString = isValidCreatedDate 
+    ? createdDate.toLocaleDateString() 
+    : 'Unknown date';
 
   return (
     <div className="min-h-screen relative bg-white">
@@ -128,7 +129,7 @@ export default function SharePage() {
                 {shareData.title}
               </h1>
               <p className="text-sm text-gray-500 mt-1">
-                Shared on {createdDate.toLocaleDateString()} • Expires {expiresDate.toLocaleDateString()}
+                Shared on {createdDateString} • Expires {expiresDateString}
               </p>
             </div>
             <div className="text-sm text-gray-500">

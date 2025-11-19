@@ -328,14 +328,14 @@ test.describe('Sidebar - Toggle Behavior with New Layout', () => {
       await toggleButton.click();
       await page.waitForTimeout(500);
       
-      let hasLowZ = await page.locator('.z-10').count() > 0;
+      const hasLowZ = await page.locator('.z-10').count() > 0;
       expect(hasLowZ).toBeTruthy();
       
       // Expand
       await toggleButton.click();
       await page.waitForTimeout(500);
       
-      let hasHighZ = await page.locator('.z-\\[1000\\]').count() > 0;
+      const hasHighZ = await page.locator('.z-\\[1000\\]').count() > 0;
       expect(hasHighZ).toBeTruthy();
     }
   });

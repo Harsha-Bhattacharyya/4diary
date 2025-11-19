@@ -692,8 +692,10 @@ function WorkspaceContent() {
         />
       </div>
 
-      {/* Main Content - No margin adjustment needed as sidebar overlays */}
-      <main className="relative z-0 flex-1 overflow-y-auto">
+      {/* Main Content - Dynamic left margin based on sidebar state */}
+      <main className={`relative z-0 flex-1 overflow-y-auto transition-all duration-300 ${
+        sidebarCollapsed ? 'ml-16' : 'ml-64'
+      }`}>
         <div className="max-w-7xl mx-auto p-6 sm:p-8">
           {/* Header Section */}
           <div className="mb-8">
