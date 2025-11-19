@@ -100,7 +100,7 @@ export default function BlockEditor({
   };
 
   return (
-    <div className="relative w-full h-full">
+    <div className="relative w-full h-full touch-auto">
       {/* Formatting Toolbar */}
       {showToolbar && <FormattingToolbar editor={editor} />}
 
@@ -118,12 +118,14 @@ export default function BlockEditor({
       )}
 
       {/* Editor */}
-      <BlockNoteViewRaw
-        editor={editor}
-        onChange={handleChange}
-        editable={editable}
-        theme="light"
-      />
+      <div className="touch-manipulation" style={{ WebkitTapHighlightColor: 'transparent' }}>
+        <BlockNoteViewRaw
+          editor={editor}
+          onChange={handleChange}
+          editable={editable}
+          theme="light"
+        />
+      </div>
     </div>
   );
 }
