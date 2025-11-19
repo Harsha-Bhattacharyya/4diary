@@ -30,11 +30,11 @@ const BlockEditor = dynamic(() => import("@/components/editor/BlockEditor"), {
 });
 
 /**
- * Render the workspace and coordinate encryption initialization, authentication, workspace lifecycle, and document operations.
+ * Render the workspace UI and manage authentication, encryption initialization, workspace lifecycle, and document operations.
  *
- * Handles user session checking, key manager initialization, loading or creating the default workspace, listing and opening documents, and providing handlers for creating, saving, sharing, renaming, and exporting documents or the entire workspace. Switches between a full-screen editor for an open document and the workspace overview when no document is open.
+ * Shows a full-screen editor when a document is open; otherwise presents the workspace overview including the sidebar, stats, quick actions, and document lists. Exposes handlers for creating, opening, saving, sharing, renaming, exporting, and templating documents and surfaces loading/error states.
  *
- * @returns The rendered workspace UI as a JSX element
+ * @returns A JSX element representing the workspace UI
  */
 function WorkspaceContent() {
   const searchParams = useSearchParams();
@@ -674,11 +674,11 @@ function WorkspaceContent() {
   // Workspace view when no document is open
   return (
     <>
-      <div className="min-h-screen relative flex">
+      <div className="min-h-screen relative">
       <LeatherBackground />
 
-      {/* Sidebar */}
-      <div className="relative z-10 fade-in">
+      {/* Sidebar - Overlay */}
+      <div className="fade-in">
         <Sidebar
           workspaceId={workspaceId || "demo"}
           documents={documents.map((doc) => ({
@@ -692,9 +692,9 @@ function WorkspaceContent() {
         />
       </div>
 
-      {/* Main Content */}
-      <main className={`relative z-10 flex-1 overflow-y-auto transition-all duration-300 ${
-        sidebarCollapsed ? 'ml-0' : ''
+      {/* Main Content - Dynamic left margin based on sidebar state */}
+      <main className={`relative z-0 flex-1 overflow-y-auto transition-all duration-300 ${
+        sidebarCollapsed ? 'ml-16' : 'ml-64'
       }`}>
         <div className="max-w-7xl mx-auto p-6 sm:p-8">
           {/* Header Section */}

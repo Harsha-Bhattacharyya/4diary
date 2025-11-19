@@ -42,44 +42,89 @@ export default function BlockEditor({
 }: BlockEditorProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [hasChanges, setHasChanges] = useState(false);
+  const [lastContentHash, setLastContentHash] = useState<number>(0);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   // Create editor instance
   const editor = useCreateBlockNote({
     initialContent: initialContent || undefined,
   });
 
-  // Auto-save functionality
+  // Simple fast hash function for content comparison
+  const hashContent = (content: unknown[]): number => {
+    const str = JSON.stringify(content);
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32-bit integer
+    }
+    return hash;
+  };
+
+  // Initialize lastContentHash when editor is ready with initialContent
   useEffect(() => {
-    if (!autoSave || !onSave) return;
+    // Wait for next tick to ensure editor is initialized with initialContent
+    const timer = setTimeout(() => {
+      const hash = hashContent(editor.document);
+      setLastContentHash(hash);
+      setIsInitialized(true);
+    }, 0);
+    
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Auto-save functionality - only save when there are changes
+  useEffect(() => {
+    if (!autoSave || !onSave || !hasChanges || !isInitialized) return;
 
     const timeoutId = setTimeout(async () => {
       const content = editor.document;
-      if (content && content.length > 0) {
+      
+      // Double-check with full comparison before saving
+      const currentHash = hashContent(content);
+      
+      // Only save if content has actually changed
+      if (content && content.length > 0 && currentHash !== lastContentHash) {
         setIsSaving(true);
         try {
           await onSave(content);
           setLastSaved(new Date());
+          setLastContentHash(currentHash);
+          setHasChanges(false);
         } catch (error) {
           console.error("Failed to save:", error);
         } finally {
           setIsSaving(false);
         }
+      } else {
+        // Content hasn't actually changed, just reset the flag
+        setHasChanges(false);
       }
     }, autoSaveInterval);
 
     return () => clearTimeout(timeoutId);
-  }, [editor.document, autoSave, onSave, autoSaveInterval]);
+  }, [hasChanges, autoSave, onSave, autoSaveInterval, lastContentHash, isInitialized]);
 
-  // Handle changes
+  // Handle changes - lightweight change detection
   const handleChange = () => {
     const content = editor.document;
+    
+    // Just mark that there are changes without heavy serialization
+    // The actual comparison will happen before save
+    if (isInitialized) {
+      setHasChanges(true);
+    }
+    
     if (onChange) {
       onChange(content);
     }
   };
 
   return (
-    <div className="relative w-full h-full">
+    <div className="relative w-full h-full touch-auto">
       {/* Formatting Toolbar */}
       {showToolbar && <FormattingToolbar editor={editor} />}
 
@@ -97,12 +142,14 @@ export default function BlockEditor({
       )}
 
       {/* Editor */}
-      <BlockNoteViewRaw
-        editor={editor}
-        onChange={handleChange}
-        editable={editable}
-        theme="light"
-      />
+      <div className="touch-manipulation" style={{ WebkitTapHighlightColor: 'transparent' }}>
+        <BlockNoteViewRaw
+          editor={editor}
+          onChange={handleChange}
+          editable={editable}
+          theme="light"
+        />
+      </div>
     </div>
   );
 }

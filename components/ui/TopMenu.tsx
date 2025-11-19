@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import LeatherButton from "./LeatherButton";
 
 interface TopMenuProps {
@@ -9,16 +10,39 @@ interface TopMenuProps {
 }
 
 /**
- * Top navigation bar with a hamburger toggle, current page label, login button, and a dropdown of navigation links.
+ * Render the top navigation bar with a hamburger toggle, current page label, authentication controls, and a dropdown menu.
  *
- * Renders a top bar button that toggles a dropdown menu with links to Home, Workspace, Templates, Docs, and About.
- * Selecting any menu item or clicking the backdrop closes the dropdown.
- *
- * @param currentPage - Label shown next to the hamburger icon; defaults to "Home"
- * @returns A JSX element representing the top navigation bar and its dropdown
+ * @param currentPage - Label displayed next to the hamburger icon; defaults to `"Home"`
+ * @returns A JSX element containing the top navigation bar and its dropdown menu
  */
 export default function TopMenu({ currentPage = "Home" }: TopMenuProps) {
+  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+
+  useEffect(() => {
+    /**
+     * Check the current authentication session and update the component's authentication state.
+     *
+     * Updates `isAuthenticated` to reflect the session; when authenticated, sets `userEmail` to the session email.
+     * If the session check fails, sets `isAuthenticated` to `false`.
+     */
+    async function checkAuth() {
+      try {
+        const response = await fetch("/api/auth/session");
+        const data = await response.json();
+        setIsAuthenticated(data.authenticated);
+        if (data.authenticated) {
+          setUserEmail(data.email);
+        }
+      } catch (err) {
+        console.error("Auth check error:", err);
+        setIsAuthenticated(false);
+      }
+    }
+    checkAuth();
+  }, []);
 
   return (
     <>
@@ -47,11 +71,43 @@ export default function TopMenu({ currentPage = "Home" }: TopMenuProps) {
             <span className="font-semibold">{currentPage}</span>
           </button>
           
-          <Link href="/workspace">
-            <LeatherButton variant="parchment" size="sm">
-              Log in
-            </LeatherButton>
-          </Link>
+          {isAuthenticated ? (
+            <div className="flex items-center gap-3">
+              <span className="text-leather-200 text-sm">
+                {userEmail?.split('@')[0] || 'User'}
+              </span>
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    const response = await fetch("/api/auth/logout", { method: "POST" });
+                    
+                    if (!response.ok) {
+                      const data = await response.json().catch(() => ({}));
+                      throw new Error(data.error || "Logout failed");
+                    }
+                    
+                    // Only clear state and redirect on successful logout
+                    setIsAuthenticated(false);
+                    setUserEmail(null);
+                    router.push("/auth");
+                  } catch (err) {
+                    console.error("Logout error:", err);
+                    alert(err instanceof Error ? err.message : "Failed to logout. Please try again.");
+                  }
+                }}
+                className="text-leather-300 hover:text-leather-100 text-sm transition-colors"
+              >
+                Logout
+              </button>
+            </div>
+          ) : (
+            <Link href="/auth">
+              <LeatherButton variant="parchment" size="sm">
+                Log in
+              </LeatherButton>
+            </Link>
+          )}
         </div>
 
         {/* Dropdown Menu */}
