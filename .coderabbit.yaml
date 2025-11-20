@@ -1,5 +1,6 @@
 language: "en-US"
 reviews:
+  review_status: false
   profile: "assertive"
   auto_review:
     enabled: true
