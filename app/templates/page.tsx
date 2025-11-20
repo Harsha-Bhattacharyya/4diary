@@ -85,7 +85,7 @@ export default function TemplatesPage() {
       <LeatherBackground />
       
       {/* Top Menu */}
-      <div className="relative z-10">
+      <div className="relative z-[350]">
         <TopMenu currentPage="Templates" />
       </div>
 

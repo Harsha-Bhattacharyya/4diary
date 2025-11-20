@@ -17,7 +17,7 @@ export default function About() {
       <LeatherBackground />
       
       {/* Top Menu */}
-      <div className="relative z-10">
+      <div className="relative z-[350]">
         <TopMenu currentPage="About" />
       </div>
 
