@@ -204,21 +204,14 @@ function WorkspaceContent() {
   }, [templateId, newType, userEmail, router]);
 
   const handleSave = async (content: unknown[]) => {
-    if (!currentDocument || !workspaceId) {
-      console.error("Cannot save: missing document or workspace");
-      return;
-    }
-    
-    if (!userEmail) {
-      console.error("Cannot save: userEmail is null");
-      setError("Authentication required. Please refresh the page.");
-      return;
-    }
+    if (!currentDocument || !workspaceId) return;
+
+    console.log("handleSave called with userEmail:", userEmail);
 
     try {
       await updateDocument({
         id: currentDocument.id,
-        userId: userEmail,
+        userId: userEmail!,
         content,
         metadata: currentDocument.metadata,
       });
@@ -228,6 +221,8 @@ function WorkspaceContent() {
         ...currentDocument,
         content,
       });
+      
+      console.log("Document saved successfully");
     } catch (err) {
       console.error("Save error:", err);
       setError(err instanceof Error ? err.message : "Failed to save");
@@ -290,10 +285,12 @@ function WorkspaceContent() {
         },
       });
 
+      console.log("Document created:", doc.id);
       setCurrentDocument(doc);
 
       // Reload documents list
       const updatedDocs = await listDocuments(workspaceId, userEmail);
+      console.log("Documents after creation:", updatedDocs.length);
       setDocuments(updatedDocs);
     } catch (err) {
       console.error("Create error:", err);
@@ -511,10 +508,13 @@ function WorkspaceContent() {
   }
 
   const handleCloseDocument = async () => {
+    console.log("handleCloseDocument called, workspaceId:", workspaceId, "userEmail:", userEmail);
+    
     // Reload documents list to show any new or updated documents
     if (workspaceId && userEmail) {
       try {
         const updatedDocs = await listDocuments(workspaceId, userEmail);
+        console.log("Reloaded documents, count:", updatedDocs.length);
         setDocuments(updatedDocs);
       } catch (err) {
         console.error("Failed to reload documents:", err);
