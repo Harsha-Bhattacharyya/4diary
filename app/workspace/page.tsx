@@ -198,7 +198,7 @@ function WorkspaceContent() {
   }, [templateId, newType, userEmail, router]);
 
   const handleSave = async (content: unknown[]) => {
-    if (!currentDocument || !workspaceId) return;
+    if (!currentDocument || !workspaceId || !userEmail) return;
 
     try {
       await updateDocument({
@@ -287,6 +287,8 @@ function WorkspaceContent() {
   };
 
   const handleOpenDocument = async (docId: string) => {
+    if (!userEmail) return;
+    
     try {
       const doc = await getDocument(docId, userEmail);
       setCurrentDocument(doc);
@@ -297,7 +299,7 @@ function WorkspaceContent() {
   };
 
   const handleTitleChange = async (newTitle: string) => {
-    if (!currentDocument) return;
+    if (!currentDocument || !userEmail) return;
 
     try {
       const updatedMetadata = {
@@ -331,7 +333,7 @@ function WorkspaceContent() {
   };
 
   const handleEmojiChange = async (newEmoji: string) => {
-    if (!currentDocument) return;
+    if (!currentDocument || !userEmail) return;
 
     try {
       const updatedMetadata = {
@@ -364,7 +366,7 @@ function WorkspaceContent() {
   };
 
   const handleExportDocument = async () => {
-    if (!currentDocument) return;
+    if (!currentDocument || !userEmail) return;
 
     try {
       // Fetch the encrypted document data from API
@@ -381,7 +383,7 @@ function WorkspaceContent() {
   };
 
   const handleExportWorkspace = async () => {
-    if (!workspaceId) return;
+    if (!workspaceId || !userEmail) return;
 
     try {
       // Fetch all encrypted documents
@@ -495,7 +497,7 @@ function WorkspaceContent() {
 
   const handleCloseDocument = async () => {
     // Reload documents list to show any new or updated documents
-    if (workspaceId) {
+    if (workspaceId && userEmail) {
       try {
         const updatedDocs = await listDocuments(workspaceId, userEmail);
         setDocuments(updatedDocs);
@@ -670,6 +672,7 @@ function WorkspaceContent() {
                   : { columns: [] }
               }
               onBoardChange={async (newBoard) => {
+                if (!userEmail) return;
                 await updateDocument({
                   id: currentDocument.id,
                   userId: userEmail,
