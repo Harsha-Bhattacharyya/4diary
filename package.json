@@ -21,7 +21,7 @@
     "@caldwell619/react-kanban": "^0.0.12",
     "@sentry/nextjs": "^10.23.0",
     "@tiptap/extensions": "^3.11.0",
-    "@vercel/functions": "^3.3.0",
+    "@vercel/functions": "^3.3.3",
     "bcrypt": "^6.0.0",
     "emoji-picker-react": "^4.15.0",
     "framer-motion": "^12.23.24",
