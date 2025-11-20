@@ -487,7 +487,16 @@ function WorkspaceContent() {
     );
   }
 
-  const handleCloseDocument = () => {
+  const handleCloseDocument = async () => {
+    // Reload documents list to show any new or updated documents
+    if (workspaceId) {
+      try {
+        const updatedDocs = await listDocuments(workspaceId, userEmail);
+        setDocuments(updatedDocs);
+      } catch (err) {
+        console.error("Failed to reload documents:", err);
+      }
+    }
     setCurrentDocument(null);
   };
 
