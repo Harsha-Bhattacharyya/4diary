@@ -23,9 +23,15 @@ import {
 import { getOrCreateDefaultWorkspace } from "@/lib/workspaceService";
 import { createDocumentFromTemplate } from "@/lib/templateService";
 import { exportDocumentAsMarkdown, exportDocumentsAsZip } from "@/lib/exportService";
+import type { KanbanBoardData } from "@/components/kanban/Board";
 
 // Dynamic import to avoid SSR issues with BlockNote
 const BlockEditor = dynamic(() => import("@/components/editor/BlockEditor"), {
+  ssr: false,
+});
+
+// Dynamic import for KanbanEditor
+const KanbanEditor = dynamic(() => import("@/components/kanban/KanbanEditor").then(mod => ({ default: mod.KanbanEditor })), {
   ssr: false,
 });
 
@@ -653,18 +659,45 @@ function WorkspaceContent() {
 
         {/* Editor Content */}
         <div className="pt-20 pb-24 px-6 max-w-4xl mx-auto min-h-screen">
-          <BlockEditor
-            initialContent={currentDocument.content}
-            onSave={handleSave}
-            autoSave={true}
-            showToolbar={false}
-          />
+          {currentDocument.metadata.type === 'board' ? (
+            // Render Kanban board for board-type documents
+            <KanbanEditor
+              initialData={
+                Array.isArray(currentDocument.content) && 
+                currentDocument.content.length > 0 && 
+                (currentDocument.content[0] as { board?: KanbanBoardData })?.board
+                  ? (currentDocument.content[0] as { board: KanbanBoardData }).board
+                  : { columns: [] }
+              }
+              onBoardChange={async (newBoard) => {
+                await updateDocument({
+                  id: currentDocument.id,
+                  userId: userEmail,
+                  content: [{ board: newBoard }],
+                  metadata: currentDocument.metadata,
+                });
+                setCurrentDocument({
+                  ...currentDocument,
+                  content: [{ board: newBoard }],
+                });
+              }}
+            />
+          ) : (
+            // Render regular BlockEditor for other documents
+            <BlockEditor
+              initialContent={currentDocument.content}
+              onSave={handleSave}
+              autoSave={true}
+              showToolbar={false}
+            />
+          )}
         </div>
 
-        {/* Bottom Formatting Toolbar - Scrollable */}
-        <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-lg">
-          <div className="max-w-4xl mx-auto px-6 py-3 overflow-x-auto">
-            <div className="flex items-center justify-start gap-2 min-w-max">
+        {/* Bottom Formatting Toolbar - Scrollable - Only show for non-board documents */}
+        {currentDocument.metadata.type !== 'board' && (
+          <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-lg">
+            <div className="max-w-4xl mx-auto px-6 py-3 overflow-x-auto">
+              <div className="flex items-center justify-start gap-2 min-w-max">
               {/* Text Formatting */}
               <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors font-bold flex-shrink-0">
                 B
@@ -699,6 +732,7 @@ function WorkspaceContent() {
             </div>
           </div>
         </div>
+        )}
 
         {/* Share Toast Notification */}
         {showShareToast && (

@@ -30,9 +30,6 @@ interface KanbanBoardProps {
   initialData: KanbanBoardData;
   onBoardChange: (board: KanbanBoardData) => void;
   readOnly?: boolean;
-  renderCard?: (card: KanbanCard, columnId?: string | number) => React.ReactNode;
-  renderColumnHeader?: (column: KanbanColumn) => React.ReactNode;
-  renderColumnAddon?: (columnId: string | number) => React.ReactNode;
 }
 
 /**
@@ -51,9 +48,6 @@ export function KanbanBoard({
   initialData,
   onBoardChange,
   readOnly = false,
-  renderCard,
-  renderColumnHeader,
-  renderColumnAddon,
 }: KanbanBoardProps) {
   const [board, setBoard] = useState(initialData);
 
@@ -92,23 +86,6 @@ export function KanbanBoard({
     setBoard(newBoard);
     onBoardChange(newBoard);
   };
-
-  // Default card renderer
-  const defaultRenderCard = (card: KanbanCard) => (
-    <div>
-      <div className="react-kanban-card__title">{card.title}</div>
-      {card.description && (
-        <div className="react-kanban-card__description">
-          {card.description}
-        </div>
-      )}
-    </div>
-  );
-
-  // Default column header renderer
-  const defaultRenderColumnHeader = (column: KanbanColumn) => (
-    <div className="react-kanban-column-header">{column.title}</div>
-  );
 
   return (
     <div className="kanban-wrapper">
@@ -181,14 +158,18 @@ export function KanbanBoard({
         onCardDragEnd={handleCardDragEnd}
         disableColumnDrag
         disableCardDrag={readOnly}
-        renderCard={(card: KanbanCard, { column }: { column: KanbanColumn }) => 
-          renderCard ? renderCard(card, column.id) : defaultRenderCard(card)
-        }
+        renderCard={(card: KanbanCard) => (
+          <div>
+            <div className="react-kanban-card__title">{card.title}</div>
+            {card.description && (
+              <div className="react-kanban-card__description">
+                {card.description}
+              </div>
+            )}
+          </div>
+        )}
         renderColumnHeader={(column: KanbanColumn) => (
-          <>
-            {renderColumnHeader ? renderColumnHeader(column) : defaultRenderColumnHeader(column)}
-            {renderColumnAddon && renderColumnAddon(column.id)}
-          </>
+          <div className="react-kanban-column-header">{column.title}</div>
         )}
       />
     </div>
