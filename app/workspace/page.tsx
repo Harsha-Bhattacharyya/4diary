@@ -78,6 +78,12 @@ function WorkspaceContent() {
           return;
         }
 
+        if (!data.email) {
+          console.error("Authenticated but no email provided");
+          router.push("/auth");
+          return;
+        }
+
         setUserEmail(data.email);
       } catch (err) {
         console.error("Auth check error:", err);
@@ -198,7 +204,16 @@ function WorkspaceContent() {
   }, [templateId, newType, userEmail, router]);
 
   const handleSave = async (content: unknown[]) => {
-    if (!currentDocument || !workspaceId || !userEmail) return;
+    if (!currentDocument || !workspaceId) {
+      console.error("Cannot save: missing document or workspace");
+      return;
+    }
+    
+    if (!userEmail) {
+      console.error("Cannot save: userEmail is null");
+      setError("Authentication required. Please refresh the page.");
+      return;
+    }
 
     try {
       await updateDocument({
@@ -504,6 +519,8 @@ function WorkspaceContent() {
       } catch (err) {
         console.error("Failed to reload documents:", err);
       }
+    } else {
+      console.warn("Cannot reload documents on close: missing workspaceId or userEmail", { workspaceId, userEmail });
     }
     setCurrentDocument(null);
   };
