@@ -19,7 +19,7 @@ export default function Home() {
       <LeatherBackground />
       
       {/* Top Menu */}
-      <div className="relative z-[100]">
+      <div className="relative z-[350]">
         <TopMenu currentPage="Home" />
       </div>
       

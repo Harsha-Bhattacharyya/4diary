@@ -30,7 +30,7 @@ export default function SettingsPage() {
       <LeatherBackground />
       
       {/* Top Menu */}
-      <div className="relative z-[9999]">
+      <div className="relative z-[350]">
         <TopMenu currentPage="Settings" />
       </div>
 

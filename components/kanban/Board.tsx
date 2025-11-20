@@ -127,7 +127,7 @@ export function KanbanBoard({
           border-radius: 6px;
           padding: 0.75rem;
           margin-bottom: 0.5rem;
-          cursor: ${readOnly ? "default" : "pointer"};
+          cursor: ${readOnly ? "default" : "grab"};
           transition: all 0.2s;
         }
 
@@ -149,6 +149,7 @@ export function KanbanBoard({
 
         .react-kanban-card--dragging {
           opacity: 0.5;
+          cursor: grabbing !important;
         }
       `}</style>
 
