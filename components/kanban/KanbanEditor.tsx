@@ -157,7 +157,6 @@ export function KanbanEditor({
     <div className="kanban-editor-wrapper">
       <style jsx global>{`
         .kanban-editor-wrapper {
-          padding: 1rem;
           background: #1A1410;
           min-height: 100vh;
         }
@@ -170,6 +169,9 @@ export function KanbanEditor({
           background: #2D2416;
           border: 1px solid #8B7355;
           border-radius: 8px;
+          max-width: 1200px;
+          margin-left: auto;
+          margin-right: auto;
         }
 
         .editor-button {
@@ -192,35 +194,6 @@ export function KanbanEditor({
           cursor: not-allowed;
         }
 
-        .react-kanban-board {
-          display: flex;
-          gap: 1rem;
-          overflow-x: auto;
-          padding: 1rem 0;
-        }
-
-        .react-kanban-column {
-          background: #2D2416;
-          border: 1px solid #8B7355;
-          border-radius: 8px;
-          min-width: 300px;
-          max-width: 300px;
-          padding: 1rem;
-          position: relative;
-        }
-
-        .react-kanban-column-header {
-          font-size: 1.125rem;
-          font-weight: 600;
-          color: #E8DCC4;
-          margin-bottom: 1rem;
-          padding-bottom: 0.5rem;
-          border-bottom: 1px solid #8B7355;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        }
-
         .column-delete-btn {
           padding: 0.25rem 0.5rem;
           background: #8B4513;
@@ -230,26 +203,11 @@ export function KanbanEditor({
           cursor: pointer;
           font-size: 0.75rem;
           transition: all 0.2s;
+          margin-left: 0.5rem;
         }
 
         .column-delete-btn:hover {
           background: #A0522D;
-        }
-
-        .react-kanban-card {
-          background: #3D3426;
-          border: 1px solid #8B7355;
-          border-radius: 6px;
-          padding: 0.75rem;
-          margin-bottom: 0.5rem;
-          cursor: ${readOnly ? "default" : "pointer"};
-          transition: all 0.2s;
-          position: relative;
-        }
-
-        .react-kanban-card:hover {
-          background: ${readOnly ? "#3D3426" : "#4D4436"};
-          border-color: ${readOnly ? "#8B7355" : "#A08465"};
         }
 
         .card-controls {
@@ -283,18 +241,7 @@ export function KanbanEditor({
           background: #A0522D;
         }
 
-        .react-kanban-card__title {
-          color: #E8DCC4;
-          font-weight: 500;
-          margin-bottom: 0.5rem;
-        }
-
-        .react-kanban-card__description {
-          color: #C4B8A0;
-          font-size: 0.875rem;
-        }
-
-        .add-card-form, .add-column-form {
+        .add-card-form {
           background: #3D3426;
           border: 1px solid #8B7355;
           border-radius: 6px;
@@ -331,10 +278,6 @@ export function KanbanEditor({
           gap: 0.5rem;
         }
 
-        .react-kanban-card--dragging {
-          opacity: 0.5;
-        }
-
         .add-card-btn {
           width: 100%;
           padding: 0.5rem;
@@ -352,9 +295,10 @@ export function KanbanEditor({
           border-color: #A08465;
         }
 
-        .add-column-wrapper {
-          min-width: 300px;
-          max-width: 300px;
+        .react-kanban-column-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
         }
       `}</style>
 
@@ -370,96 +314,120 @@ export function KanbanEditor({
         </div>
       )}
 
-      <div className="react-kanban-board">
-        {board.columns.map((column) => (
-          <div key={column.id} className="react-kanban-column">
-            <div className="react-kanban-column-header">
-              <span>{column.title}</span>
-              {!readOnly && board.columns.length > 1 && (
-                <button
-                  type="button"
-                  className="column-delete-btn"
-                  onClick={() => handleDeleteColumn(column.id)}
-                  title="Delete column"
-                >
-                  🗑️
-                </button>
-              )}
-            </div>
-
-            {column.cards.map((card) => (
-              <div key={card.id}>
-                {editingCard?.columnId === column.id && editingCard?.cardId === card.id ? (
-                  <div className="add-card-form">
-                    <input
-                      type="text"
-                      className="form-input"
-                      value={editCardTitle}
-                      onChange={(e) => setEditCardTitle(e.target.value)}
-                      placeholder="Card title"
-                      autoFocus
-                    />
-                    <textarea
-                      className="form-textarea"
-                      value={editCardDescription}
-                      onChange={(e) => setEditCardDescription(e.target.value)}
-                      placeholder="Description (optional)"
-                    />
-                    <div className="form-actions">
-                      <button
-                        type="button"
-                        className="card-btn"
-                        onClick={() => handleEditCard(column.id, card.id)}
-                      >
-                        Save
-                      </button>
-                      <button
-                        type="button"
-                        className="card-btn"
-                        onClick={() => {
-                          setEditingCard(null);
-                          setEditCardTitle("");
-                          setEditCardDescription("");
-                        }}
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="react-kanban-card">
-                    <div className="react-kanban-card__title">{card.title}</div>
-                    {card.description && (
-                      <div className="react-kanban-card__description">
-                        {card.description}
-                      </div>
-                    )}
-                    {!readOnly && (
-                      <div className="card-controls">
-                        <button
-                          type="button"
-                          className="card-btn"
-                          onClick={() => startEditCard(column.id, card)}
-                        >
-                          ✏️ Edit
-                        </button>
-                        <button
-                          type="button"
-                          className="card-btn delete"
-                          onClick={() => handleDeleteCard(column.id, card.id)}
-                        >
-                          🗑️ Delete
-                        </button>
-                      </div>
-                    )}
+      <KanbanBoard
+        initialData={board}
+        onBoardChange={handleBoardChange}
+        readOnly={readOnly}
+        renderCard={(card: KanbanCard, columnId?: string | number) => (
+          <div>
+            {editingCard?.columnId === columnId && editingCard?.cardId === card.id ? (
+              <div className="add-card-form" style={{ marginBottom: 0 }}>
+                <input
+                  type="text"
+                  className="form-input"
+                  value={editCardTitle}
+                  onChange={(e) => setEditCardTitle(e.target.value)}
+                  placeholder="Card title"
+                  autoFocus
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleEditCard(columnId!, card.id);
+                    } else if (e.key === 'Escape') {
+                      setEditingCard(null);
+                      setEditCardTitle("");
+                      setEditCardDescription("");
+                    }
+                  }}
+                />
+                <textarea
+                  className="form-textarea"
+                  value={editCardDescription}
+                  onChange={(e) => setEditCardDescription(e.target.value)}
+                  placeholder="Description (optional)"
+                />
+                <div className="form-actions">
+                  <button
+                    type="button"
+                    className="card-btn"
+                    onClick={() => handleEditCard(columnId!, card.id)}
+                  >
+                    💾 Save
+                  </button>
+                  <button
+                    type="button"
+                    className="card-btn"
+                    onClick={() => {
+                      setEditingCard(null);
+                      setEditCardTitle("");
+                      setEditCardDescription("");
+                    }}
+                  >
+                    ✖️ Cancel
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="react-kanban-card__title">{card.title}</div>
+                {card.description && (
+                  <div className="react-kanban-card__description">
+                    {card.description}
                   </div>
                 )}
-              </div>
-            ))}
-
+                {!readOnly && (
+                  <div className="card-controls">
+                    <button
+                      type="button"
+                      className="card-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        startEditCard(columnId!, card);
+                      }}
+                    >
+                      ✏️ Edit
+                    </button>
+                    <button
+                      type="button"
+                      className="card-btn delete"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (confirm('Delete this card?')) {
+                          handleDeleteCard(columnId!, card.id);
+                        }
+                      }}
+                    >
+                      🗑️ Delete
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        )}
+        renderColumnHeader={(column: KanbanColumn) => (
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span>{column.title}</span>
+            {!readOnly && board.columns.length > 1 && (
+              <button
+                type="button"
+                className="column-delete-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDeleteColumn(column.id);
+                }}
+                title="Delete column"
+              >
+                🗑️
+              </button>
+            )}
+          </div>
+        )}
+        renderColumnAddon={(columnId: string | number) => (
+          <>
             {!readOnly && (
               <>
-                {isAddingCard === column.id ? (
+                {isAddingCard === columnId ? (
                   <div className="add-card-form">
                     <input
                       type="text"
@@ -468,6 +436,16 @@ export function KanbanEditor({
                       onChange={(e) => setNewCardTitle(e.target.value)}
                       placeholder="Card title"
                       autoFocus
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          handleAddCard(columnId);
+                        } else if (e.key === 'Escape') {
+                          setIsAddingCard(null);
+                          setNewCardTitle("");
+                          setNewCardDescription("");
+                        }
+                      }}
                     />
                     <textarea
                       className="form-textarea"
@@ -479,9 +457,9 @@ export function KanbanEditor({
                       <button
                         type="button"
                         className="card-btn"
-                        onClick={() => handleAddCard(column.id)}
+                        onClick={() => handleAddCard(columnId)}
                       >
-                        Add
+                        ➕ Add
                       </button>
                       <button
                         type="button"
@@ -492,7 +470,7 @@ export function KanbanEditor({
                           setNewCardDescription("");
                         }}
                       >
-                        Cancel
+                        ✖️ Cancel
                       </button>
                     </div>
                   </div>
@@ -500,71 +478,58 @@ export function KanbanEditor({
                   <button
                     type="button"
                     className="add-card-btn"
-                    onClick={() => setIsAddingCard(column.id)}
+                    onClick={() => setIsAddingCard(columnId)}
                   >
                     ➕ Add Card
                   </button>
                 )}
               </>
             )}
-          </div>
-        ))}
-
-        {!readOnly && isAddingColumn && (
-          <div className="add-column-wrapper">
-            <div className="add-card-form">
-              <input
-                type="text"
-                className="form-input"
-                value={newColumnTitle}
-                onChange={(e) => setNewColumnTitle(e.target.value)}
-                placeholder="Column title"
-                autoFocus
-              />
-              <div className="form-actions">
-                <button
-                  type="button"
-                  className="card-btn"
-                  onClick={handleAddColumn}
-                >
-                  Add Column
-                </button>
-                <button
-                  type="button"
-                  className="card-btn"
-                  onClick={() => {
-                    setIsAddingColumn(false);
-                    setNewColumnTitle("");
-                  }}
-                >
-                  Cancel
-                </button>
+            {!readOnly && isAddingColumn && columnId === board.columns[board.columns.length - 1].id && (
+              <div style={{ position: 'absolute', left: '100%', top: 0, marginLeft: '1rem', width: '300px' }}>
+                <div className="add-card-form">
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={newColumnTitle}
+                    onChange={(e) => setNewColumnTitle(e.target.value)}
+                    placeholder="Column title"
+                    autoFocus
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleAddColumn();
+                      } else if (e.key === 'Escape') {
+                        setIsAddingColumn(false);
+                        setNewColumnTitle("");
+                      }
+                    }}
+                  />
+                  <div className="form-actions">
+                    <button
+                      type="button"
+                      className="card-btn"
+                      onClick={handleAddColumn}
+                    >
+                      ➕ Add Column
+                    </button>
+                    <button
+                      type="button"
+                      className="card-btn"
+                      onClick={() => {
+                        setIsAddingColumn(false);
+                        setNewColumnTitle("");
+                      }}
+                    >
+                      ✖️ Cancel
+                    </button>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+            )}
+          </>
         )}
-
-        {!readOnly && !isAddingColumn && (
-          <div className="add-column-wrapper">
-            <button
-              type="button"
-              className="add-card-btn"
-              style={{ height: "fit-content" }}
-              onClick={() => setIsAddingColumn(true)}
-            >
-              ➕ Add Column
-            </button>
-          </div>
-        )}
-      </div>
-
-      <div style={{ marginTop: "1rem" }}>
-        <KanbanBoard
-          initialData={board}
-          onBoardChange={handleBoardChange}
-          readOnly={readOnly}
-        />
-      </div>
+      />
     </div>
   );
 }
