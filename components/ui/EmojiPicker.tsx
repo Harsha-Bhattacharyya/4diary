@@ -6,7 +6,14 @@
 "use client";
 
 import React, { useState } from "react";
-import EmojiPicker, { EmojiClickData, Theme } from "emoji-picker-react";
+import dynamic from "next/dynamic";
+import type { EmojiClickData, Theme } from "emoji-picker-react";
+
+// Dynamic import to avoid SSR issues with emoji-picker-react
+const EmojiPicker = dynamic(() => import("emoji-picker-react"), {
+  ssr: false,
+  loading: () => <div className="w-[350px] h-[450px] bg-[#222] rounded-lg animate-pulse" />,
+});
 
 interface EmojiPickerComponentProps {
   selectedEmoji?: string;
@@ -54,7 +61,7 @@ export function EmojiPickerComponent({
           <div className="absolute z-50 mt-2 left-0">
             <EmojiPicker
               onEmojiClick={handleEmojiClick}
-              theme={Theme.DARK}
+              theme={"dark" as Theme}
               previewConfig={{ showPreview: false }}
             />
           </div>
