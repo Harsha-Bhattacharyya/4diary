@@ -1,0 +1,44 @@
+/* Custom styles for BlockNote Editor */
+
+/* Make formatting toolbar text black for better visibility */
+.bn-formatting-toolbar button,
+.bn-formatting-toolbar select,
+.bn-formatting-toolbar .bn-button,
+.bn-formatting-toolbar .bn-select {
+  color: #000000 !important;
+}
+
+/* Make slash menu (suggestion menu) text black */
+.bn-suggestion-menu .bn-suggestion-menu-item,
+.bn-suggestion-menu-item {
+  color: #000000 !important;
+}
+
+/* Ensure dropdown menus also have black text */
+.bn-formatting-toolbar .bn-select-menu-item,
+.bn-select-menu-item {
+  color: #000000 !important;
+}
+
+/* Make sure icons and labels in toolbar are black */
+.bn-formatting-toolbar svg,
+.bn-formatting-toolbar path {
+  stroke: #000000 !important;
+  fill: #000000 !important;
+}
+
+/* Ensure hover states maintain visibility */
+.bn-formatting-toolbar button:hover,
+.bn-formatting-toolbar .bn-button:hover {
+  color: #000000 !important;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Make suggestion menu items more visible */
+.bn-suggestion-menu-item:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.bn-suggestion-menu-item-selected {
+  background-color: rgba(0, 0, 0, 0.15);
+}

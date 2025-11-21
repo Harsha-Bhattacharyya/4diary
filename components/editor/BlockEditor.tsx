@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useCreateBlockNote, BlockNoteViewRaw } from "@blocknote/react";
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/react/style.css";
+import "./editor.css";
 import FormattingToolbar from "./FormattingToolbar";
 
 interface BlockEditorProps {
@@ -149,6 +150,7 @@ export default function BlockEditor({
           editable={editable}
           theme="light"
           sideMenu={false}
+          slashMenu={true}
         />
       </div>
     </div>

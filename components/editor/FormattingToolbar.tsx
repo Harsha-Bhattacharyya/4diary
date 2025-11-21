@@ -129,7 +129,7 @@ export default function FormattingToolbar({ editor }: FormattingToolbarProps) {
                 button.action();
               }}
               className={`px-3 py-1.5 text-sm font-medium rounded transition-all duration-200 
-                hover:bg-leather-600 hover:text-leather-100 text-leather-200 active:bg-leather-700
+                hover:bg-leather-600 hover:text-leather-100 text-black active:bg-leather-700
                 ${button.style}`}
               title={button.title}
               type="button"
@@ -150,7 +150,7 @@ export default function FormattingToolbar({ editor }: FormattingToolbarProps) {
                 button.action();
               }}
               className="px-3 py-1.5 text-sm font-medium rounded transition-all duration-200 
-                hover:bg-leather-600 hover:text-leather-100 text-leather-200 active:bg-leather-700"
+                hover:bg-leather-600 hover:text-leather-100 text-black active:bg-leather-700"
               title={button.title}
               type="button"
               style={{ touchAction: 'none' }}
