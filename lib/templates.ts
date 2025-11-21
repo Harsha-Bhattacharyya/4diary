@@ -317,6 +317,117 @@ export const builtInTemplates: DocumentTemplate[] = [
       { key: "date", label: "Date" },
     ],
   },
+  {
+    id: "research-notes",
+    name: "Research Notes",
+    description: "Academic or research documentation",
+    category: "notes",
+    icon: "📚",
+    content: [
+      {
+        type: "heading",
+        props: { level: 1 },
+        content: [{ type: "text", text: "{{title}}" }],
+      },
+      {
+        type: "paragraph",
+        content: [
+          { type: "text", text: "Date: {{date}}", styles: { bold: true } },
+        ],
+      },
+      {
+        type: "heading",
+        props: { level: 2 },
+        content: [{ type: "text", text: "Key Questions" }],
+      },
+      {
+        type: "bulletListItem",
+        content: [{ type: "text", text: "" }],
+      },
+      {
+        type: "heading",
+        props: { level: 2 },
+        content: [{ type: "text", text: "Research Findings" }],
+      },
+      {
+        type: "paragraph",
+        content: [{ type: "text", text: "" }],
+      },
+      {
+        type: "heading",
+        props: { level: 2 },
+        content: [{ type: "text", text: "Sources and Citations" }],
+      },
+      {
+        type: "bulletListItem",
+        content: [{ type: "text", text: "" }],
+      },
+      {
+        type: "heading",
+        props: { level: 2 },
+        content: [{ type: "text", text: "Conclusions" }],
+      },
+      {
+        type: "paragraph",
+        content: [{ type: "text", text: "" }],
+      },
+    ],
+    variables: [
+      { key: "title", label: "Research Topic" },
+      { key: "date", label: "Date" },
+    ],
+  },
+  {
+    id: "ideas-brainstorming",
+    name: "Ideas & Brainstorming",
+    description: "Capture creative ideas",
+    category: "productivity",
+    icon: "💡",
+    content: [
+      {
+        type: "heading",
+        props: { level: 1 },
+        content: [{ type: "text", text: "{{title}}" }],
+      },
+      {
+        type: "paragraph",
+        content: [
+          { type: "text", text: "Date: {{date}}", styles: { bold: true } },
+        ],
+      },
+      {
+        type: "heading",
+        props: { level: 2 },
+        content: [{ type: "text", text: "Problem Statement" }],
+      },
+      {
+        type: "paragraph",
+        content: [{ type: "text", text: "" }],
+      },
+      {
+        type: "heading",
+        props: { level: 2 },
+        content: [{ type: "text", text: "Potential Solutions" }],
+      },
+      {
+        type: "bulletListItem",
+        content: [{ type: "text", text: "" }],
+      },
+      {
+        type: "heading",
+        props: { level: 2 },
+        content: [{ type: "text", text: "Next Actions" }],
+      },
+      {
+        type: "bulletListItem",
+        content: [{ type: "text", text: "" }],
+      },
+    ],
+    variables: [
+      { key: "title", label: "Idea Title" },
+      { key: "date", label: "Date" },
+    ],
+  },
 ];
 
 /**

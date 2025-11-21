@@ -10,14 +10,24 @@ Templates are pre-structured documents that help you quickly create common types
 
 4Diary comes with several built-in templates:
 
-### 📓 Daily Journal
+### 📅 Daily Note
+
+A simple daily note with date heading.
+
+**Structure:**
+- Date header
+- Morning section
+- Afternoon section
+- Evening section
+
+### 📔 Journal Entry
 
 Perfect for daily reflections and journaling.
 
 **Structure:**
 - Date header
-- Mood tracker
-- Daily highlights
+- How I'm feeling
+- What happened today
 - Gratitude section
 - Tomorrow's goals
 
@@ -41,19 +51,17 @@ Organize project documentation.
 - Project overview
 - Goals and objectives
 - Timeline
-- Milestones
+- Deliverables
 - Resources needed
-- Success metrics
 
 ### ✅ Task List
 
-Simple task management.
+Simple task management with priority levels.
 
 **Structure:**
-- Task categories
-- Priority levels
-- Due dates
-- Status tracking
+- High priority tasks
+- Medium priority tasks
+- Low priority tasks
 
 ### 📚 Research Notes
 
