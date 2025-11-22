@@ -20,6 +20,13 @@ const imFellEnglish = IM_Fell_English({
 export const metadata: Metadata = {
   title: "4diary - Privacy Focused Solution",
   description: "A privacy focused solution for the modern world",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "4Diary",
+  },
+  themeColor: "#f59e0b",
 };
 
 /**
@@ -38,6 +45,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${imFellDWPica.variable} ${imFellEnglish.variable}`}>
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#f59e0b" />
+        <link rel="apple-touch-icon" href="/icon.png" />
+      </head>
       <body className="antialiased">
         {children}
       </body>
