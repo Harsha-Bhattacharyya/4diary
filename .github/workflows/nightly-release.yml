@@ -51,10 +51,10 @@ jobs:
         
         if [ -z "$LAST_TAG" ]; then
           # No previous nightly tag, get all commits from last release or last 50 commits
-          COMMITS=$(git log --oneline -50 --no-merges --grep="^Initial plan$" --invert-grep)
+          COMMITS=$(git log --oneline -50 --no-merges --grep="Initial plan" --invert-grep)
         else
           # Get commits since last nightly tag
-          COMMITS=$(git log ${LAST_TAG}..HEAD --oneline --no-merges --grep="^Initial plan$" --invert-grep)
+          COMMITS=$(git log ${LAST_TAG}..HEAD --oneline --no-merges --grep="Initial plan" --invert-grep)
         fi
         
         # Check if there are any new commits (excluding "Initial plan")
@@ -64,15 +64,15 @@ jobs:
         else
           echo "has_changes=true" >> $GITHUB_OUTPUT
           
-          # Format changelog
-          echo "changelog<<EOF" >> $GITHUB_OUTPUT
-          echo "## Nightly Build - $(date +%Y-%m-%d)" >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
-          echo "### Changes since last nightly:" >> $GITHUB_OUTPUT
-          echo "$COMMITS" | while read line; do
-            echo "- $line" >> $GITHUB_OUTPUT
-          done
-          echo "EOF" >> $GITHUB_OUTPUT
+          # Write changelog to output
+          {
+            echo "changelog<<EOF"
+            echo "## Nightly Build - $(date +%Y-%m-%d)"
+            echo ""
+            echo "### Changes since last nightly:"
+            echo "$COMMITS" | sed 's/^/- /'
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
         fi
     
     - name: Create nightly tag and release
