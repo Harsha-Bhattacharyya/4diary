@@ -4,7 +4,7 @@
 
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import Link from "next/link";
 import type { Document } from "@/lib/documentService";
 
@@ -20,12 +20,9 @@ interface DayDocuments {
 
 export default function CalendarView({ documents }: CalendarViewProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [daysWithDocs, setDaysWithDocs] = useState<Map<string, Document[]>>(
-    new Map()
-  );
 
-  // Group documents by date
-  useEffect(() => {
+  // Group documents by date using useMemo to avoid effect
+  const daysWithDocs = useMemo(() => {
     const grouped = new Map<string, Document[]>();
     
     documents.forEach((doc) => {
@@ -38,10 +35,7 @@ export default function CalendarView({ documents }: CalendarViewProps) {
       grouped.get(dateStr)!.push(doc);
     });
 
-    // Use React 19's batched updates
-    requestAnimationFrame(() => {
-      setDaysWithDocs(grouped);
-    });
+    return grouped;
   }, [documents]);
 
   // Generate calendar days

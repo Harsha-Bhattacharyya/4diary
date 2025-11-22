@@ -97,13 +97,14 @@ async function syncDocuments() {
 
 // Push notifications (future enhancement)
 self.addEventListener('push', (event) => {
+  const data = event.data?.json() || {};
   const options = {
-    body: event.data?.text() || 'New notification',
-    icon: '/icon.png',
-    badge: '/icon.png',
+    body: data.body || 'New notification',
+    icon: '/4diary.png',
+    badge: '/4diary.png',
   };
 
   event.waitUntil(
-    self.registration.showNotification('4Diary', options)
+    self.registration.showNotification(data.title || '4Diary', options)
   );
 });

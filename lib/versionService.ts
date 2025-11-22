@@ -40,6 +40,7 @@ export async function saveDocumentVersion(
     const tx = db.transaction(['versions'], 'readwrite');
     const store = tx.objectStore('versions');
     await store.add(version);
+    await tx.complete;
     
     // Keep only last 50 versions per document
     await pruneOldVersions(documentId, 50);
@@ -62,6 +63,7 @@ export async function getDocumentVersions(
     const store = tx.objectStore('versions');
     const index = store.index('by-document');
     const versions = await index.getAll(documentId);
+    await tx.complete;
     
     // Sort by timestamp descending
     return versions.sort(

@@ -9,13 +9,13 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/icon.png",
+      "src": "/4diary.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/icon.png",
+      "src": "/4diary.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
@@ -30,7 +30,7 @@
       "url": "/workspace?new=doc",
       "icons": [
         {
-          "src": "/icon.png",
+          "src": "/4diary.png",
           "sizes": "192x192"
         }
       ]
@@ -42,7 +42,7 @@
       "url": "/workspace?new=quick",
       "icons": [
         {
-          "src": "/icon.png",
+          "src": "/4diary.png",
           "sizes": "192x192"
         }
       ]

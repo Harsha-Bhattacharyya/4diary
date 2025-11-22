@@ -73,8 +73,8 @@ export default function PWAInstallPrompt() {
   useEffect(() => {
     const dismissed = localStorage.getItem("pwaPromptDismissed");
     if (dismissed && new Date(dismissed) > new Date()) {
-      // Use a microtask to avoid cascading render
-      Promise.resolve().then(() => setShowPrompt(false));
+      // Defer state update to next tick
+      setTimeout(() => setShowPrompt(false), 0);
     }
   }, []);
 

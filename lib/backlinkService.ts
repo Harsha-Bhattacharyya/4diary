@@ -3,20 +3,22 @@
  * Extracts [[wiki-style]] links and provides backlink queries
  */
 
+// Wiki link pattern: [[Document Title]] or [[Document Title|Display Text]]
+const WIKI_LINK_REGEX = /\[\[([^\]|]+)(?:\|[^\]]+)?\]\]/g;
+
 /**
  * Extract wiki-style links from document content
  * Matches [[Document Title]] or [[Document Title|Display Text]]
  */
 export function extractWikiLinks(content: unknown[]): string[] {
   const links: string[] = [];
-  const wikiLinkRegex = /\[\[([^\]|]+)(?:\|[^\]]+)?\]\]/g;
 
   function extractFromBlock(block: Record<string, unknown>): void {
     if (!block) return;
 
     // Extract from text content
     if (typeof block.content === 'string') {
-      const matches = block.content.matchAll(wikiLinkRegex);
+      const matches = block.content.matchAll(WIKI_LINK_REGEX);
       for (const match of matches) {
         const linkTitle = match[1].trim();
         if (linkTitle && !links.includes(linkTitle)) {
