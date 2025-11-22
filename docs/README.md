@@ -28,27 +28,31 @@ Detailed guides for using 4Diary's features effectively.
 ### Architecture
 Technical documentation for understanding how 4Diary works.
 
-- [Architecture Overview](architecture/architecture.md) - System design and components
-- [Security Architecture](architecture/security-architecture.md) - Encryption implementation details
-- [Database Schema](architecture/database-schema.md) - MongoDB collections and structure
-- [API Reference](architecture/api-reference.md) - REST API endpoints documentation
-- [Deployment Guide](architecture/deployment.md) - Production deployment strategies
+- [Architecture Overview](architecture/architecture.md) - System design and components ✅
+- [Database Schema](architecture/database-schema.md) - MongoDB collections and structure ✅
+- Security Architecture - Encryption implementation details 📝 *Planned*
+- API Reference - REST API endpoints documentation 📝 *Planned*
+- Deployment Guide - Production deployment strategies 📝 *Planned*
 
 ### Advanced Topics
 Deep dives into advanced features and customization.
 
-- [Encryption Deep Dive](advanced/encryption.md) - Cryptographic implementation details
-- [Self-Hosting Guide](advanced/self-hosting.md) - Complete self-hosting instructions
-- [Custom Themes](advanced/theming.md) - Customize the leather theme
-- [Performance Optimization](advanced/performance.md) - Optimize for large workspaces
+- Encryption Deep Dive - Cryptographic implementation details 📝 *Planned*
+- Self-Hosting Guide - Complete self-hosting instructions 📝 *Planned*
+- Custom Themes - Customize the leather theme 📝 *Planned*
+- Performance Optimization - Optimize for large workspaces 📝 *Planned*
+
+> **Note**: See [Security & Privacy Guide](guides/security-privacy.md) for encryption basics and [Architecture Overview](architecture/architecture.md) for system design.
 
 ### Development
 Resources for contributors and developers.
 
-- [Development Workflow](development/workflow.md) - Setting up your dev environment
-- [Testing Guide](development/testing.md) - Writing and running tests
-- [Code Style Guide](development/code-style.md) - Coding standards and conventions
-- [Best Practices](development/best-practices.md) - Contributing guidelines
+- Development Workflow - Setting up your dev environment 📝 *Planned*
+- Testing Guide - Writing and running tests 📝 *Planned*
+- Code Style Guide - Coding standards and conventions 📝 *Planned*
+- Best Practices - Contributing guidelines 📝 *Planned*
+
+> **Note**: See [CONTRIBUTING.md](../CONTRIBUTING.md) and [TESTING_GUIDE.md](../TESTING_GUIDE.md) in the project root for current development documentation.
 
 ## 🔍 Quick Navigation
 
@@ -66,18 +70,18 @@ Resources for contributors and developers.
 
 **Privacy Conscious**
 1. Understand [Security & Privacy](guides/security-privacy.md)
-2. Read [Security Architecture](architecture/security-architecture.md)
-3. Review [Encryption Deep Dive](advanced/encryption.md)
+2. Read [Architecture Overview](architecture/architecture.md)
+3. Check [Database Schema](architecture/database-schema.md)
 
 **Self-Hosters**
-1. Follow the [Self-Hosting Guide](advanced/self-hosting.md)
-2. Review [Deployment Guide](architecture/deployment.md)
-3. Check [Performance Optimization](advanced/performance.md)
+1. Review [Architecture Overview](architecture/architecture.md)
+2. Check [Database Schema](architecture/database-schema.md)
+3. See [Installation Guide](getting-started/installation.md) Docker section
 
 **Developers**
-1. Set up [Development Workflow](development/workflow.md)
-2. Read [Architecture Overview](architecture/architecture.md)
-3. Follow [Code Style Guide](development/code-style.md)
+1. Read [Architecture Overview](architecture/architecture.md)
+2. Review [Database Schema](architecture/database-schema.md)
+3. Check [CONTRIBUTING.md](../CONTRIBUTING.md) for guidelines
 
 ### By Feature
 
