@@ -40,7 +40,7 @@ jobs:
       run: npm run build
     
     - name: Run tests
-      run: npm test || echo "Tests completed with warnings"
+      run: npm test
     
     - name: Get version from tag
       id: version
@@ -95,10 +95,28 @@ jobs:
           if [ -z "$COMMITS" ]; then
             echo "No changes in this release."
           else
-            # Categorize commits
-            echo "$COMMITS" | grep -i "^[a-f0-9]* feat" | sed 's/^/- /' || echo ""
-            echo "$COMMITS" | grep -i "^[a-f0-9]* fix" | sed 's/^/- /' || echo ""
-            echo "$COMMITS" | grep -v -i "^[a-f0-9]* \(feat\|fix\)" | sed 's/^/- /' || echo ""
+            # Show features
+            FEATURES=$(echo "$COMMITS" | grep -i "feat" || true)
+            if [ -n "$FEATURES" ]; then
+              echo "#### Features"
+              echo "$FEATURES" | sed 's/^/- /'
+              echo ""
+            fi
+            
+            # Show fixes
+            FIXES=$(echo "$COMMITS" | grep -i "fix" || true)
+            if [ -n "$FIXES" ]; then
+              echo "#### Bug Fixes"
+              echo "$FIXES" | sed 's/^/- /'
+              echo ""
+            fi
+            
+            # Show other changes
+            OTHER=$(echo "$COMMITS" | grep -v -i "feat\|fix" || true)
+            if [ -n "$OTHER" ]; then
+              echo "#### Other Changes"
+              echo "$OTHER" | sed 's/^/- /'
+            fi
           fi
           
           echo ""
