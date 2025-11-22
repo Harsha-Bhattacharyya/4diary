@@ -52,12 +52,15 @@
 
 ### TypeScript
 
-- **Strict Mode**: `strict: false` in tsconfig.json (intentional for rapid development)
+- **Strict Mode**: Currently `strict: false` in tsconfig.json for rapid alpha development
+  - Note: Consider enabling strict mode post-alpha for better type safety
+  - When writing new code, follow strict typing practices even though strict mode is off
 - **Target**: ES2020
 - **Module Resolution**: bundler
 - **Path Aliases**: Use `@/*` for root-level imports
-- **Type Annotations**: Prefer explicit types for function parameters and return values
+- **Type Annotations**: Always prefer explicit types for function parameters and return values
 - **Interfaces**: Use interfaces for component props and data structures
+- **Avoid `any`**: Use specific types or `unknown` instead of `any` when possible
 
 ### React Components
 
