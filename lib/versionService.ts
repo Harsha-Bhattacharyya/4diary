@@ -37,10 +37,16 @@ export async function saveDocumentVersion(
 
   try {
     const db = await openVersionDB();
-    const tx = db.transaction(['versions'], 'readwrite');
-    const store = tx.objectStore('versions');
-    await store.add(version);
-    await tx.complete;
+    
+    await new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(['versions'], 'readwrite');
+      const store = tx.objectStore('versions');
+      
+      store.add(version);
+      
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
     
     // Keep only last 50 versions per document
     await pruneOldVersions(documentId, 50);
@@ -59,11 +65,16 @@ export async function getDocumentVersions(
 
   try {
     const db = await openVersionDB();
-    const tx = db.transaction(['versions'], 'readonly');
-    const store = tx.objectStore('versions');
-    const index = store.index('by-document');
-    const versions = await index.getAll(documentId);
-    await tx.complete;
+    
+    const versions = await new Promise<DocumentVersion[]>((resolve, reject) => {
+      const tx = db.transaction(['versions'], 'readonly');
+      const store = tx.objectStore('versions');
+      const index = store.index('by-document');
+      const request = index.getAll(documentId);
+      
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
     
     // Sort by timestamp descending
     return versions.sort(
@@ -90,14 +101,20 @@ async function pruneOldVersions(
     if (versions.length <= keepCount) return;
 
     const db = await openVersionDB();
-    const tx = db.transaction(['versions'], 'readwrite');
-    const store = tx.objectStore('versions');
+    
+    await new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(['versions'], 'readwrite');
+      const store = tx.objectStore('versions');
 
-    // Delete versions beyond keepCount
-    const toDelete = versions.slice(keepCount);
-    for (const version of toDelete) {
-      await store.delete(version.id);
-    }
+      // Delete versions beyond keepCount
+      const toDelete = versions.slice(keepCount);
+      for (const version of toDelete) {
+        store.delete(version.id);
+      }
+      
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
   } catch (error) {
     console.error('Error pruning old versions:', error);
   }
@@ -134,12 +151,18 @@ export async function clearDocumentVersions(documentId: string): Promise<void> {
   try {
     const versions = await getDocumentVersions(documentId);
     const db = await openVersionDB();
-    const tx = db.transaction(['versions'], 'readwrite');
-    const store = tx.objectStore('versions');
+    
+    await new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(['versions'], 'readwrite');
+      const store = tx.objectStore('versions');
 
-    for (const version of versions) {
-      await store.delete(version.id);
-    }
+      for (const version of versions) {
+        store.delete(version.id);
+      }
+      
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
   } catch (error) {
     console.error('Error clearing document versions:', error);
   }
