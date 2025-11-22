@@ -1,3 +1,14 @@
+/**
+ * Copyright © 2025 Harsha Bhattacharyya
+ * 
+ * This file is part of 4diary.
+ * 
+ * SPDX-License-Identifier: BSD-3-Clause
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the conditions in the LICENSE file are met.
+ */
+
 // This file configures the initialization of Sentry for edge features (middleware, edge routes, and so on).
 // The config you add here will be used whenever one of the edge features is loaded.
 // Note that this config is unrelated to the Vercel Edge Runtime and is also required when running locally.

@@ -1,4 +1,15 @@
 /**
+ * Copyright © 2025 Harsha Bhattacharyya
+ * 
+ * This file is part of 4diary.
+ * 
+ * SPDX-License-Identifier: BSD-3-Clause
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the conditions in the LICENSE file are met.
+ */
+
+/**
  * Derives a base64-encoded encryption key from a password using PBKDF2 with the user's email as salt.
  *
  * @param password - The user's password used as the PBKDF2 input key material
