@@ -46,8 +46,14 @@ export default function AuthPage() {
       password += allChars[Math.floor(Math.random() * allChars.length)];
     }
     
-    // Shuffle the password
-    return password.split('').sort(() => Math.random() - 0.5).join('');
+    // Shuffle using Fisher-Yates algorithm
+    const chars = password.split('');
+    for (let i = chars.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [chars[i], chars[j]] = [chars[j], chars[i]];
+    }
+    
+    return chars.join('');
   };
 
   const handleGeneratePassword = () => {
@@ -57,7 +63,13 @@ export default function AuthPage() {
 
   const handleCopyPassword = async () => {
     if (password) {
-      await navigator.clipboard.writeText(password);
+      try {
+        await navigator.clipboard.writeText(password);
+        // Could add a toast notification here for success feedback
+      } catch (err) {
+        console.error('Failed to copy password:', err);
+        alert('Failed to copy password. Please copy it manually.');
+      }
     }
   };
 

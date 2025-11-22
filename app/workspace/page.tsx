@@ -65,7 +65,7 @@ function WorkspaceContent() {
     /**
      * Checks the current user session and redirects to the sign-in page if not authenticated.
      *
-     * If the session is authenticated, updates the component state with the user's email.
+     * If the session is authenticated, updates the component state with the user's username.
      * If the session is not authenticated or the request fails, navigates to `/auth`.
      */
     async function checkAuth() {
