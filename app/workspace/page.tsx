@@ -11,6 +11,8 @@ import EditableTitle from "@/components/ui/EditableTitle";
 import { EmojiPickerComponent } from "@/components/ui/EmojiPicker";
 import { QuickNote } from "@/components/ui/QuickNote";
 import SaveTemplateModal from "@/components/ui/SaveTemplateModal";
+import PWAInstallPrompt from "@/components/ui/PWAInstallPrompt";
+import PWAInit from "@/components/ui/PWAInit";
 import dynamic from "next/dynamic";
 import { keyManager } from "@/lib/crypto/keyManager";
 import {
@@ -23,6 +25,7 @@ import {
 import { getOrCreateDefaultWorkspace } from "@/lib/workspaceService";
 import { createDocumentFromTemplate } from "@/lib/templateService";
 import { exportDocumentAsMarkdown, exportDocumentsAsZip } from "@/lib/exportService";
+import { saveDocumentVersion } from "@/lib/versionService";
 import type { KanbanBoardData } from "@/components/kanban/Board";
 
 // Dynamic import to avoid SSR issues with BlockNote
@@ -32,6 +35,19 @@ const BlockEditor = dynamic(() => import("@/components/editor/BlockEditor"), {
 
 // Dynamic import for KanbanEditor
 const KanbanEditor = dynamic(() => import("@/components/kanban/KanbanEditor").then(mod => ({ default: mod.KanbanEditor })), {
+  ssr: false,
+});
+
+// Dynamic imports for new features
+const CalendarView = dynamic(() => import("@/components/ui/CalendarView"), {
+  ssr: false,
+});
+
+const VersionHistory = dynamic(() => import("@/components/ui/VersionHistory"), {
+  ssr: false,
+});
+
+const Backlinks = dynamic(() => import("@/components/ui/Backlinks"), {
   ssr: false,
 });
 
@@ -59,13 +75,16 @@ function WorkspaceContent() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [showShareToast, setShowShareToast] = useState(false);
   const [showSaveTemplateModal, setShowSaveTemplateModal] = useState(false);
+  const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
+  const [showVersionHistory, setShowVersionHistory] = useState(false);
+  const [showBacklinks, setShowBacklinks] = useState(true);
 
   // Check authentication
   useEffect(() => {
     /**
      * Checks the current user session and redirects to the sign-in page if not authenticated.
      *
-     * If the session is authenticated, updates the component state with the user's email.
+     * If the session is authenticated, updates the component state with the user's username.
      * If the session is not authenticated or the request fails, navigates to `/auth`.
      */
     async function checkAuth() {
@@ -78,13 +97,13 @@ function WorkspaceContent() {
           return;
         }
 
-        if (!data.email) {
-          console.error("Authenticated but no email provided");
+        if (!data.username) {
+          console.error("Authenticated but no username provided");
           router.push("/auth");
           return;
         }
 
-        setUserEmail(data.email);
+        setUserEmail(data.username);
       } catch (err) {
         console.error("Auth check error:", err);
         router.push("/auth");
@@ -213,6 +232,13 @@ function WorkspaceContent() {
         content,
         metadata: currentDocument.metadata,
       });
+
+      // Save version history
+      await saveDocumentVersion(
+        currentDocument.id,
+        content,
+        currentDocument.metadata.title
+      );
 
       // Update local state
       setCurrentDocument({
@@ -623,6 +649,28 @@ function WorkspaceContent() {
                   📄 Templates
                 </button>
               </Link>
+              <div className="border-t border-gray-200 my-2"></div>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowVersionHistory(true);
+                  setDropdownOpen(false);
+                }}
+                className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+              >
+                📚 Version History
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowBacklinks(!showBacklinks);
+                  setDropdownOpen(false);
+                }}
+                className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+              >
+                🔗 {showBacklinks ? "Hide" : "Show"} Backlinks
+              </button>
+              <div className="border-t border-gray-200 my-2"></div>
               <button
                 type="button"
                 onClick={handleExportDocument}
@@ -666,39 +714,53 @@ function WorkspaceContent() {
         </div>
 
         {/* Editor Content */}
-        <div className="pt-20 pb-24 px-6 max-w-4xl mx-auto min-h-screen">
-          {currentDocument.metadata.type === 'board' ? (
-            // Render Kanban board for board-type documents
-            <KanbanEditor
-              initialData={
-                Array.isArray(currentDocument.content) && 
-                currentDocument.content.length > 0 && 
-                (currentDocument.content[0] as { board?: KanbanBoardData })?.board
-                  ? (currentDocument.content[0] as { board: KanbanBoardData }).board
-                  : { columns: [] }
-              }
-              onBoardChange={async (newBoard) => {
-                if (!userEmail) return;
-                await updateDocument({
-                  id: currentDocument.id,
-                  userId: userEmail,
-                  content: [{ board: newBoard }],
-                  metadata: currentDocument.metadata,
-                });
-                setCurrentDocument({
-                  ...currentDocument,
-                  content: [{ board: newBoard }],
-                });
-              }}
-            />
-          ) : (
-            // Render regular BlockEditor for other documents
-            <BlockEditor
-              initialContent={currentDocument.content}
-              onSave={handleSave}
-              autoSave={true}
-              showToolbar={false}
-            />
+        <div className="pt-20 pb-24 px-6 mx-auto min-h-screen flex gap-6">
+          <div className="flex-1 max-w-4xl">
+            {currentDocument.metadata.type === 'board' ? (
+              // Render Kanban board for board-type documents
+              <KanbanEditor
+                initialData={
+                  Array.isArray(currentDocument.content) && 
+                  currentDocument.content.length > 0 && 
+                  (currentDocument.content[0] as { board?: KanbanBoardData })?.board
+                    ? (currentDocument.content[0] as { board: KanbanBoardData }).board
+                    : { columns: [] }
+                }
+                onBoardChange={async (newBoard) => {
+                  if (!userEmail) return;
+                  await updateDocument({
+                    id: currentDocument.id,
+                    userId: userEmail,
+                    content: [{ board: newBoard }],
+                    metadata: currentDocument.metadata,
+                  });
+                  setCurrentDocument({
+                    ...currentDocument,
+                    content: [{ board: newBoard }],
+                  });
+                }}
+              />
+            ) : (
+              // Render regular BlockEditor for other documents
+              <BlockEditor
+                initialContent={currentDocument.content}
+                onSave={handleSave}
+                autoSave={true}
+                showToolbar={false}
+              />
+            )}
+          </div>
+
+          {/* Backlinks Sidebar */}
+          {showBacklinks && currentDocument.metadata.type !== 'board' && workspaceId && userEmail && (
+            <div className="w-80 flex-shrink-0">
+              <Backlinks
+                documentTitle={currentDocument.metadata.title}
+                workspaceId={workspaceId}
+                userId={userEmail}
+                keyManager={keyManager}
+              />
+            </div>
           )}
         </div>
 
@@ -772,8 +834,24 @@ function WorkspaceContent() {
         initialTitle={currentDocument.metadata.title}
       />
 
+      {/* Version History Modal */}
+      {showVersionHistory && (
+        <VersionHistory
+          documentId={currentDocument.id}
+          onRestore={async (content) => {
+            await handleSave(content);
+            setShowVersionHistory(false);
+          }}
+          onClose={() => setShowVersionHistory(false)}
+        />
+      )}
+
       {/* QuickNote Modal - Available globally with Ctrl+Q */}
       <QuickNote onSave={handleSaveQuickNote} />
+
+      {/* PWA Components */}
+      <PWAInit />
+      <PWAInstallPrompt />
     </>
     );
   }
@@ -875,9 +953,33 @@ function WorkspaceContent() {
 
           {/* Quick Actions */}
           <GlassCard className="mb-8 p-4 sm:p-6">
-            <h2 className="text-lg sm:text-xl font-bold text-leather-100 mb-4">
-              Quick Actions
-            </h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg sm:text-xl font-bold text-leather-100">
+                Quick Actions
+              </h2>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setViewMode("list")}
+                  className={`px-3 py-1 rounded text-sm transition-colors ${
+                    viewMode === "list"
+                      ? "bg-leather-600 text-white"
+                      : "bg-leather-900/30 text-leather-200 hover:bg-leather-900/50"
+                  }`}
+                >
+                  📋 List
+                </button>
+                <button
+                  onClick={() => setViewMode("calendar")}
+                  className={`px-3 py-1 rounded text-sm transition-colors ${
+                    viewMode === "calendar"
+                      ? "bg-leather-600 text-white"
+                      : "bg-leather-900/30 text-leather-200 hover:bg-leather-900/50"
+                  }`}
+                >
+                  📅 Calendar
+                </button>
+              </div>
+            </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
               <button
                 onClick={handleCreateDocument}
@@ -925,17 +1027,23 @@ function WorkspaceContent() {
           {/* Documents Section */}
           {documents.length > 0 ? (
             <div className="space-y-6">
-              {/* Recent Documents */}
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl sm:text-2xl font-bold text-leather-100">
-                    Recent Documents
-                  </h2>
-                  <LeatherButton 
-                    variant="parchment" 
-                    size="sm"
-                    onClick={() => {
-                      const sorted = [...documents].sort((a, b) => 
+              {viewMode === "calendar" ? (
+                /* Calendar View */
+                <CalendarView documents={documents} />
+              ) : (
+                /* List View */
+                <>
+                  {/* Recent Documents */}
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <h2 className="text-xl sm:text-2xl font-bold text-leather-100">
+                        Recent Documents
+                      </h2>
+                      <LeatherButton 
+                        variant="parchment" 
+                        size="sm"
+                        onClick={() => {
+                          const sorted = [...documents].sort((a, b) => 
                         new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime()
                       );
                       setDocuments(sorted);
@@ -1055,6 +1163,8 @@ function WorkspaceContent() {
                   </GlassCard>
                 </div>
               )}
+                </>
+              )}
             </div>
           ) : (
             /* Empty State */
@@ -1123,6 +1233,10 @@ function WorkspaceContent() {
 
     {/* QuickNote Modal - Available globally with Ctrl+Q */}
     <QuickNote onSave={handleSaveQuickNote} />
+
+    {/* PWA Components */}
+    <PWAInit />
+    <PWAInstallPrompt />
   </>
   );
 }

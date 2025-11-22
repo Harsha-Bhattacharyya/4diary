@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { IM_Fell_DW_Pica, IM_Fell_English } from "next/font/google";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 // Note: IM Fell fonts only support weight 400. Bold text will be synthesized by the browser.
@@ -20,6 +22,13 @@ const imFellEnglish = IM_Fell_English({
 export const metadata: Metadata = {
   title: "4diary - Privacy Focused Solution",
   description: "A privacy focused solution for the modern world",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "4Diary",
+  },
+  themeColor: "#f59e0b",
 };
 
 /**
@@ -38,8 +47,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${imFellDWPica.variable} ${imFellEnglish.variable}`}>
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#f59e0b" />
+        <link rel="apple-touch-icon" href="/4diary.png" />
+      </head>
       <body className="antialiased">
         {children}
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

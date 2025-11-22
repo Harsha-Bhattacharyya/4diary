@@ -40,14 +40,14 @@ test.describe('TopMenu - Authentication State Detection', () => {
     await expect(loginButton).toBeVisible();
   });
 
-  test('should display user email when authenticated', async ({ page }) => {
+  test('should display username when authenticated', async ({ page }) => {
     await page.route('**/api/auth/session', async (route) => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({
           authenticated: true,
-          email: 'testuser@example.com',
+          username: 'testuser',
         }),
       });
     });
@@ -55,7 +55,7 @@ test.describe('TopMenu - Authentication State Detection', () => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
     
-    // Should display username (part before @)
+    // Should display username
     await expect(page.getByText('testuser')).toBeVisible();
   });
 
@@ -66,7 +66,7 @@ test.describe('TopMenu - Authentication State Detection', () => {
         contentType: 'application/json',
         body: JSON.stringify({
           authenticated: true,
-          email: 'user@test.com',
+          username: 'testuser',
         }),
       });
     });
@@ -79,14 +79,14 @@ test.describe('TopMenu - Authentication State Detection', () => {
     await expect(logoutButton).toBeVisible();
   });
 
-  test('should extract username from email (before @ symbol)', async ({ page }) => {
+  test('should display username directly from session', async ({ page }) => {
     await page.route('**/api/auth/session', async (route) => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({
           authenticated: true,
-          email: 'john.doe@example.com',
+          username: 'johndoe',
         }),
       });
     });
@@ -94,8 +94,8 @@ test.describe('TopMenu - Authentication State Detection', () => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
     
-    // Should display only the part before @
-    await expect(page.getByText('john.doe')).toBeVisible();
+    // Should display the username directly
+    await expect(page.getByText('johndoe')).toBeVisible();
   });
 
   test('should handle authentication check errors gracefully', async ({ page }) => {
@@ -148,7 +148,7 @@ test.describe('TopMenu - Logout Functionality', () => {
         contentType: 'application/json',
         body: JSON.stringify({
           authenticated: true,
-          email: 'user@test.com',
+          username: 'testuser',
         }),
       });
     });
@@ -181,7 +181,7 @@ test.describe('TopMenu - Logout Functionality', () => {
         contentType: 'application/json',
         body: JSON.stringify({
           authenticated: true,
-          email: 'user@test.com',
+          username: 'testuser',
         }),
       });
     });
@@ -211,7 +211,7 @@ test.describe('TopMenu - Logout Functionality', () => {
         contentType: 'application/json',
         body: JSON.stringify({
           authenticated: true,
-          email: 'user@test.com',
+          username: 'testuser',
         }),
       });
     });
@@ -228,7 +228,7 @@ test.describe('TopMenu - Logout Functionality', () => {
     await page.waitForLoadState('networkidle');
     
     // Verify authenticated state
-    await expect(page.getByText('user')).toBeVisible();
+    await expect(page.getByText('testuser')).toBeVisible();
     
     // Logout
     const logoutButton = page.getByRole('button', { name: /Logout/i });
@@ -248,7 +248,7 @@ test.describe('TopMenu - Logout Functionality', () => {
         contentType: 'application/json',
         body: JSON.stringify({
           authenticated: true,
-          email: 'user@test.com',
+          username: 'testuser',
         }),
       });
     });
@@ -280,7 +280,7 @@ test.describe('TopMenu - Logout Functionality', () => {
         contentType: 'application/json',
         body: JSON.stringify({
           authenticated: true,
-          email: 'user@test.com',
+          username: 'testuser',
         }),
       });
     });
@@ -297,7 +297,7 @@ test.describe('TopMenu - Logout Functionality', () => {
     await page.waitForLoadState('networkidle');
     
     // Verify email is displayed
-    await expect(page.getByText('user')).toBeVisible();
+    await expect(page.getByText('testuser')).toBeVisible();
     
     // Logout
     await page.getByRole('button', { name: /Logout/i }).click();
@@ -316,7 +316,7 @@ test.describe('TopMenu - User Display', () => {
         contentType: 'application/json',
         body: JSON.stringify({
           authenticated: true,
-          email: 'testuser@example.com',
+          username: 'testuser',
         }),
       });
     });
@@ -336,7 +336,7 @@ test.describe('TopMenu - User Display', () => {
         contentType: 'application/json',
         body: JSON.stringify({
           authenticated: true,
-          email: 'user@test.com',
+          username: 'testuser',
         }),
       });
     });
@@ -345,18 +345,18 @@ test.describe('TopMenu - User Display', () => {
     await page.waitForLoadState('networkidle');
     
     // Container should have flex layout
-    const container = page.locator('.flex.items-center.gap-3').filter({ hasText: /user|Logout/i });
+    const container = page.locator('.flex.items-center.gap-3').filter({ hasText: /testuser|Logout/i });
     await expect(container).toBeVisible();
   });
 
-  test('should handle very long email addresses', async ({ page }) => {
+  test('should handle very long usernames', async ({ page }) => {
     await page.route('**/api/auth/session', async (route) => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({
           authenticated: true,
-          email: 'verylongemailaddressfortesting@extremelylongdomainname.com',
+          username: 'verylongusernamefortesting123456789',
         }),
       });
     });
@@ -364,38 +364,18 @@ test.describe('TopMenu - User Display', () => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
     
-    // Should display username portion
-    await expect(page.getByText('verylongemailaddressfortesting')).toBeVisible();
+    // Should display username
+    await expect(page.getByText('verylongusernamefortesting123456789')).toBeVisible();
   });
 
-  test('should handle email without @ symbol gracefully', async ({ page }) => {
+  test('should handle null username', async ({ page }) => {
     await page.route('**/api/auth/session', async (route) => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({
           authenticated: true,
-          email: 'invalidemail',
-        }),
-      });
-    });
-
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
-    
-    // Should display something (likely empty string or full email)
-    const hasContent = await page.locator('body').isVisible();
-    expect(hasContent).toBeTruthy();
-  });
-
-  test('should handle null email', async ({ page }) => {
-    await page.route('**/api/auth/session', async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          authenticated: true,
-          email: null,
+          username: null,
         }),
       });
     });
@@ -470,7 +450,7 @@ test.describe('TopMenu - Hamburger Menu with Auth', () => {
         contentType: 'application/json',
         body: JSON.stringify({
           authenticated: true,
-          email: 'user@test.com',
+          username: 'testuser',
         }),
       });
     });
@@ -490,7 +470,7 @@ test.describe('TopMenu - Hamburger Menu with Auth', () => {
         contentType: 'application/json',
         body: JSON.stringify({
           authenticated: true,
-          email: 'user@test.com',
+          username: 'testuser',
         }),
       });
     });
@@ -513,7 +493,7 @@ test.describe('TopMenu - Hamburger Menu with Auth', () => {
         contentType: 'application/json',
         body: JSON.stringify({
           authenticated: true,
-          email: 'user@test.com',
+          username: 'testuser',
         }),
       });
     });
@@ -541,7 +521,7 @@ test.describe('TopMenu - Logout Button Styling', () => {
         contentType: 'application/json',
         body: JSON.stringify({
           authenticated: true,
-          email: 'user@test.com',
+          username: 'testuser',
         }),
       });
     });
@@ -564,7 +544,7 @@ test.describe('TopMenu - Logout Button Styling', () => {
         contentType: 'application/json',
         body: JSON.stringify({
           authenticated: true,
-          email: 'user@test.com',
+          username: 'testuser',
         }),
       });
     });
@@ -585,7 +565,7 @@ test.describe('TopMenu - Logout Button Styling', () => {
         contentType: 'application/json',
         body: JSON.stringify({
           authenticated: true,
-          email: 'user@test.com',
+          username: 'testuser',
         }),
       });
     });
@@ -608,7 +588,7 @@ test.describe('TopMenu - State Persistence', () => {
         contentType: 'application/json',
         body: JSON.stringify({
           authenticated: true,
-          email: 'persistent@test.com',
+          username: 'persistent',
         }),
       });
     });
@@ -637,7 +617,7 @@ test.describe('TopMenu - State Persistence', () => {
         contentType: 'application/json',
         body: JSON.stringify({
           authenticated: true,
-          email: 'user@test.com',
+          username: 'testuser',
         }),
       });
     });
