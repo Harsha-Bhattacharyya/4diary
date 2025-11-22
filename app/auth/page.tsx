@@ -25,8 +25,6 @@ export default function AuthPage() {
   const [agreeToTerms, setAgreeToTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showPasswordGenerator, setShowPasswordGenerator] = useState(false);
-  const [failedAttempts, setFailedAttempts] = useState(0);
 
   const generateSecurePassword = () => {
     const length = 16;
@@ -55,7 +53,6 @@ export default function AuthPage() {
   const handleGeneratePassword = () => {
     const newPassword = generateSecurePassword();
     setPassword(newPassword);
-    setShowPasswordGenerator(false);
   };
 
   const handleCopyPassword = async () => {
@@ -101,9 +98,6 @@ export default function AuthPage() {
       router.push("/workspace");
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
-      if (isLogin) {
-        setFailedAttempts(prev => prev + 1);
-      }
     } finally {
       setLoading(false);
     }
