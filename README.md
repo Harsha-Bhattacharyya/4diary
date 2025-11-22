@@ -17,6 +17,9 @@ A privacy-focused, end-to-end encrypted note-taking application built with Next.
 - 😀 **Emoji Icons**: Visual identification with emoji document icons
 - ⚡ **Quick Note**: Lightning-fast note capture (Ctrl/Cmd + Q)
 - 📖 **Quick Read**: Distraction-free reader mode
+- 🔗 **Backlinks**: Bidirectional linking with [[wiki-style]] syntax
+- 📅 **Calendar View**: Organize and view documents by date
+- 📚 **Version History**: Track changes and restore previous versions
 
 ### Collaboration & Sharing
 - 🔗 **Ephemeral Share Links**: Secure, time-limited sharing (24-hour default)
@@ -29,6 +32,7 @@ A privacy-focused, end-to-end encrypted note-taking application built with Next.
 - 🔗 **Embed Previews**: Rich URL previews with sanitized metadata
 - 📥 **Export Freedom**: Export as Markdown or ZIP files
 - 📦 **Self-Hostable**: Docker-ready deployment
+- 📱 **PWA Support**: Install as a progressive web app with offline capabilities
 
 ### UI/UX
 - 🎨 **Leather Theme**: Rich, warm color palette inspired by leather journals
@@ -145,6 +149,7 @@ For production, update the `docker-compose.yml` with:
 - **Export**: JSZip
 - **Kanban**: @asseinfo/react-kanban
 - **Emoji Picker**: emoji-picker-react
+- **Monitoring**: Sentry (error tracking), Vercel Analytics (web analytics & speed insights)
 
 ## 🔐 Security
 
@@ -211,6 +216,39 @@ For information about reporting security vulnerabilities, supported versions, an
 2. Click the "Reader Mode" button
 3. Adjust font size with A-/A+ buttons
 4. Press ESC or click ✕ to exit
+
+### Backlinks (Bidirectional Linking)
+
+1. Create links using [[Document Title]] syntax in your documents
+2. Links are automatically detected and indexed
+3. View backlinks sidebar when editing a document
+4. See all documents that link to the current page
+5. Click any backlink to navigate to that document
+
+### Calendar View
+
+1. In the workspace, toggle between List and Calendar views
+2. See all your documents organized by date
+3. Navigate between months using arrow buttons
+4. Click on any document to open it
+5. Visual indicators show days with documents
+
+### Version History
+
+1. Open any document
+2. Click the menu button (☰) → "Version History"
+3. Browse previous versions of the document
+4. Click on a version to preview it
+5. Click "Restore" to revert to that version
+6. Versions are saved automatically (keeps last 50 versions)
+
+### Progressive Web App (PWA)
+
+1. Visit the app in a supported browser (Chrome, Edge, Safari)
+2. Look for the "Install" prompt or browser install button
+3. Click install to add 4Diary to your device
+4. Access the app from your home screen or app drawer
+5. Works offline with automatic sync when back online
 
 ## ⌨️ Keyboard Shortcuts
 
