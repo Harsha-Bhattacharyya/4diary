@@ -30,19 +30,17 @@ Technical documentation for understanding how 4Diary works.
 
 - [Architecture Overview](architecture/architecture.md) - System design and components ✅
 - [Database Schema](architecture/database-schema.md) - MongoDB collections and structure ✅
-- Security Architecture - Encryption implementation details 📝 *Planned*
-- API Reference - REST API endpoints documentation 📝 *Planned*
-- Deployment Guide - Production deployment strategies 📝 *Planned*
+- [Security Architecture](architecture/security-architecture.md) - Encryption implementation details ✅
+- [API Reference](architecture/api-reference.md) - REST API endpoints documentation ✅
+- [Deployment Guide](architecture/deployment.md) - Production deployment strategies ✅
 
 ### Advanced Topics
 Deep dives into advanced features and customization.
 
-- Encryption Deep Dive - Cryptographic implementation details 📝 *Planned*
-- Self-Hosting Guide - Complete self-hosting instructions 📝 *Planned*
-- Custom Themes - Customize the leather theme 📝 *Planned*
-- Performance Optimization - Optimize for large workspaces 📝 *Planned*
-
-> **Note**: See [Security & Privacy Guide](guides/security-privacy.md) for encryption basics and [Architecture Overview](architecture/architecture.md) for system design.
+- [Encryption Deep Dive](advanced/encryption.md) - Cryptographic implementation details ✅
+- [Self-Hosting Guide](advanced/self-hosting.md) - Complete self-hosting instructions ✅
+- [Custom Themes](advanced/theming.md) - Customize the leather theme ✅
+- [Performance Optimization](advanced/performance.md) - Optimize for large workspaces ✅
 
 ### Development
 Resources for contributors and developers.
@@ -70,13 +68,13 @@ Resources for contributors and developers.
 
 **Privacy Conscious**
 1. Understand [Security & Privacy](guides/security-privacy.md)
-2. Read [Architecture Overview](architecture/architecture.md)
-3. Check [Database Schema](architecture/database-schema.md)
+2. Read [Security Architecture](architecture/security-architecture.md)
+3. Review [Encryption Deep Dive](advanced/encryption.md)
 
 **Self-Hosters**
-1. Review [Architecture Overview](architecture/architecture.md)
-2. Check [Database Schema](architecture/database-schema.md)
-3. See [Installation Guide](getting-started/installation.md) Docker section
+1. Follow the [Self-Hosting Guide](advanced/self-hosting.md)
+2. Review [Deployment Guide](architecture/deployment.md)
+3. Check [Performance Optimization](advanced/performance.md)
 
 **Developers**
 1. Read [Architecture Overview](architecture/architecture.md)
