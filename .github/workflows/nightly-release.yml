@@ -1,0 +1,109 @@
+name: Nightly Release
+
+on:
+  schedule:
+    # Run nightly at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch: # Allow manual trigger
+
+permissions:
+  contents: write
+
+jobs:
+  nightly-release:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+      with:
+        fetch-depth: 0 # Fetch all history for changelog
+    
+    - name: Use Node.js
+      uses: actions/setup-node@v6
+      with:
+        node-version: '22.x'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Run linter
+      run: npm run lint
+    
+    - name: Build project
+      run: npm run build
+    
+    - name: Get last nightly tag
+      id: last_tag
+      run: |
+        LAST_TAG=$(git tag -l "nightly-*" | sort -V | tail -n 1)
+        if [ -z "$LAST_TAG" ]; then
+          echo "last_tag=" >> $GITHUB_OUTPUT
+        else
+          echo "last_tag=$LAST_TAG" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: Generate changelog (excluding "Initial plan" commits)
+      id: changelog
+      run: |
+        LAST_TAG="${{ steps.last_tag.outputs.last_tag }}"
+        
+        if [ -z "$LAST_TAG" ]; then
+          # No previous nightly tag, get all commits from last release or last 50 commits
+          COMMITS=$(git log --oneline -50 --no-merges --grep="Initial plan" --invert-grep)
+        else
+          # Get commits since last nightly tag
+          COMMITS=$(git log ${LAST_TAG}..HEAD --oneline --no-merges --grep="Initial plan" --invert-grep)
+        fi
+        
+        # Check if there are any new commits (excluding "Initial plan")
+        if [ -z "$COMMITS" ]; then
+          echo "has_changes=false" >> $GITHUB_OUTPUT
+          echo "No new commits to release"
+        else
+          echo "has_changes=true" >> $GITHUB_OUTPUT
+          
+          # Write changelog to output
+          {
+            echo "changelog<<EOF"
+            echo "## Nightly Build - $(date +%Y-%m-%d)"
+            echo ""
+            echo "### Changes since last nightly:"
+            echo "$COMMITS" | sed 's/^/- /'
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
+        fi
+    
+    - name: Create nightly tag and release
+      if: steps.changelog.outputs.has_changes == 'true'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        TAG_NAME="nightly-$(date +%Y%m%d-%H%M%S)"
+        
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        
+        git tag -a "$TAG_NAME" -m "Nightly build $(date +%Y-%m-%d)"
+        git push origin "$TAG_NAME"
+        
+        # Create release
+        gh release create "$TAG_NAME" \
+          --title "Nightly Build - $(date +%Y-%m-%d)" \
+          --notes "${{ steps.changelog.outputs.changelog }}" \
+          --prerelease
+    
+    - name: Clean up old nightly releases
+      if: steps.changelog.outputs.has_changes == 'true'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        # Keep only the last 7 nightly releases
+        NIGHTLY_TAGS=$(git tag -l "nightly-*" | sort -V | head -n -7)
+        
+        for tag in $NIGHTLY_TAGS; do
+          echo "Deleting old nightly release: $tag"
+          gh release delete "$tag" --yes || true
+          git push --delete origin "$tag" || true
+        done
