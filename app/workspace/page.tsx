@@ -84,7 +84,7 @@ function WorkspaceContent() {
     /**
      * Checks the current user session and redirects to the sign-in page if not authenticated.
      *
-     * If the session is authenticated, updates the component state with the user's email.
+     * If the session is authenticated, updates the component state with the user's username.
      * If the session is not authenticated or the request fails, navigates to `/auth`.
      */
     async function checkAuth() {
@@ -97,13 +97,13 @@ function WorkspaceContent() {
           return;
         }
 
-        if (!data.email) {
-          console.error("Authenticated but no email provided");
+        if (!data.username) {
+          console.error("Authenticated but no username provided");
           router.push("/auth");
           return;
         }
 
-        setUserEmail(data.email);
+        setUserEmail(data.username);
       } catch (err) {
         console.error("Auth check error:", err);
         router.push("/auth");

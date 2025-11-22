@@ -7,22 +7,30 @@ import { deriveKeyFromPassword } from "@/lib/crypto-utils";
 /**
  * Handle signup requests and create a new user account.
  *
- * Processes a JSON body with `email`, `password`, and optional `name`; creates and stores a new user record, issues a JWT session token, and sets an HTTP-only `session` cookie on success.
+ * Processes a JSON body with `username`, `password`, and optional `name`; creates and stores a new user record, issues a JWT session token, and sets an HTTP-only `session` cookie on success.
  *
- * @param request - Incoming request whose JSON body must include `email` and `password` (and may include `name`)
+ * @param request - Incoming request whose JSON body must include `username` and `password` (and may include `name`)
  * @returns A NextResponse with:
  *  - status 201 and a success JSON body and an HTTP-only `session` cookie when the account is created,
- *  - status 400 and an error JSON body when `email` or `password` is missing,
- *  - status 409 and an error JSON body when the email is already registered,
+ *  - status 400 and an error JSON body when `username` or `password` is missing or username contains spaces,
+ *  - status 409 and an error JSON body when the username is already taken,
  *  - status 500 and an error JSON body on internal failure.
  */
 export async function POST(request: NextRequest) {
   try {
-    const { email, password, name } = await request.json();
+    const { username, password, name } = await request.json();
 
-    if (!email || !password) {
+    if (!username || !password) {
       return NextResponse.json(
-        { error: "Email and password are required" },
+        { error: "Username and password are required" },
+        { status: 400 }
+      );
+    }
+
+    // Validate username has no spaces
+    if (username.includes(" ")) {
+      return NextResponse.json(
+        { error: "Username cannot contain spaces" },
         { status: 400 }
       );
     }
@@ -37,10 +45,10 @@ export async function POST(request: NextRequest) {
 
     const usersCollection = db.collection("users");
     // Check if user already exists
-    const existingUser = await usersCollection.findOne({ email });
+    const existingUser = await usersCollection.findOne({ username });
     if (existingUser) {
       return NextResponse.json(
-        { error: "User already exists" },
+        { error: "Username already taken" },
         { status: 409 }
       );
     }
@@ -49,14 +57,14 @@ export async function POST(request: NextRequest) {
     const passwordHash = await bcrypt.hash(password, 10);
 
     // Derive encryption key from password
-    const encryptionKey = await deriveKeyFromPassword(password, email);
+    const encryptionKey = await deriveKeyFromPassword(password, username);
 
     // Create user
     const user = {
-      email,
+      username,
       passwordHash,
       encryptionKey,
-      name: name || email.split("@")[0],
+      name: name || username,
       createdAt: new Date(),
     };
 
@@ -73,7 +81,7 @@ export async function POST(request: NextRequest) {
     }
 
     const secret = new TextEncoder().encode(secretValue);
-    const token = await new SignJWT({ email, encryptionKey })
+    const token = await new SignJWT({ username, encryptionKey })
       .setProtectedHeader({ alg: "HS256" })
       .setExpirationTime("7d")
       .sign(secret);
