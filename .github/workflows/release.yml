@@ -95,24 +95,24 @@ jobs:
           if [ -z "$COMMITS" ]; then
             echo "No changes in this release."
           else
-            # Show features (commits starting with "feat:" or "feat(")
-            FEATURES=$(echo "$COMMITS" | grep -E '^\w+ feat[:(]' || true)
+            # Show features (commits with "feat:" or "feat(" or starting with "Add")
+            FEATURES=$(echo "$COMMITS" | grep -iE '^[a-f0-9]+ (feat[:(]|Add )' || true)
             if [ -n "$FEATURES" ]; then
               echo "#### Features"
               echo "$FEATURES" | sed 's/^/- /'
               echo ""
             fi
             
-            # Show fixes (commits starting with "fix:" or "fix(")
-            FIXES=$(echo "$COMMITS" | grep -E '^\w+ fix[:(]' || true)
+            # Show fixes (commits with "fix:" or "fix(" or starting with "Fix")
+            FIXES=$(echo "$COMMITS" | grep -iE '^[a-f0-9]+ (fix[:(]|Fix )' || true)
             if [ -n "$FIXES" ]; then
               echo "#### Bug Fixes"
               echo "$FIXES" | sed 's/^/- /'
               echo ""
             fi
             
-            # Show other changes (exclude feat: and fix: commits)
-            OTHER=$(echo "$COMMITS" | grep -v -E '^\w+ (feat|fix)[:(]' || true)
+            # Show other changes (exclude features and fixes)
+            OTHER=$(echo "$COMMITS" | grep -v -iE '^[a-f0-9]+ (feat[:(]|fix[:(]|Add |Fix )' || true)
             if [ -n "$OTHER" ]; then
               echo "#### Other Changes"
               echo "$OTHER" | sed 's/^/- /'
