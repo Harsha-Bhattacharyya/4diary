@@ -19,13 +19,13 @@ export default function TopMenu({ currentPage = "Home" }: TopMenuProps) {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [username, setUsername] = useState<string | null>(null);
 
   useEffect(() => {
     /**
      * Check the current authentication session and update the component's authentication state.
      *
-     * Updates `isAuthenticated` to reflect the session; when authenticated, sets `userEmail` to the session email.
+     * Updates `isAuthenticated` to reflect the session; when authenticated, sets `username` to the session username.
      * If the session check fails, sets `isAuthenticated` to `false`.
      */
     async function checkAuth() {
@@ -34,7 +34,7 @@ export default function TopMenu({ currentPage = "Home" }: TopMenuProps) {
         const data = await response.json();
         setIsAuthenticated(data.authenticated);
         if (data.authenticated) {
-          setUserEmail(data.email);
+          setUsername(data.username);
         }
       } catch (err) {
         console.error("Auth check error:", err);
@@ -74,7 +74,7 @@ export default function TopMenu({ currentPage = "Home" }: TopMenuProps) {
           {isAuthenticated ? (
             <div className="flex items-center gap-3">
               <span className="text-leather-200 text-sm">
-                {userEmail?.split('@')[0] || 'User'}
+                {username || 'User'}
               </span>
               <button
                 type="button"
@@ -89,7 +89,7 @@ export default function TopMenu({ currentPage = "Home" }: TopMenuProps) {
                     
                     // Only clear state and redirect on successful logout
                     setIsAuthenticated(false);
-                    setUserEmail(null);
+                    setUsername(null);
                     router.push("/auth");
                   } catch (err) {
                     console.error("Logout error:", err);

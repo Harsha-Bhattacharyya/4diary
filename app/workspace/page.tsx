@@ -78,13 +78,13 @@ function WorkspaceContent() {
           return;
         }
 
-        if (!data.email) {
-          console.error("Authenticated but no email provided");
+        if (!data.username) {
+          console.error("Authenticated but no username provided");
           router.push("/auth");
           return;
         }
 
-        setUserEmail(data.email);
+        setUserEmail(data.username);
       } catch (err) {
         console.error("Auth check error:", err);
         router.push("/auth");
