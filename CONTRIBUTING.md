@@ -51,6 +51,29 @@ Enhancement suggestions are tracked as GitHub issues. When creating an enhanceme
 5. Make sure your code lints
 6. Issue that pull request!
 
+## CI/CD Workflows
+
+The project uses GitHub Actions for continuous integration and releases:
+
+* **CI Workflow** (`.github/workflows/ci.yml`): Runs on every push and pull request to main branch
+  - Lints code with ESLint
+  - Builds the project
+  - Runs tests with Playwright
+  - Tests on Node.js 20.x and 22.x
+
+* **Nightly Release** (`.github/workflows/nightly-release.yml`): Automated nightly builds
+  - Runs daily at 2 AM UTC
+  - Creates pre-release tags (e.g., `nightly-20250122-020000`)
+  - Automatically cleans up old nightly releases (keeps last 7)
+  - Excludes commits with message "Initial plan"
+
+* **Main Release** (`.github/workflows/release.yml`): Stable releases
+  - Triggered by version tags (e.g., `v1.0.0`, `v0.1.0-alpha`)
+  - Can be triggered manually via workflow_dispatch
+  - Generates changelog from commits
+  - Excludes commits with message "Initial plan"
+  - Supports pre-release tags (alpha, beta, rc)
+
 ## Development Setup
 
 ```bash
