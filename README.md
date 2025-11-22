@@ -149,6 +149,7 @@ For production, update the `docker-compose.yml` with:
 - **Export**: JSZip
 - **Kanban**: @asseinfo/react-kanban
 - **Emoji Picker**: emoji-picker-react
+- **Monitoring**: Sentry (error tracking), Vercel Analytics (web analytics & speed insights)
 
 ## 🔐 Security
 

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { IM_Fell_DW_Pica, IM_Fell_English } from "next/font/google";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 // Note: IM Fell fonts only support weight 400. Bold text will be synthesized by the browser.
@@ -52,6 +54,8 @@ export default function RootLayout({
       </head>
       <body className="antialiased">
         {children}
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
