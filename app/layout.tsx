@@ -644,11 +644,6 @@ export const metadata: Metadata = {
     creator: "@4diary",
     site: "@4diary"
   },
-  verification: {
-    google: "google-site-verification-code",
-    yandex: "yandex-verification-code",
-    yahoo: "yahoo-verification-code"
-  },
   alternates: {
     canonical: "https://4diary.vercel.app"
   },
@@ -754,7 +749,6 @@ export default function RootLayout({
         <meta name="distribution" content="Global" />
         <meta name="HandheldFriendly" content="True" />
         <meta name="MobileOptimized" content="320" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-touch-fullscreen" content="yes" />
         <link rel="author" href="https://github.com/Harsha-Bhattacharyya" />
         <link rel="me" href="https://github.com/Harsha-Bhattacharyya" />

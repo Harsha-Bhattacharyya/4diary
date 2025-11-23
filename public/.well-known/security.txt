@@ -1,7 +1,5 @@
-Contact: mailto:security@4diary.app
 Contact: https://github.com/Harsha-Bhattacharyya/4diary/security/advisories/new
 Expires: 2026-12-31T23:59:59.000Z
-Encryption: https://github.com/Harsha-Bhattacharyya.gpg
 Preferred-Languages: en
 Canonical: https://4diary.vercel.app/.well-known/security.txt
 Policy: https://github.com/Harsha-Bhattacharyya/4diary/blob/main/SECURITY.md
@@ -14,8 +12,7 @@ Acknowledgments: https://github.com/Harsha-Bhattacharyya/4diary/blob/main/SECURI
 #
 # If you discover a security vulnerability, please:
 # 1. Do NOT open a public GitHub issue
-# 2. Report it via GitHub Security Advisories (preferred)
-# 3. Or email us at security@4diary.app
+# 2. Report it via GitHub Security Advisories (preferred): https://github.com/Harsha-Bhattacharyya/4diary/security/advisories/new
 #
 # We aim to:
 # - Acknowledge receipt within 48 hours
