@@ -1,0 +1,105 @@
+# humanstxt.org/
+# The humans responsible & technology colophon
+
+# TEAM
+
+    Creator & Lead Developer: Harsha Bhattacharyya
+    GitHub: https://github.com/Harsha-Bhattacharyya
+    Location: India
+
+# THANKS
+
+    All contributors and users
+    Open source community
+    Next.js team
+    Vercel team
+    MongoDB team
+    All package maintainers
+
+# TECHNOLOGY COLOPHON
+
+    ## Framework & Languages
+    Next.js 16.0.3
+    React 19.2.0
+    TypeScript 5.9.3
+    
+    ## Styling
+    Tailwind CSS v4
+    Custom leather theme
+    IM Fell fonts
+    
+    ## Security & Privacy
+    Web Crypto API (AES-256-GCM)
+    Zero-knowledge architecture
+    End-to-end encryption
+    
+    ## Editor
+    BlockNote
+    TipTap extensions
+    Sanitize HTML
+    React Markdown
+    
+    ## Database & Cache
+    MongoDB 7.0.0
+    Redis (optional)
+    IndexedDB (client-side)
+    
+    ## Testing
+    Playwright 1.56.1
+    E2E and Unit tests
+    
+    ## Deployment
+    Vercel
+    Docker
+    Standalone output
+    
+    ## Monitoring & Analytics
+    Sentry
+    Vercel Analytics
+    Speed Insights
+    
+    ## Other Tools
+    ESLint
+    PostCSS
+    Jose (JWT)
+    UUID
+    JSZip
+    Framer Motion
+    React Kanban
+    Emoji Picker React
+    React Hotkeys Hook
+    
+    ## Features
+    - Military-grade encryption
+    - Zero-knowledge architecture
+    - Notion-like editor
+    - Kanban boards
+    - Quick notes
+    - Ephemeral sharing
+    - Backlinks
+    - Templates
+    - Calendar view
+    - Version history
+    - PWA support
+    - Offline capabilities
+    - Self-hostable
+    - Open source (BSD-3-Clause)
+    
+# CONTACT
+
+    GitHub: https://github.com/Harsha-Bhattacharyya/4diary
+    Issues: https://github.com/Harsha-Bhattacharyya/4diary/issues
+    Security: https://github.com/Harsha-Bhattacharyya/4diary/security
+    
+# MADE WITH
+
+    ❤️ Love for privacy
+    🔒 Passion for security
+    🎨 Eye for design
+    🇮🇳 Made in India
+    
+# LICENSE
+
+    BSD-3-Clause License
+    Free and Open Source Software (FLOSS)
+    Copyright © 2025 Harsha Bhattacharyya

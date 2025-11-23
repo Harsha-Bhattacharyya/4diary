@@ -1,0 +1,24 @@
+# robots.txt for 4diary - Privacy-focused note-taking application
+
+# Allow all search engines to crawl the public pages
+User-agent: *
+Allow: /
+Allow: /about
+Allow: /docs
+Disallow: /workspace
+Disallow: /workspace/*
+Disallow: /api/
+Disallow: /api/*
+Disallow: /auth
+Disallow: /auth/*
+Disallow: /share/
+Disallow: /share/*
+Disallow: /settings
+Disallow: /settings/*
+Disallow: /templates
+
+# Crawl-delay for polite crawling (in seconds)
+Crawl-delay: 1
+
+# Sitemap location
+Sitemap: https://4diary.vercel.app/sitemap.xml

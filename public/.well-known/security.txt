@@ -1,0 +1,23 @@
+Contact: https://github.com/Harsha-Bhattacharyya/4diary/security/advisories/new
+Expires: 2026-12-31T23:59:59.000Z
+Preferred-Languages: en
+Canonical: https://4diary.vercel.app/.well-known/security.txt
+Policy: https://github.com/Harsha-Bhattacharyya/4diary/blob/main/SECURITY.md
+Acknowledgments: https://github.com/Harsha-Bhattacharyya/4diary/blob/main/SECURITY.md#acknowledgments
+
+# Security Policy for 4diary
+# 
+# 4diary is a privacy-focused, end-to-end encrypted note-taking application.
+# We take security seriously and appreciate responsible disclosure of security vulnerabilities.
+#
+# If you discover a security vulnerability, please:
+# 1. Do NOT open a public GitHub issue
+# 2. Report it via GitHub Security Advisories (preferred): https://github.com/Harsha-Bhattacharyya/4diary/security/advisories/new
+#
+# We aim to:
+# - Acknowledge receipt within 48 hours
+# - Provide an initial assessment within 7 days
+# - Keep you informed of our progress
+# - Credit you in our security acknowledgments (if desired)
+#
+# Thank you for helping keep 4diary secure!
