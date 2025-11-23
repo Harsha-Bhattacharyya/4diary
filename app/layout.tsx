@@ -746,6 +746,21 @@ export default function RootLayout({
         <link rel="shortcut icon" href="/4diary.png" />
         <link rel="apple-touch-icon" sizes="180x180" href="/4diary.png" />
         <link rel="mask-icon" href="/4diary.png" color="#f59e0b" />
+        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+        <link rel="dns-prefetch" href="https://cdn.vercel-insights.com" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <meta name="rating" content="General" />
+        <meta name="distribution" content="Global" />
+        <meta name="HandheldFriendly" content="True" />
+        <meta name="MobileOptimized" content="320" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-touch-fullscreen" content="yes" />
+        <link rel="author" href="https://github.com/Harsha-Bhattacharyya" />
+        <link rel="me" href="https://github.com/Harsha-Bhattacharyya" />
+        <link rel="help" href="https://github.com/Harsha-Bhattacharyya/4diary/discussions" />
+        <link rel="license" href="https://github.com/Harsha-Bhattacharyya/4diary/blob/main/LICENSE" />
+        <link rel="humans" href="/humans.txt" />
       </head>
       <body className="antialiased">
         <Script

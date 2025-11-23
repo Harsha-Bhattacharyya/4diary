@@ -133,6 +133,61 @@ export default function Home() {
     }
   };
 
+  const faqData = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Is 4diary really secure?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes! 4diary uses military-grade AES-256-GCM encryption with a zero-knowledge architecture. This means your notes are encrypted on your device before being sent to the server, and we never have access to your unencrypted content. The encryption keys are stored only on your device, ensuring complete privacy."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is zero-knowledge encryption?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Zero-knowledge encryption means that the server never sees your unencrypted data. All encryption and decryption happens on your device (client-side), so even if our servers were compromised, your notes would remain secure because we never have access to your encryption keys."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I self-host 4diary?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Absolutely! 4diary is open-source and designed to be self-hostable. We provide Docker containers and detailed documentation to help you run your own instance. This gives you complete control over your data and infrastructure."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does 4diary work offline?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes! 4diary is a Progressive Web App (PWA) with offline support. You can install it on your device and continue taking notes even without an internet connection. Your notes will sync automatically when you're back online."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What features does 4diary offer?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "4diary offers a rich set of features including: Notion-like rich text editing, Kanban boards for task management, Quick Note feature (Ctrl/Cmd + Q), backlinks with wiki-style syntax, ephemeral share links, templates, calendar view, version history, export to Markdown and ZIP, and much more - all with end-to-end encryption."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is 4diary free to use?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes! 4diary is completely free and open-source software (FLOSS) licensed under the BSD-3-Clause license. You can use it, modify it, and even distribute it freely. There are no premium tiers or hidden costs."
+        }
+      }
+    ]
+  };
+
   return (
     <div className="min-h-screen relative">
       <Script
@@ -149,6 +204,11 @@ export default function Home() {
         id="structured-data-webpage"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(webpageData) }}
+      />
+      <Script
+        id="structured-data-faq"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqData) }}
       />
       <LeatherBackground />
       

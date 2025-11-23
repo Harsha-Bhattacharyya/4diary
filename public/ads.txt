@@ -1,0 +1,4 @@
+# ads.txt for 4diary
+# This file is intentionally empty.
+# 4diary does not serve ads and does not participate in any advertising networks.
+# We are a privacy-focused, ad-free application.
