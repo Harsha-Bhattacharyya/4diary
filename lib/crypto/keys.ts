@@ -197,8 +197,9 @@ export async function storeMasterKey(
   salt: Uint8Array
 ): Promise<void> {
   const db = await openKeyStore();
+  const exported = await crypto.subtle.exportKey("raw", key);
   
-  return new Promise(async (resolve, reject) => {
+  return new Promise((resolve, reject) => {
     const transaction = db.transaction(["keys"], "readwrite");
     const store = transaction.objectStore("keys");
 
@@ -207,8 +208,6 @@ export async function storeMasterKey(
     transaction.onerror = () => reject(transaction.error);
 
     try {
-      const exported = await crypto.subtle.exportKey("raw", key);
-
       // Perform the put operation
       store.put(
         {

@@ -25,8 +25,10 @@ test.describe('IndexedDB Key Storage - Transaction Handling', () => {
 
     // Test the key storage flow in the browser context
     const result = await page.evaluate(async () => {
-      // Import the functions (they're available in the browser context)
-      const { storeMasterKey, retrieveMasterKey, generateMasterKey } = await import('/lib/crypto/keys');
+      // Import the functions from the module
+      // Using absolute path for browser context evaluation
+      const keyModule = await import('@/lib/crypto/keys');
+      const { storeMasterKey, retrieveMasterKey, generateMasterKey } = keyModule;
       
       try {
         // Generate a test key
@@ -74,7 +76,8 @@ test.describe('IndexedDB Key Storage - Transaction Handling', () => {
     await page.waitForLoadState('networkidle');
 
     const result = await page.evaluate(async () => {
-      const { storeMasterKey, generateMasterKey } = await import('/lib/crypto/keys');
+      const keyModule = await import('@/lib/crypto/keys');
+      const { storeMasterKey, generateMasterKey } = keyModule;
       
       try {
         // Store key multiple times in sequence
@@ -100,7 +103,8 @@ test.describe('IndexedDB Key Storage - Transaction Handling', () => {
     await page.waitForLoadState('networkidle');
 
     const result = await page.evaluate(async () => {
-      const { retrieveMasterKey } = await import('/lib/crypto/keys');
+      const keyModule = await import('@/lib/crypto/keys');
+      const { retrieveMasterKey } = keyModule;
       
       try {
         // Clear the database first
