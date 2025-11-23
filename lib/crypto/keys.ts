@@ -235,29 +235,30 @@ export async function retrieveMasterKey(): Promise<MasterKey | null> {
     const store = transaction.objectStore("keys");
     const request = store.get("master");
     
-    request.onsuccess = async () => {
-      try {
-        const data = request.result;
-        if (!data) {
-          resolve(null);
-          return;
-        }
-
-        const key = await crypto.subtle.importKey(
-          "raw",
-          data.key,
-          "AES-GCM",
-          true,
-          ["encrypt", "decrypt"]
-        );
-
-        resolve({
-          key,
-          salt: new Uint8Array(data.salt),
-        });
-      } catch (error) {
-        reject(error);
+    request.onsuccess = () => {
+      const data = request.result;
+      if (!data) {
+        resolve(null);
+        return;
       }
+
+      // Import the key asynchronously and resolve with it
+      crypto.subtle.importKey(
+        "raw",
+        data.key,
+        "AES-GCM",
+        true,
+        ["encrypt", "decrypt"]
+      )
+        .then((key) => {
+          resolve({
+            key,
+            salt: new Uint8Array(data.salt),
+          });
+        })
+        .catch((error) => {
+          reject(error);
+        });
     };
     
     request.onerror = () => reject(request.error);
