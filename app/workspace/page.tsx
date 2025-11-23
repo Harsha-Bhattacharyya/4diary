@@ -506,6 +506,50 @@ function WorkspaceContent() {
     }
   };
 
+  const handleToggleFavorite = async (docId: string, favorite: boolean) => {
+    if (!userEmail) return;
+
+    try {
+      await updateDocument({
+        id: docId,
+        userId: userEmail,
+        favorite,
+      });
+
+      // Update local state
+      setDocuments(prevDocs =>
+        prevDocs.map(doc =>
+          doc.id === docId ? { ...doc, favorite } : doc
+        )
+      );
+    } catch (err) {
+      console.error("Toggle favorite error:", err);
+      setError(err instanceof Error ? err.message : "Failed to toggle favorite");
+    }
+  };
+
+  const handleReorder = async (docId: string, newSortOrder: number) => {
+    if (!userEmail) return;
+
+    try {
+      await updateDocument({
+        id: docId,
+        userId: userEmail,
+        sortOrder: newSortOrder,
+      });
+
+      // Update local state
+      setDocuments(prevDocs =>
+        prevDocs.map(doc =>
+          doc.id === docId ? { ...doc, sortOrder: newSortOrder } : doc
+        )
+      );
+    } catch (err) {
+      console.error("Reorder error:", err);
+      setError(err instanceof Error ? err.message : "Failed to reorder document");
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen relative flex items-center justify-center">
@@ -594,6 +638,16 @@ function WorkspaceContent() {
                 onSave={handleTitleChange}
                 className="text-2xl font-bold text-gray-900 text-center"
               />
+              <button
+                type="button"
+                onClick={() => handleToggleFavorite(currentDocument.id, !currentDocument.favorite)}
+                className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors flex items-center gap-1"
+                title={currentDocument.favorite ? "Unstar this note" : "Star this note"}
+              >
+                <span className="text-lg">
+                  {currentDocument.favorite ? "⭐" : "☆"}
+                </span>
+              </button>
               <button
                 type="button"
                 onClick={handleShareDocument}
@@ -881,10 +935,14 @@ function WorkspaceContent() {
             id: doc.id,
             title: doc.metadata.title,
             folder: doc.metadata.folder,
+            favorite: doc.favorite,
+            sortOrder: doc.sortOrder,
           }))}
           onDocumentClick={handleOpenDocument}
           collapsed={sidebarCollapsed}
           onToggle={setSidebarCollapsed}
+          onToggleFavorite={handleToggleFavorite}
+          onReorder={handleReorder}
         />
       </div>
 

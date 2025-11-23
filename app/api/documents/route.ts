@@ -177,6 +177,7 @@ export async function PUT(request: NextRequest) {
       metadata,
       favorite,
       archived,
+      sortOrder,
     } = body;
 
     if (!id || !userId) {
@@ -195,6 +196,7 @@ export async function PUT(request: NextRequest) {
       if (metadata) updates.metadata = metadata;
       if (favorite !== undefined) updates.favorite = favorite;
       if (archived !== undefined) updates.archived = archived;
+      if (sortOrder !== undefined) updates.sortOrder = sortOrder;
 
       const success = inMemoryStorage.updateDocument(id, updates);
 
@@ -218,6 +220,7 @@ export async function PUT(request: NextRequest) {
     if (metadata) updateFields.metadata = metadata;
     if (favorite !== undefined) updateFields.favorite = favorite;
     if (archived !== undefined) updateFields.archived = archived;
+    if (sortOrder !== undefined) updateFields.sortOrder = sortOrder;
 
     const result = await db.collection(collections.documents).updateOne(
       { _id: new ObjectId(id), userId },

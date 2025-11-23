@@ -163,6 +163,7 @@ export interface DocumentType {
   };
   favorite: boolean;
   archived: boolean;
+  sortOrder?: number; // Custom sort order for documents in sidebar
   burnAfterReading?: boolean;
   selfDestructAt?: Date;
   createdAt: Date;
