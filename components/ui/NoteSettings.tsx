@@ -57,48 +57,37 @@ export default function NoteSettings({
     // Convert content to text for analysis
     const extractText = (blocks: unknown[]): string => {
       let text = "";
+      const stack: unknown[] = [...blocks];
       
-      const processBlock = (block: Record<string, unknown>): void => {
-        if (!block) return;
+      while (stack.length > 0) {
+        const block = stack.pop();
+        if (!block || typeof block !== "object") continue;
+        
+        const objBlock = block as Record<string, unknown>;
         
         // Handle text content directly in block
-        if (block.text) {
-          text += block.text + "\n";
+        if (objBlock.text) {
+          text += objBlock.text + "\n";
         }
         
         // Handle content array
-        if (Array.isArray(block.content)) {
-          block.content.forEach((item: unknown) => {
+        if (Array.isArray(objBlock.content)) {
+          objBlock.content.forEach((item: unknown) => {
             if (typeof item === "string") {
               text += item;
             } else if (item && typeof item === "object") {
-              const objItem = item as Record<string, unknown>;
-              if (objItem.text) {
-                text += objItem.text;
-              }
-              if (Array.isArray(objItem.content)) {
-                processBlock(objItem);
-              }
+              stack.push(item);
             }
           });
           text += "\n";
         }
         
         // Handle children/nested blocks
-        if (Array.isArray(block.children)) {
-          block.children.forEach((child: unknown) => {
-            if (child && typeof child === "object") {
-              processBlock(child as Record<string, unknown>);
-            }
-          });
+        if (Array.isArray(objBlock.children)) {
+          stack.push(...objBlock.children);
         }
-      };
+      }
       
-      blocks.forEach((block) => {
-        if (block && typeof block === "object") {
-          processBlock(block as Record<string, unknown>);
-        }
-      });
       return text;
     };
 
@@ -110,7 +99,7 @@ export default function NoteSettings({
     
     // Calculate file size (approximate JSON size in KB)
     const jsonString = JSON.stringify(content);
-    const sizeInBytes = new Blob([jsonString]).size;
+    const sizeInBytes = new TextEncoder().encode(jsonString).length;
     const sizeInKB = sizeInBytes / 1024;
 
     return {

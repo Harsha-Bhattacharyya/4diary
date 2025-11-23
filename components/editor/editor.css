@@ -66,8 +66,12 @@
   align-items: flex-start;
 }
 
+.editor-with-line-numbers {
+  counter-reset: line-number;
+}
+
 .editor-with-line-numbers .bn-block-outer::before {
-  content: attr(data-line-number);
+  content: counter(line-number);
   display: inline-block;
   width: 3rem;
   padding-right: 1rem;
@@ -78,12 +82,4 @@
   flex-shrink: 0;
   user-select: none;
   counter-increment: line-number;
-}
-
-.editor-with-line-numbers {
-  counter-reset: line-number;
-}
-
-.editor-with-line-numbers .bn-block-outer::before {
-  content: counter(line-number);
 }
