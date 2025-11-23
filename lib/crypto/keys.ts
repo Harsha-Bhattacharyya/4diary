@@ -197,24 +197,31 @@ export async function storeMasterKey(
   salt: Uint8Array
 ): Promise<void> {
   const db = await openKeyStore();
-  const transaction = db.transaction(["keys"], "readwrite");
-  const store = transaction.objectStore("keys");
+  
+  return new Promise(async (resolve, reject) => {
+    const transaction = db.transaction(["keys"], "readwrite");
+    const store = transaction.objectStore("keys");
 
-  const exported = await crypto.subtle.exportKey("raw", key);
-
-  await store.put(
-    {
-      id: "master",
-      key: exported,
-      salt: salt,
-    },
-    "master"
-  );
-
-  // Wait for transaction to complete
-  return new Promise((resolve, reject) => {
+    // Set up transaction handlers first
     transaction.oncomplete = () => resolve();
     transaction.onerror = () => reject(transaction.error);
+
+    try {
+      const exported = await crypto.subtle.exportKey("raw", key);
+
+      // Perform the put operation
+      store.put(
+        {
+          id: "master",
+          key: exported,
+          salt: salt,
+        },
+        "master"
+      );
+    } catch (error) {
+      transaction.abort();
+      reject(error);
+    }
   });
 }
 
@@ -223,31 +230,35 @@ export async function storeMasterKey(
  */
 export async function retrieveMasterKey(): Promise<MasterKey | null> {
   const db = await openKeyStore();
-  const transaction = db.transaction(["keys"], "readonly");
-  const store = transaction.objectStore("keys");
-
+  
   return new Promise((resolve, reject) => {
+    const transaction = db.transaction(["keys"], "readonly");
+    const store = transaction.objectStore("keys");
     const request = store.get("master");
     
     request.onsuccess = async () => {
-      const data = request.result;
-      if (!data) {
-        resolve(null);
-        return;
+      try {
+        const data = request.result;
+        if (!data) {
+          resolve(null);
+          return;
+        }
+
+        const key = await crypto.subtle.importKey(
+          "raw",
+          data.key,
+          "AES-GCM",
+          true,
+          ["encrypt", "decrypt"]
+        );
+
+        resolve({
+          key,
+          salt: new Uint8Array(data.salt),
+        });
+      } catch (error) {
+        reject(error);
       }
-
-      const key = await crypto.subtle.importKey(
-        "raw",
-        data.key,
-        "AES-GCM",
-        true,
-        ["encrypt", "decrypt"]
-      );
-
-      resolve({
-        key,
-        salt: new Uint8Array(data.salt),
-      });
     };
     
     request.onerror = () => reject(request.error);
