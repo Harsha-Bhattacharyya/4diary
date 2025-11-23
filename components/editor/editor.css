@@ -59,3 +59,27 @@
 .bn-suggestion-menu-item-selected {
   background-color: var(--editor-selected-bg);
 }
+
+/* Line numbers support */
+.editor-with-line-numbers .bn-block-outer {
+  display: flex;
+  align-items: flex-start;
+}
+
+.editor-with-line-numbers {
+  counter-reset: line-number;
+}
+
+.editor-with-line-numbers .bn-block-outer::before {
+  content: counter(line-number);
+  display: inline-block;
+  width: 3rem;
+  padding-right: 1rem;
+  text-align: right;
+  color: #999;
+  font-size: 0.875rem;
+  font-family: monospace;
+  flex-shrink: 0;
+  user-select: none;
+  counter-increment: line-number;
+}

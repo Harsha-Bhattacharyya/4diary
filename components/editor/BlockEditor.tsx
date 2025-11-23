@@ -26,6 +26,7 @@ interface BlockEditorProps {
   autoSaveInterval?: number;
   editable?: boolean;
   showToolbar?: boolean;
+  showLineNumbers?: boolean;
 }
 
 /**
@@ -41,6 +42,7 @@ interface BlockEditorProps {
  * @param autoSaveInterval - Time in milliseconds between automatic saves (default: `2000`).
  * @param editable - Whether the editor content is editable (default: `true`).
  * @param showToolbar - Whether to display the formatting toolbar (default: `true`).
+ * @param showLineNumbers - Whether to display line numbers (default: `false`).
  * @returns The editor's JSX element.
  */
 export default function BlockEditor({
@@ -51,6 +53,7 @@ export default function BlockEditor({
   autoSaveInterval = 2000,
   editable = true,
   showToolbar = true,
+  showLineNumbers = false,
 }: BlockEditorProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
@@ -154,7 +157,10 @@ export default function BlockEditor({
       )}
 
       {/* Editor */}
-      <div className="touch-manipulation" style={{ WebkitTapHighlightColor: 'transparent' }}>
+      <div 
+        className={`touch-manipulation ${showLineNumbers ? 'editor-with-line-numbers' : ''}`} 
+        style={{ WebkitTapHighlightColor: 'transparent' }}
+      >
         <BlockNoteViewRaw
           editor={editor}
           onChange={handleChange}
