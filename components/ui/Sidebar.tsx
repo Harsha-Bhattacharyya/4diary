@@ -215,7 +215,7 @@ export default function Sidebar({
                     <button
                       type="button"
                       onClick={() => onDocumentClick(doc.id)}
-                      className="w-full text-left px-3 py-2 text-[#E8DCC4] hover:bg-[#3D3426] transition-colors flex items-center gap-2 rounded-md"
+                      className="group w-full text-left px-3 py-2 text-[#E8DCC4] hover:bg-[#3D3426] transition-colors flex items-center gap-2 rounded-md"
                     >
                       {/* Star icon */}
                       {onToggleFavorite && (
