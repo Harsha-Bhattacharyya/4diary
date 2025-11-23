@@ -11,7 +11,7 @@
 
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 
 interface NoteSettingsProps {
   content: unknown[];
@@ -43,30 +43,22 @@ export default function NoteSettings({
   showLineNumbers,
   onToggleLineNumbers,
 }: NoteSettingsProps) {
-  const [stats, setStats] = useState({
-    wordCount: 0,
-    lineCount: 0,
-    characterCount: 0,
-    fileSizeKB: 0,
-  });
-
   // Calculate statistics
-  useEffect(() => {
+  const stats = useMemo(() => {
     if (!content || !Array.isArray(content)) {
-      setStats({
+      return {
         wordCount: 0,
         lineCount: 0,
         characterCount: 0,
         fileSizeKB: 0,
-      });
-      return;
+      };
     }
 
     // Convert content to text for analysis
     const extractText = (blocks: unknown[]): string => {
       let text = "";
       
-      const processBlock = (block: any): void => {
+      const processBlock = (block: Record<string, unknown>): void => {
         if (!block) return;
         
         // Handle text content directly in block
@@ -76,15 +68,16 @@ export default function NoteSettings({
         
         // Handle content array
         if (Array.isArray(block.content)) {
-          block.content.forEach((item: any) => {
+          block.content.forEach((item: unknown) => {
             if (typeof item === "string") {
               text += item;
             } else if (item && typeof item === "object") {
-              if (item.text) {
-                text += item.text;
+              const objItem = item as Record<string, unknown>;
+              if (objItem.text) {
+                text += objItem.text;
               }
-              if (Array.isArray(item.content)) {
-                processBlock(item);
+              if (Array.isArray(objItem.content)) {
+                processBlock(objItem);
               }
             }
           });
@@ -93,11 +86,19 @@ export default function NoteSettings({
         
         // Handle children/nested blocks
         if (Array.isArray(block.children)) {
-          block.children.forEach(processBlock);
+          block.children.forEach((child: unknown) => {
+            if (child && typeof child === "object") {
+              processBlock(child as Record<string, unknown>);
+            }
+          });
         }
       };
       
-      blocks.forEach(processBlock);
+      blocks.forEach((block) => {
+        if (block && typeof block === "object") {
+          processBlock(block as Record<string, unknown>);
+        }
+      });
       return text;
     };
 
@@ -112,12 +113,12 @@ export default function NoteSettings({
     const sizeInBytes = new Blob([jsonString]).size;
     const sizeInKB = sizeInBytes / 1024;
 
-    setStats({
+    return {
       wordCount: words.length,
       lineCount: lines.length,
       characterCount: text.length,
       fileSizeKB: parseFloat(sizeInKB.toFixed(2)),
-    });
+    };
   }, [content]);
 
   // Format date for display
