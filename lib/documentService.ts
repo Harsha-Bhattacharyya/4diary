@@ -39,6 +39,7 @@ export interface Document {
   content: unknown[];
   favorite: boolean;
   archived: boolean;
+  sortOrder?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -57,6 +58,7 @@ export interface UpdateDocumentParams {
   metadata?: DocumentMetadata;
   favorite?: boolean;
   archived?: boolean;
+  sortOrder?: number;
 }
 
 /**
@@ -106,6 +108,7 @@ export async function createDocument(
     content: params.content,
     favorite: false,
     archived: false,
+    sortOrder: undefined,
     createdAt: result.document.createdAt,
     updatedAt: result.document.updatedAt,
   };
@@ -146,6 +149,7 @@ export async function updateDocument(
       metadata: params.metadata,
       favorite: params.favorite,
       archived: params.archived,
+      sortOrder: params.sortOrder,
     }),
   });
 
@@ -181,6 +185,7 @@ async function decryptDocument(encryptedDoc: {
   metadata: DocumentMetadata;
   favorite: boolean;
   archived: boolean;
+  sortOrder?: number;
   createdAt: string;
   updatedAt: string;
 }): Promise<Document> {
@@ -211,6 +216,7 @@ async function decryptDocument(encryptedDoc: {
     content: JSON.parse(content),
     favorite: encryptedDoc.favorite,
     archived: encryptedDoc.archived,
+    sortOrder: encryptedDoc.sortOrder,
     createdAt: encryptedDoc.createdAt,
     updatedAt: encryptedDoc.updatedAt,
   };

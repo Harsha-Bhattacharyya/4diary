@@ -22,6 +22,7 @@ import EditableTitle from "@/components/ui/EditableTitle";
 import { EmojiPickerComponent } from "@/components/ui/EmojiPicker";
 import { QuickNote } from "@/components/ui/QuickNote";
 import SaveTemplateModal from "@/components/ui/SaveTemplateModal";
+import NoteSettings from "@/components/ui/NoteSettings";
 import PWAInstallPrompt from "@/components/ui/PWAInstallPrompt";
 import PWAInit from "@/components/ui/PWAInit";
 import dynamic from "next/dynamic";
@@ -89,6 +90,9 @@ function WorkspaceContent() {
   const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
   const [showVersionHistory, setShowVersionHistory] = useState(false);
   const [showBacklinks, setShowBacklinks] = useState(true);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [showNoteSettings, setShowNoteSettings] = useState(false);
+  const [showLineNumbers, setShowLineNumbers] = useState(false);
 
   // Check authentication
   useEffect(() => {
@@ -319,6 +323,7 @@ function WorkspaceContent() {
       });
 
       setCurrentDocument(doc);
+      setIsEditMode(true); // Start in edit mode for new documents
 
       // Reload documents list
       const updatedDocs = await listDocuments(workspaceId, userEmail);
@@ -335,6 +340,7 @@ function WorkspaceContent() {
     try {
       const doc = await getDocument(docId, userEmail);
       setCurrentDocument(doc);
+      setIsEditMode(false); // Start in read mode
     } catch (err) {
       console.error("Open error:", err);
       setError(err instanceof Error ? err.message : "Failed to open document");
@@ -506,6 +512,50 @@ function WorkspaceContent() {
     }
   };
 
+  const handleToggleFavorite = async (docId: string, favorite: boolean) => {
+    if (!userEmail) return;
+
+    try {
+      await updateDocument({
+        id: docId,
+        userId: userEmail,
+        favorite,
+      });
+
+      // Update local state
+      setDocuments(prevDocs =>
+        prevDocs.map(doc =>
+          doc.id === docId ? { ...doc, favorite } : doc
+        )
+      );
+    } catch (err) {
+      console.error("Toggle favorite error:", err);
+      setError(err instanceof Error ? err.message : "Failed to toggle favorite");
+    }
+  };
+
+  const handleReorder = async (docId: string, newSortOrder: number) => {
+    if (!userEmail) return;
+
+    try {
+      await updateDocument({
+        id: docId,
+        userId: userEmail,
+        sortOrder: newSortOrder,
+      });
+
+      // Update local state
+      setDocuments(prevDocs =>
+        prevDocs.map(doc =>
+          doc.id === docId ? { ...doc, sortOrder: newSortOrder } : doc
+        )
+      );
+    } catch (err) {
+      console.error("Reorder error:", err);
+      setError(err instanceof Error ? err.message : "Failed to reorder document");
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen relative flex items-center justify-center">
@@ -596,6 +646,16 @@ function WorkspaceContent() {
               />
               <button
                 type="button"
+                onClick={() => handleToggleFavorite(currentDocument.id, !currentDocument.favorite)}
+                className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors flex items-center gap-1"
+                title={currentDocument.favorite ? "Unstar this note" : "Star this note"}
+              >
+                <span className="text-lg">
+                  {currentDocument.favorite ? "⭐" : "☆"}
+                </span>
+              </button>
+              <button
+                type="button"
                 onClick={handleShareDocument}
                 className="px-3 py-1 text-sm bg-leather-300 hover:bg-leather-400 text-white rounded-lg transition-colors flex items-center gap-1"
                 title="Share this note (24h link)"
@@ -661,6 +721,16 @@ function WorkspaceContent() {
                 </button>
               </Link>
               <div className="border-t border-gray-200 my-2"></div>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowNoteSettings(true);
+                  setDropdownOpen(false);
+                }}
+                className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+              >
+                ⚙️ Note Settings
+              </button>
               <button
                 type="button"
                 onClick={() => {
@@ -758,6 +828,8 @@ function WorkspaceContent() {
                 onSave={handleSave}
                 autoSave={true}
                 showToolbar={false}
+                editable={isEditMode}
+                showLineNumbers={showLineNumbers}
               />
             )}
           </div>
@@ -775,45 +847,103 @@ function WorkspaceContent() {
           )}
         </div>
 
-        {/* Bottom Formatting Toolbar - Scrollable - Only show for non-board documents */}
-        {currentDocument.metadata.type !== 'board' && (
+        {/* Floating Edit Button - Only show in read mode for non-board documents */}
+        {!isEditMode && currentDocument.metadata.type !== 'board' && (
+          <button
+            type="button"
+            onClick={() => setIsEditMode(true)}
+            className="fixed bottom-24 right-6 z-50 p-4 bg-leather-600 hover:bg-leather-700 text-white rounded-full shadow-2xl transition-all hover:scale-110"
+            aria-label="Enter edit mode"
+            title="Enter edit mode"
+          >
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+              />
+            </svg>
+          </button>
+        )}
+
+        {/* Bottom Formatting Toolbar - Scrollable - Only show for non-board documents in edit mode */}
+        {isEditMode && currentDocument.metadata.type !== 'board' && (
           <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-lg">
             <div className="max-w-4xl mx-auto px-6 py-3 overflow-x-auto">
-              <div className="flex items-center justify-start gap-2 min-w-max">
-              {/* Text Formatting */}
-              <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors font-bold flex-shrink-0">
-                B
-              </button>
-              <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors italic flex-shrink-0">
-                I
-              </button>
-              <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors flex-shrink-0">
-                ⟨/⟩
-              </button>
-              <div className="h-6 w-px bg-gray-300 mx-2 flex-shrink-0"></div>
-              {/* Block Formatting */}
-              <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors text-sm flex-shrink-0">
-                H1
-              </button>
-              <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors text-sm flex-shrink-0">
-                H2
-              </button>
-              <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors text-sm flex-shrink-0">
-                H3
-              </button>
-              <div className="h-6 w-px bg-gray-300 mx-2 flex-shrink-0"></div>
-              <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors flex-shrink-0">
-                •
-              </button>
-              <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors flex-shrink-0">
-                1.
-              </button>
-              <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors flex-shrink-0">
-                ☑
-              </button>
+              <div className="flex items-center justify-between gap-2 min-w-max">
+                <div className="flex items-center gap-2">
+                  {/* Edit Mode Indicator */}
+                  <div className="flex items-center gap-2 px-3 py-1 bg-green-100 text-green-700 rounded-lg text-sm font-medium">
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                      focusable="false"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                      />
+                    </svg>
+                    Edit Mode
+                  </div>
+                  {/* Exit Edit Mode Button */}
+                  <button
+                    type="button"
+                    onClick={() => setIsEditMode(false)}
+                    className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-sm"
+                  >
+                    Exit Edit Mode
+                  </button>
+                </div>
+                <div className="flex items-center gap-2">
+                  {/* Text Formatting */}
+                  <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors font-bold flex-shrink-0">
+                    B
+                  </button>
+                  <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors italic flex-shrink-0">
+                    I
+                  </button>
+                  <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors flex-shrink-0">
+                    ⟨/⟩
+                  </button>
+                  <div className="h-6 w-px bg-gray-300 mx-2 flex-shrink-0"></div>
+                  {/* Block Formatting */}
+                  <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors text-sm flex-shrink-0">
+                    H1
+                  </button>
+                  <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors text-sm flex-shrink-0">
+                    H2
+                  </button>
+                  <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors text-sm flex-shrink-0">
+                    H3
+                  </button>
+                  <div className="h-6 w-px bg-gray-300 mx-2 flex-shrink-0"></div>
+                  <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors flex-shrink-0">
+                    •
+                  </button>
+                  <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors flex-shrink-0">
+                    1.
+                  </button>
+                  <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors flex-shrink-0">
+                    ☑
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
         )}
 
         {/* Share Toast Notification */}
@@ -843,6 +973,16 @@ function WorkspaceContent() {
         onClose={() => setShowSaveTemplateModal(false)}
         onSave={handleSaveAsTemplate}
         initialTitle={currentDocument.metadata.title}
+      />
+
+      {/* Note Settings Modal */}
+      <NoteSettings
+        content={currentDocument.content}
+        lastModified={currentDocument.updatedAt}
+        isOpen={showNoteSettings}
+        onClose={() => setShowNoteSettings(false)}
+        showLineNumbers={showLineNumbers}
+        onToggleLineNumbers={setShowLineNumbers}
       />
 
       {/* Version History Modal */}
@@ -881,10 +1021,14 @@ function WorkspaceContent() {
             id: doc.id,
             title: doc.metadata.title,
             folder: doc.metadata.folder,
+            favorite: doc.favorite,
+            sortOrder: doc.sortOrder,
           }))}
           onDocumentClick={handleOpenDocument}
           collapsed={sidebarCollapsed}
           onToggle={setSidebarCollapsed}
+          onToggleFavorite={handleToggleFavorite}
+          onReorder={handleReorder}
         />
       </div>
 
