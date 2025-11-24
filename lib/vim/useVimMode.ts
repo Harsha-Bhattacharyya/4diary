@@ -39,6 +39,13 @@ export function useVimMode({ enabled, onCommand, onExit }: UseVimModeOptions) {
       vimManagerRef.current = null;
       setVimState(null);
     }
+    return () => {
+      if (vimManagerRef.current) {
+        vimManagerRef.current.reset();
+        vimManagerRef.current = null;
+        setVimState(null);
+      }
+    };
   }, [enabled]);
 
   // Handle key down events
