@@ -637,11 +637,11 @@ function WorkspaceContent() {
             <button
               type="button"
               onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 hover:bg-leather-100 rounded-lg transition-colors"
               aria-label="Toggle menu"
             >
               <svg
-                className="w-6 h-6 text-gray-700"
+                className="w-6 h-6 text-leather-800"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -705,11 +705,11 @@ function WorkspaceContent() {
             <button
               type="button"
               onClick={handleCloseDocument}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 hover:bg-leather-100 rounded-lg transition-colors"
               aria-label="Close document"
             >
               <svg
-                className="w-6 h-6 text-gray-700"
+                className="w-6 h-6 text-leather-800"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"

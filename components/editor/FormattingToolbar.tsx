@@ -128,7 +128,7 @@ export default function FormattingToolbar({ editor }: FormattingToolbarProps) {
   ];
 
   return (
-    <div className="sticky top-0 z-20 glass-card p-2 mb-4 rounded-lg shadow-md touch-manipulation overflow-x-auto scrollbar-hide">
+    <div className="sticky top-0 z-20 glass-card p-2 mb-4 rounded-lg shadow-md touch-manipulation overflow-x-auto scrollbar-hide bg-leather-100/90 backdrop-blur-sm">
       <div className="flex flex-wrap items-center gap-1">
         {/* Text Formatting */}
         <div className="flex items-center gap-1 pr-2 border-r border-leather-500">
@@ -140,7 +140,7 @@ export default function FormattingToolbar({ editor }: FormattingToolbarProps) {
                 button.action();
               }}
               className={`px-3 py-1.5 text-sm font-medium rounded transition-all duration-200 
-                hover:bg-leather-600 hover:text-leather-100 text-black active:bg-leather-700
+                bg-leather-200 text-leather-800 hover:bg-leather-600 hover:text-leather-100 active:bg-leather-700
                 ${button.style}`}
               title={button.title}
               type="button"
@@ -161,7 +161,7 @@ export default function FormattingToolbar({ editor }: FormattingToolbarProps) {
                 button.action();
               }}
               className="px-3 py-1.5 text-sm font-medium rounded transition-all duration-200 
-                hover:bg-leather-600 hover:text-leather-100 text-black active:bg-leather-700"
+                bg-leather-200 text-leather-800 hover:bg-leather-600 hover:text-leather-100 active:bg-leather-700"
               title={button.title}
               type="button"
               style={{ touchAction: 'none' }}
