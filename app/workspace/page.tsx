@@ -32,6 +32,7 @@ import {
   updateDocument,
   listDocuments,
   getDocument,
+  deleteDocument,
   type Document,
 } from "@/lib/documentService";
 import { getOrCreateDefaultWorkspace } from "@/lib/workspaceService";
@@ -93,6 +94,7 @@ function WorkspaceContent() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [showNoteSettings, setShowNoteSettings] = useState(false);
   const [showLineNumbers, setShowLineNumbers] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   // Check authentication
   useEffect(() => {
@@ -556,6 +558,28 @@ function WorkspaceContent() {
     }
   };
 
+  const handleDeleteDocument = async () => {
+    if (!currentDocument || !userEmail) return;
+
+    try {
+      await deleteDocument(currentDocument.id, userEmail);
+
+      // Close the document and reload the list
+      setCurrentDocument(null);
+      setShowDeleteConfirm(false);
+
+      // Reload documents list
+      if (workspaceId) {
+        const updatedDocs = await listDocuments(workspaceId, userEmail);
+        setDocuments(updatedDocs);
+      }
+    } catch (err) {
+      console.error("Delete error:", err);
+      setError(err instanceof Error ? err.message : "Failed to delete document");
+      setShowDeleteConfirm(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen relative flex items-center justify-center">
@@ -787,6 +811,17 @@ function WorkspaceContent() {
                 </button>
               </Link>
               <div className="border-t border-gray-200 my-2"></div>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowDeleteConfirm(true);
+                  setDropdownOpen(false);
+                }}
+                className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-600 transition-colors"
+              >
+                🗑️ Delete Note
+              </button>
+              <div className="border-t border-gray-200 my-2"></div>
               <div className="px-4 py-2 text-sm text-gray-500">
                 🔐 End-to-end encrypted
               </div>
@@ -999,6 +1034,35 @@ function WorkspaceContent() {
 
       {/* QuickNote Modal - Available globally with Ctrl+Q */}
       <QuickNote onSave={handleSaveQuickNote} />
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50">
+          <GlassCard className="max-w-md w-full mx-4 p-6">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Delete Note?</h3>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to delete &quot;{currentDocument?.metadata.title || "this note"}&quot;? 
+              This action cannot be undone.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                type="button"
+                onClick={() => setShowDeleteConfirm(false)}
+                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteDocument}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+          </GlassCard>
+        </div>
+      )}
 
       {/* PWA Components */}
       <PWAInit />

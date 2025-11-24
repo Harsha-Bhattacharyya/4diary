@@ -12,10 +12,7 @@
 @import "tailwindcss";
 
 :root {
-  --background: #2b1f16;
-  --foreground: #e8dcc8;
-  
-  /* Old Leather Brown Palette */
+  /* Old Leather Brown Palette - Static colors */
   --leather-50: #f5f0e8;
   --leather-100: #e8dcc8;
   --leather-200: #d4c5a8;
@@ -26,8 +23,21 @@
   --leather-700: #4a3b28;
   --leather-800: #2b1f16;
   --leather-900: #1a1108;
-  
-  /* Leather texture and shadows */
+}
+
+/* Light mode theme */
+.light {
+  --background: #ffffff;
+  --foreground: #1a1108;
+  --leather-bg: #f5f0e8;
+  --leather-border: #e8dcc8;
+  --leather-shadow: rgba(0, 0, 0, 0.1);
+}
+
+/* Dark mode theme - default */
+.dark {
+  --background: #2b1f16;
+  --foreground: #e8dcc8;
   --leather-bg: #6b5539;
   --leather-border: #4a3b28;
   --leather-shadow: rgba(0, 0, 0, 0.5);
