@@ -33,6 +33,24 @@
   --leather-shadow: rgba(0, 0, 0, 0.5);
 }
 
+/* Light mode theme */
+.light {
+  --background: #ffffff;
+  --foreground: #1a1108;
+  --leather-bg: #f5f0e8;
+  --leather-border: #e8dcc8;
+  --leather-shadow: rgba(0, 0, 0, 0.1);
+}
+
+/* Dark mode theme */
+.dark {
+  --background: #2b1f16;
+  --foreground: #e8dcc8;
+  --leather-bg: #6b5539;
+  --leather-border: #4a3b28;
+  --leather-shadow: rgba(0, 0, 0, 0.5);
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

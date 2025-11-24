@@ -16,9 +16,10 @@ import LeatherBackground from "@/components/ui/LeatherBackground";
 import GlassCard from "@/components/ui/GlassCard";
 import LeatherButton from "@/components/ui/LeatherButton";
 import TopMenu from "@/components/ui/TopMenu";
+import { useTheme } from "@/components/ui/ThemeProvider";
 
 /**
- * Render the application Settings page with security, export, privacy, and self-hosting sections.
+ * Render the application Settings page with security, export, privacy, appearance, and self-hosting sections.
  *
  * Includes an "Export Workspace" action that simulates exporting workspace data by toggling an in-progress state and showing a notification.
  *
@@ -26,6 +27,7 @@ import TopMenu from "@/components/ui/TopMenu";
  */
 export default function SettingsPage() {
   const [exportInProgress, setExportInProgress] = useState(false);
+  const { theme, toggleTheme } = useTheme();
 
   const handleExportWorkspace = async () => {
     setExportInProgress(true);
@@ -103,6 +105,32 @@ export default function SettingsPage() {
                 <div className="px-4 py-2 bg-green-700/40 text-green-200 text-sm font-bold border-2 border-green-600">
                   Zero Knowledge
                 </div>
+              </div>
+            </div>
+          </GlassCard>
+
+          {/* Appearance Settings */}
+          <GlassCard className="mb-6 settings-card">
+            <h2 className="text-2xl font-bold mb-4 text-leather-100">
+              🎨 Appearance
+            </h2>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between py-3">
+                <div>
+                  <h3 className="font-bold text-leather-100">
+                    Theme
+                  </h3>
+                  <p className="text-sm text-leather-300">
+                    Choose between light and dark mode for the editor
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={toggleTheme}
+                  className="px-4 py-2 bg-leather-600 hover:bg-leather-700 text-leather-100 rounded-lg transition-colors font-medium"
+                >
+                  {theme === "light" ? "☀️ Light" : "🌙 Dark"}
+                </button>
               </div>
             </div>
           </GlassCard>
