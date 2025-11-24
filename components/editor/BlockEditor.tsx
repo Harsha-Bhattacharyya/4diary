@@ -11,12 +11,15 @@
  * modification, are permitted provided that the conditions in the LICENSE file are met.
  */
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useCreateBlockNote, BlockNoteViewRaw } from "@blocknote/react";
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/react/style.css";
 import "./editor.css";
 import FormattingToolbar from "./FormattingToolbar";
+import VimModeIndicator from "./VimModeIndicator";
+import { useVimMode } from "@/lib/vim/useVimMode";
+import { VimMode } from "@/lib/vim/VimMode";
 
 interface BlockEditorProps {
   initialContent?: unknown[];
@@ -60,10 +63,31 @@ export default function BlockEditor({
   const [hasChanges, setHasChanges] = useState(false);
   const [lastContentHash, setLastContentHash] = useState<number>(0);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [vimEnabled, setVimEnabled] = useState(false);
+  const editorContainerRef = useRef<HTMLDivElement>(null);
 
   // Create editor instance
   const editor = useCreateBlockNote({
     initialContent: initialContent || undefined,
+  });
+
+  // Vim mode integration
+  const { vimState, handleKeyDown, setMode, isVimEnabled } = useVimMode({
+    enabled: vimEnabled,
+    onCommand: (command) => {
+      if (command.action === 'save' || command.action === 'save-and-exit') {
+        if (onSave) {
+          const content = editor.document;
+          onSave(content);
+        }
+      }
+      if (command.action === 'exit' || command.action === 'save-and-exit' || command.action === 'force-exit') {
+        setVimEnabled(false);
+      }
+    },
+    onExit: () => {
+      setVimEnabled(false);
+    },
   });
 
   // Simple fast hash function for content comparison
@@ -90,6 +114,36 @@ export default function BlockEditor({
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Listen for Ctrl+Shift+V to toggle vim mode
+  useEffect(() => {
+    const handleGlobalKeyDown = (event: KeyboardEvent) => {
+      if (event.ctrlKey && event.shiftKey && event.key === 'V') {
+        event.preventDefault();
+        setVimEnabled((prev) => !prev);
+        return;
+      }
+
+      // If vim mode is enabled, handle vim keybindings
+      if (vimEnabled && editorContainerRef.current) {
+        handleKeyDown(event);
+      }
+    };
+
+    document.addEventListener('keydown', handleGlobalKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleGlobalKeyDown);
+    };
+  }, [vimEnabled, handleKeyDown]);
+
+  // Set editor to read-only when in vim normal/command mode
+  useEffect(() => {
+    if (vimState) {
+      const isReadOnlyMode = vimState.mode === VimMode.NORMAL || vimState.mode === VimMode.COMMAND;
+      // Note: BlockNote doesn't have a direct way to toggle editability after creation
+      // We'll handle this through keyboard event interception instead
+    }
+  }, [vimState]);
 
   // Auto-save functionality - only save when there are changes
   useEffect(() => {
@@ -139,9 +193,12 @@ export default function BlockEditor({
   };
 
   return (
-    <div className="relative w-full h-full touch-auto">
+    <div className="relative w-full h-full touch-auto" ref={editorContainerRef}>
+      {/* Vim Mode Indicator */}
+      {vimEnabled && <VimModeIndicator vimState={vimState} isEnabled={isVimEnabled} />}
+
       {/* Formatting Toolbar */}
-      {showToolbar && <FormattingToolbar editor={editor} />}
+      {showToolbar && !vimEnabled && <FormattingToolbar editor={editor} />}
 
       {/* Save status */}
       {autoSave && (
@@ -153,6 +210,13 @@ export default function BlockEditor({
               ✓ Saved {lastSaved.toLocaleTimeString()}
             </span>
           ) : null}
+        </div>
+      )}
+
+      {/* Vim mode toggle hint */}
+      {!vimEnabled && editable && (
+        <div className="absolute top-4 left-4 z-10 px-3 py-1 rounded-full glass-card text-xs text-gray-500">
+          Press Ctrl+Shift+V for Vim mode
         </div>
       )}
 
