@@ -12,6 +12,7 @@ A privacy-focused, end-to-end encrypted note-taking application built with Next.
 
 ### Document Management
 - ✍️ **Notion-like Editor**: Rich text editing with BlockNote
+- ⌨️ **Vim Mode**: Full Vim keybindings support (Ctrl+Shift+V to toggle)
 - 📁 **Smart Organization**: Folders, tags, favorites, and archives
 - 📄 **Templates**: Pre-built templates for various use cases
 - 😀 **Emoji Icons**: Visual identification with emoji document icons
@@ -37,7 +38,7 @@ A privacy-focused, end-to-end encrypted note-taking application built with Next.
 ### UI/UX
 - 🎨 **Leather Theme**: Rich, warm color palette inspired by leather journals
 - 🖥️ **Full-screen Editor**: Distraction-free editing experience
-- 🎯 **Keyboard Shortcuts**: Quick note (Ctrl/Cmd + Q) and more
+- 🎯 **Keyboard Shortcuts**: Quick note (Ctrl/Cmd + Q), Vim mode (Ctrl+Shift+V), and more
 
 ## 🚀 Getting Started
 
@@ -179,6 +180,14 @@ For information about reporting security vulnerabilities, supported versions, an
 2. Start typing - auto-saved locally
 3. Click "Save to Workspace" when ready
 4. Note is encrypted and synced to your workspace
+
+### Vim Mode (⌨️ Power User Editing)
+
+1. Press `Ctrl+Shift+V` in any editor to toggle Vim mode
+2. Use standard Vim keybindings (hjkl for navigation, i for insert, etc.)
+3. Support for 4 modes: NORMAL, INSERT, REPLACE, and COMMAND
+4. Exit with `:wq`, `:q`, or `:x` commands
+5. See [Vim Mode Documentation](docs/VIM_MODE.md) for complete guide
 
 ### Kanban Boards
 

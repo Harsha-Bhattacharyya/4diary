@@ -20,6 +20,7 @@ import FormattingToolbar from "./FormattingToolbar";
 import VimModeIndicator from "./VimModeIndicator";
 import { useVimMode } from "@/lib/vim/useVimMode";
 import { VimMode } from "@/lib/vim/VimMode";
+import { VimNavigationHandler } from "@/lib/vim/VimNavigationHandler";
 
 interface BlockEditorProps {
   initialContent?: unknown[];
@@ -65,11 +66,19 @@ export default function BlockEditor({
   const [isInitialized, setIsInitialized] = useState(false);
   const [vimEnabled, setVimEnabled] = useState(false);
   const editorContainerRef = useRef<HTMLDivElement>(null);
+  const vimNavigationHandlerRef = useRef<VimNavigationHandler | null>(null);
 
   // Create editor instance
   const editor = useCreateBlockNote({
     initialContent: initialContent || undefined,
   });
+
+  // Initialize vim navigation handler
+  useEffect(() => {
+    if (editor && !vimNavigationHandlerRef.current) {
+      vimNavigationHandlerRef.current = new VimNavigationHandler(editor);
+    }
+  }, [editor]);
 
   // Vim mode integration
   const { vimState, handleKeyDown, setMode, isVimEnabled } = useVimMode({
@@ -126,7 +135,60 @@ export default function BlockEditor({
 
       // If vim mode is enabled, handle vim keybindings
       if (vimEnabled && editorContainerRef.current) {
-        handleKeyDown(event);
+        const handled = handleKeyDown(event);
+        
+        // If not handled by vim mode manager, try navigation handler
+        if (!handled && vimState && vimNavigationHandlerRef.current) {
+          const navHandler = vimNavigationHandlerRef.current;
+          const key = event.key;
+          const count = vimState.count || 1;
+          const lastCmd = vimState.lastCommand;
+          
+          // Handle navigation in normal mode
+          if (vimState.mode === VimMode.NORMAL) {
+            // Handle special commands
+            if (lastCmd === 'gg') {
+              navHandler.moveToDocumentStart();
+              event.preventDefault();
+              return;
+            }
+
+            // Handle compound commands (dd, dw, yy, etc.)
+            if (lastCmd && ['dd', 'dw', 'd$', 'd0', 'yy', 'yw', 'cc', 'cw'].includes(lastCmd)) {
+              if (navHandler.handleCompoundCommand(lastCmd, count)) {
+                event.preventDefault();
+                return;
+              }
+            }
+
+            // Handle insert mode positioning
+            if (['I', 'a', 'A', 'o', 'O'].includes(lastCmd)) {
+              navHandler.handleInsertModeCommand(lastCmd as any);
+              event.preventDefault();
+              return;
+            }
+
+            // Handle replace character
+            if (lastCmd.startsWith('r') && lastCmd.length > 1) {
+              const char = lastCmd.slice(1);
+              navHandler.replaceCharacter(char);
+              event.preventDefault();
+              return;
+            }
+
+            // Handle navigation commands
+            if (navHandler.handleNavigation(key, count)) {
+              event.preventDefault();
+              return;
+            }
+
+            // Handle editing commands
+            if (navHandler.handleEdit(key, count)) {
+              event.preventDefault();
+              return;
+            }
+          }
+        }
       }
     };
 
@@ -134,7 +196,7 @@ export default function BlockEditor({
     return () => {
       document.removeEventListener('keydown', handleGlobalKeyDown);
     };
-  }, [vimEnabled, handleKeyDown]);
+  }, [vimEnabled, handleKeyDown, vimState]);
 
   // Set editor to read-only when in vim normal/command mode
   useEffect(() => {
