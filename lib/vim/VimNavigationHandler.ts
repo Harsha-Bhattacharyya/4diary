@@ -16,6 +16,13 @@ import { BlockNoteEditor } from "@blocknote/core";
 /**
  * Vim Navigation Handler
  * Handles vim navigation and editing commands for BlockNote editor
+ * 
+ * NOTE: This implementation uses document.execCommand() for text manipulation
+ * which is deprecated but still widely supported. Future versions should migrate
+ * to modern alternatives like:
+ * - Clipboard API for copy/paste operations
+ * - Direct BlockNote/ProseMirror API for text manipulation
+ * - Selection API with Range objects for better control
  */
 export class VimNavigationHandler {
   private editor: BlockNoteEditor;

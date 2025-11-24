@@ -163,14 +163,14 @@ export default function BlockEditor({
 
             // Handle insert mode positioning
             if (['I', 'a', 'A', 'o', 'O'].includes(lastCmd)) {
-              navHandler.handleInsertModeCommand(lastCmd as any);
+              navHandler.handleInsertModeCommand(lastCmd as 'i' | 'I' | 'a' | 'A' | 'o' | 'O');
               event.preventDefault();
               return;
             }
 
-            // Handle replace character
-            if (lastCmd.startsWith('r') && lastCmd.length > 1) {
-              const char = lastCmd.slice(1);
+            // Handle replace character (r followed by one character)
+            if (lastCmd.startsWith('r') && lastCmd.length === 2) {
+              const char = lastCmd.charAt(1);
               navHandler.replaceCharacter(char);
               event.preventDefault();
               return;
