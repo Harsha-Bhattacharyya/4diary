@@ -206,7 +206,8 @@ test.describe('Theme Toggle Feature', () => {
     const buttonText = await themeButton.textContent();
     
     // Should contain emoji and text
-    expect(buttonText).toMatch(/[☀️🌙]/);
+    const hasSunOrMoonEmoji = buttonText?.includes('☀️') || buttonText?.includes('🌙');
+    expect(hasSunOrMoonEmoji).toBeTruthy();
     expect(buttonText).toMatch(/Dark|Light/);
   });
 
