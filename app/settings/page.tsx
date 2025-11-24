@@ -127,6 +127,9 @@ export default function SettingsPage() {
                 <button
                   type="button"
                   onClick={toggleTheme}
+                  role="switch"
+                  aria-checked={theme === "dark"}
+                  aria-label={`Theme: ${theme === "light" ? "Light mode" : "Dark mode"}. Click to toggle.`}
                   className="px-4 py-2 bg-leather-600 hover:bg-leather-700 text-leather-100 rounded-lg transition-colors font-medium"
                 >
                   {theme === "light" ? "☀️ Light" : "🌙 Dark"}
