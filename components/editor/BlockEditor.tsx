@@ -12,9 +12,10 @@
  */
 
 import React, { useEffect, useState, useRef } from "react";
-import { useCreateBlockNote, BlockNoteViewRaw } from "@blocknote/react";
+import { useCreateBlockNote } from "@blocknote/react";
+import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/core/fonts/inter.css";
-import "@blocknote/react/style.css";
+import "@blocknote/mantine/style.css";
 import "./editor.css";
 import FormattingToolbar from "./FormattingToolbar";
 import VimModeIndicator from "./VimModeIndicator";
@@ -309,7 +310,7 @@ export default function BlockEditor({
         className={`touch-manipulation ${showLineNumbers ? 'editor-with-line-numbers' : ''}`} 
         style={{ WebkitTapHighlightColor: 'transparent' }}
       >
-        <BlockNoteViewRaw
+        <BlockNoteView
           editor={editor}
           onChange={handleChange}
           editable={editable}
