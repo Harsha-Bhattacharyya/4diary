@@ -464,4 +464,122 @@ export class VimNavigationHandler {
     // Insert new character
     document.execCommand('insertText', false, char);
   }
+
+  /**
+   * Handle vim navigation in visual mode (extends selection)
+   */
+  handleVisualNavigation(key: string, count: number = 1, isLinewise: boolean = false): boolean {
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) return false;
+
+    if (isLinewise) {
+      // In visual line mode, select entire lines
+      switch (key) {
+        case 'j': // Extend selection down by lines
+          for (let i = 0; i < count; i++) {
+            selection.modify('extend', 'forward', 'line');
+          }
+          return true;
+        
+        case 'k': // Extend selection up by lines
+          for (let i = 0; i < count; i++) {
+            selection.modify('extend', 'backward', 'line');
+          }
+          return true;
+        
+        case 'G': // Extend to end of document
+          selection.modify('extend', 'forward', 'documentboundary');
+          return true;
+      }
+    }
+
+    // Character-wise visual selection
+    switch (key) {
+      case 'h': // Extend selection left
+        for (let i = 0; i < count; i++) {
+          selection.modify('extend', 'backward', 'character');
+        }
+        return true;
+      
+      case 'l': // Extend selection right
+        for (let i = 0; i < count; i++) {
+          selection.modify('extend', 'forward', 'character');
+        }
+        return true;
+      
+      case 'j': // Extend selection down
+        for (let i = 0; i < count; i++) {
+          selection.modify('extend', 'forward', 'line');
+        }
+        return true;
+      
+      case 'k': // Extend selection up
+        for (let i = 0; i < count; i++) {
+          selection.modify('extend', 'backward', 'line');
+        }
+        return true;
+      
+      case 'w': // Extend selection forward by word
+        for (let i = 0; i < count; i++) {
+          selection.modify('extend', 'forward', 'word');
+        }
+        return true;
+      
+      case 'b': // Extend selection backward by word
+        for (let i = 0; i < count; i++) {
+          selection.modify('extend', 'backward', 'word');
+        }
+        return true;
+      
+      case 'e': // Extend to end of word
+        for (let i = 0; i < count; i++) {
+          selection.modify('extend', 'forward', 'word');
+        }
+        return true;
+      
+      case '0': // Extend to start of line
+        selection.modify('extend', 'backward', 'lineboundary');
+        return true;
+      
+      case '$': // Extend to end of line
+        selection.modify('extend', 'forward', 'lineboundary');
+        return true;
+      
+      case 'G': // Extend to end of document
+        selection.modify('extend', 'forward', 'documentboundary');
+        return true;
+      
+      default:
+        return false;
+    }
+  }
+
+  /**
+   * Delete visual selection
+   */
+  deleteVisualSelection(): void {
+    const selection = window.getSelection();
+    if (!selection || selection.isCollapsed) return;
+
+    document.execCommand('delete');
+  }
+
+  /**
+   * Yank (copy) visual selection
+   */
+  yankVisualSelection(): void {
+    const selection = window.getSelection();
+    if (!selection || selection.isCollapsed) return;
+
+    document.execCommand('copy');
+    // Collapse selection after yanking
+    selection.collapseToEnd();
+  }
+
+  /**
+   * Change visual selection (delete and enter insert mode)
+   */
+  changeVisualSelection(): void {
+    this.deleteVisualSelection();
+  }
 }

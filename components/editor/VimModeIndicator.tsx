@@ -37,6 +37,10 @@ export default function VimModeIndicator({ vimState, isEnabled }: VimModeIndicat
         return 'bg-red-500';
       case VimMode.COMMAND:
         return 'bg-yellow-500';
+      case VimMode.VISUAL:
+        return 'bg-purple-500';
+      case VimMode.VISUAL_LINE:
+        return 'bg-purple-600';
       default:
         return 'bg-gray-500';
     }
@@ -52,6 +56,10 @@ export default function VimModeIndicator({ vimState, isEnabled }: VimModeIndicat
         return 'REPLACE';
       case VimMode.COMMAND:
         return 'COMMAND';
+      case VimMode.VISUAL:
+        return 'VISUAL';
+      case VimMode.VISUAL_LINE:
+        return 'VISUAL LINE';
       default:
         return 'VIM';
     }

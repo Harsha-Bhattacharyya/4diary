@@ -257,3 +257,133 @@ test.describe('Vim Mode - UI Changes', () => {
     await expect(normalMode).not.toBeVisible();
   });
 });
+
+test.describe('Vim Mode - Visual Modes', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/workspace');
+    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(500);
+    
+    // Enable vim mode
+    await page.keyboard.press('Control+Shift+V');
+    await page.waitForTimeout(200);
+  });
+
+  test('should enter VISUAL mode with v', async ({ page }) => {
+    await page.keyboard.press('v');
+    await page.waitForTimeout(200);
+    
+    const visualMode = page.locator('text=VISUAL');
+    await expect(visualMode).toBeVisible();
+  });
+
+  test('should enter VISUAL LINE mode with V', async ({ page }) => {
+    await page.keyboard.press('V');
+    await page.waitForTimeout(200);
+    
+    const visualLineMode = page.locator('text=VISUAL LINE');
+    await expect(visualLineMode).toBeVisible();
+  });
+
+  test('should exit VISUAL mode with Escape', async ({ page }) => {
+    await page.keyboard.press('v');
+    await page.waitForTimeout(100);
+    
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(100);
+    
+    const normalMode = page.locator('text=NORMAL');
+    await expect(normalMode).toBeVisible();
+  });
+
+  test('should exit VISUAL LINE mode with Escape', async ({ page }) => {
+    await page.keyboard.press('V');
+    await page.waitForTimeout(100);
+    
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(100);
+    
+    const normalMode = page.locator('text=NORMAL');
+    await expect(normalMode).toBeVisible();
+  });
+
+  test('should toggle between VISUAL and VISUAL LINE modes', async ({ page }) => {
+    // Start with VISUAL mode
+    await page.keyboard.press('v');
+    await page.waitForTimeout(100);
+    
+    let visualMode = page.locator('text=VISUAL').first();
+    await expect(visualMode).toBeVisible();
+    
+    // Switch to VISUAL LINE
+    await page.keyboard.press('V');
+    await page.waitForTimeout(100);
+    
+    const visualLineMode = page.locator('text=VISUAL LINE');
+    await expect(visualLineMode).toBeVisible();
+    
+    // Switch back to VISUAL
+    await page.keyboard.press('v');
+    await page.waitForTimeout(100);
+    
+    visualMode = page.locator('text=VISUAL').first();
+    await expect(visualMode).toBeVisible();
+  });
+
+  test('should exit VISUAL mode when pressing v again', async ({ page }) => {
+    await page.keyboard.press('v');
+    await page.waitForTimeout(100);
+    
+    // Press v again to exit
+    await page.keyboard.press('v');
+    await page.waitForTimeout(100);
+    
+    const normalMode = page.locator('text=NORMAL');
+    await expect(normalMode).toBeVisible();
+  });
+
+  test('should exit VISUAL LINE mode when pressing V again', async ({ page }) => {
+    await page.keyboard.press('V');
+    await page.waitForTimeout(100);
+    
+    // Press V again to exit
+    await page.keyboard.press('V');
+    await page.waitForTimeout(100);
+    
+    const normalMode = page.locator('text=NORMAL');
+    await expect(normalMode).toBeVisible();
+  });
+
+  test('should return to NORMAL mode after delete in VISUAL mode', async ({ page }) => {
+    await page.keyboard.press('v');
+    await page.waitForTimeout(100);
+    
+    await page.keyboard.press('d');
+    await page.waitForTimeout(100);
+    
+    const normalMode = page.locator('text=NORMAL');
+    await expect(normalMode).toBeVisible();
+  });
+
+  test('should return to NORMAL mode after yank in VISUAL mode', async ({ page }) => {
+    await page.keyboard.press('v');
+    await page.waitForTimeout(100);
+    
+    await page.keyboard.press('y');
+    await page.waitForTimeout(100);
+    
+    const normalMode = page.locator('text=NORMAL');
+    await expect(normalMode).toBeVisible();
+  });
+
+  test('should enter INSERT mode after change in VISUAL mode', async ({ page }) => {
+    await page.keyboard.press('v');
+    await page.waitForTimeout(100);
+    
+    await page.keyboard.press('c');
+    await page.waitForTimeout(100);
+    
+    const insertMode = page.locator('text=INSERT');
+    await expect(insertMode).toBeVisible();
+  });
+});

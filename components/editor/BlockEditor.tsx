@@ -144,6 +144,36 @@ export default function BlockEditor({
           const count = vimState.count || 1;
           const lastCmd = vimState.lastCommand;
           
+          // Handle navigation in visual modes
+          if (vimState.mode === VimMode.VISUAL || vimState.mode === VimMode.VISUAL_LINE) {
+            const isLinewise = vimState.mode === VimMode.VISUAL_LINE;
+            
+            // Handle visual mode operations
+            if (lastCmd === 'd' || lastCmd === 'x') {
+              navHandler.deleteVisualSelection();
+              event.preventDefault();
+              return;
+            }
+            
+            if (lastCmd === 'y') {
+              navHandler.yankVisualSelection();
+              event.preventDefault();
+              return;
+            }
+            
+            if (lastCmd === 'c') {
+              navHandler.changeVisualSelection();
+              event.preventDefault();
+              return;
+            }
+            
+            // Handle visual navigation (extends selection)
+            if (navHandler.handleVisualNavigation(key, count, isLinewise)) {
+              event.preventDefault();
+              return;
+            }
+          }
+          
           // Handle navigation in normal mode
           if (vimState.mode === VimMode.NORMAL) {
             // Handle special commands
@@ -197,15 +227,7 @@ export default function BlockEditor({
       document.removeEventListener('keydown', handleGlobalKeyDown);
     };
   }, [vimEnabled, handleKeyDown, vimState]);
-
-  // Set editor to read-only when in vim normal/command mode
-  useEffect(() => {
-    if (vimState) {
-      const isReadOnlyMode = vimState.mode === VimMode.NORMAL || vimState.mode === VimMode.COMMAND;
-      // Note: BlockNote doesn't have a direct way to toggle editability after creation
-      // We'll handle this through keyboard event interception instead
-    }
-  }, [vimState]);
+  // Note: Read-only behavior for vim NORMAL/COMMAND/VISUAL modes is enforced via keyboard event interception
 
   // Auto-save functionality - only save when there are changes
   useEffect(() => {

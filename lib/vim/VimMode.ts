@@ -17,6 +17,8 @@ export enum VimMode {
   INSERT = 'INSERT',
   REPLACE = 'REPLACE',
   COMMAND = 'COMMAND',
+  VISUAL = 'VISUAL',
+  VISUAL_LINE = 'VISUAL_LINE',
 }
 
 /**
@@ -31,6 +33,8 @@ export interface VimState {
   macro: { [key: string]: string[] };
   recording: string | null;
   lastSearchPattern: string;
+  visualStart: { node: Node | null; offset: number } | null;
+  visualEnd: { node: Node | null; offset: number } | null;
 }
 
 /**
@@ -45,6 +49,8 @@ export const initialVimState: VimState = {
   macro: {},
   recording: null,
   lastSearchPattern: '',
+  visualStart: null,
+  visualEnd: null,
 };
 
 /**
@@ -96,6 +102,9 @@ export class VimModeManager {
         return this.handleReplaceMode(key, modifiers);
       case VimMode.COMMAND:
         return this.handleCommandMode(key, modifiers);
+      case VimMode.VISUAL:
+      case VimMode.VISUAL_LINE:
+        return this.handleVisualMode(key, modifiers);
       default:
         return false;
     }
@@ -159,10 +168,30 @@ export class VimModeManager {
       return true;
     }
 
-    // Visual mode indicator (v, V)
-    if (key === 'v' || key === 'V') {
-      // For now, just indicate visual mode - actual selection handled by editor
-      return false;
+    // Visual mode
+    if (key === 'v') {
+      this.setMode(VimMode.VISUAL);
+      // Save current selection position as visual start
+      const selection = window.getSelection();
+      if (selection && selection.anchorNode) {
+        this.state.visualStart = {
+          node: selection.anchorNode,
+          offset: selection.anchorOffset
+        };
+      }
+      return true;
+    }
+    if (key === 'V') {
+      this.setMode(VimMode.VISUAL_LINE);
+      // Save current selection position as visual start
+      const selection = window.getSelection();
+      if (selection && selection.anchorNode) {
+        this.state.visualStart = {
+          node: selection.anchorNode,
+          offset: selection.anchorOffset
+        };
+      }
+      return true;
     }
 
     // Macro recording
@@ -250,6 +279,87 @@ export class VimModeManager {
     }
 
     return false; // Let editor handle replace mode typing
+  }
+
+  /**
+   * Handle Visual mode keys
+   */
+  private handleVisualMode(key: string, modifiers: { ctrl?: boolean; shift?: boolean; alt?: boolean }): boolean {
+    // ESC returns to normal mode
+    if (key === 'Escape') {
+      this.state.visualStart = null;
+      this.state.visualEnd = null;
+      this.setMode(VimMode.NORMAL);
+      return true;
+    }
+
+    // Switch between visual and visual-line mode
+    if (key === 'v') {
+      if (this.state.mode === VimMode.VISUAL) {
+        // Exit visual mode
+        this.state.visualStart = null;
+        this.state.visualEnd = null;
+        this.setMode(VimMode.NORMAL);
+      } else {
+        this.setMode(VimMode.VISUAL);
+      }
+      return true;
+    }
+
+    if (key === 'V') {
+      if (this.state.mode === VimMode.VISUAL_LINE) {
+        // Exit visual line mode
+        this.state.visualStart = null;
+        this.state.visualEnd = null;
+        this.setMode(VimMode.NORMAL);
+      } else {
+        this.setMode(VimMode.VISUAL_LINE);
+      }
+      return true;
+    }
+
+    // Handle deletion in visual mode
+    if (key === 'd' || key === 'x') {
+      this.state.lastCommand = 'd';
+      this.state.visualStart = null;
+      this.state.visualEnd = null;
+      this.setMode(VimMode.NORMAL);
+      return false; // Let navigation handler delete the selection
+    }
+
+    // Handle yank in visual mode
+    if (key === 'y') {
+      this.state.lastCommand = 'y';
+      this.state.visualStart = null;
+      this.state.visualEnd = null;
+      this.setMode(VimMode.NORMAL);
+      return false; // Let navigation handler yank the selection
+    }
+
+    // Handle change in visual mode
+    if (key === 'c') {
+      this.state.lastCommand = 'c';
+      this.state.visualStart = null;
+      this.state.visualEnd = null;
+      this.setMode(VimMode.INSERT);
+      return false; // Let navigation handler change the selection
+    }
+
+    // Navigation in visual mode (extend selection)
+    if (['h', 'j', 'k', 'l', 'w', 'b', 'e', '0', '^', '$', 'G'].includes(key)) {
+      this.state.lastCommand = key;
+      // Update visual end position
+      const selection = window.getSelection();
+      if (selection && selection.focusNode) {
+        this.state.visualEnd = {
+          node: selection.focusNode,
+          offset: selection.focusOffset
+        };
+      }
+      return false; // Let navigation handler handle movement and extend selection
+    }
+
+    return false;
   }
 
   /**

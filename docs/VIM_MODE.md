@@ -13,6 +13,8 @@ A visual indicator will appear in the bottom-left corner showing the current Vim
 - **INSERT** (green) - For text insertion
 - **REPLACE** (red) - For text replacement
 - **COMMAND** (yellow) - For executing commands
+- **VISUAL** (purple) - For character-wise visual selection
+- **VISUAL LINE** (dark purple) - For line-wise visual selection
 
 ## Modes
 
@@ -76,6 +78,8 @@ The count will be displayed in the indicator while typing.
 | `o` | Open new line below and enter INSERT mode |
 | `O` | Open new line above and enter INSERT mode |
 | `R` | Enter REPLACE mode |
+| `v` | Enter VISUAL mode |
+| `V` | Enter VISUAL LINE mode |
 | `:` | Enter COMMAND mode |
 | `Esc` | Return to NORMAL mode (from any mode) |
 
@@ -90,6 +94,48 @@ Standard text insertion mode. Type normally to insert text.
 Replace existing characters as you type.
 
 - **Esc** - Return to NORMAL mode
+
+### VISUAL Mode
+
+Character-wise visual selection mode. Select text by moving the cursor.
+
+#### Navigation in Visual Mode
+
+All navigation commands work in VISUAL mode and extend the selection:
+- `h`, `j`, `k`, `l` - Extend selection by character/line
+- `w`, `b`, `e` - Extend selection by word
+- `0`, `$` - Extend to start/end of line
+- `G` - Extend to end of document
+
+#### Operations in Visual Mode
+
+| Key | Action |
+|-----|--------|
+| `d` or `x` | Delete selected text |
+| `y` | Yank (copy) selected text |
+| `c` | Change selected text (delete and enter INSERT mode) |
+| `v` | Exit VISUAL mode (return to NORMAL) |
+| `V` | Switch to VISUAL LINE mode |
+| `Esc` | Return to NORMAL mode |
+
+### VISUAL LINE Mode
+
+Line-wise visual selection mode. Entire lines are selected.
+
+#### Navigation in Visual Line Mode
+
+- `j`, `k` - Extend selection by lines
+- `G` - Extend to end of document
+
+#### Operations in Visual Line Mode
+
+Same as VISUAL mode:
+- `d` or `x` - Delete selected lines
+- `y` - Yank (copy) selected lines
+- `c` - Change selected lines
+- `V` - Exit VISUAL LINE mode (return to NORMAL)
+- `v` - Switch to character-wise VISUAL mode
+- `Esc` - Return to NORMAL mode
 
 ### COMMAND Mode
 
@@ -129,7 +175,7 @@ Press `@` followed by the register letter to replay the macro.
 
 The Vim mode indicator in the bottom-left shows:
 
-1. **Current Mode** - Color-coded badge (NORMAL, INSERT, REPLACE, COMMAND)
+1. **Current Mode** - Color-coded badge (NORMAL, INSERT, REPLACE, COMMAND, VISUAL, VISUAL LINE)
 2. **Command Buffer** - Shows `:` commands as you type them
 3. **Recording Status** - Animated indicator when recording macros
 4. **Count Prefix** - Shows the count number when entering numeric prefixes
@@ -137,8 +183,10 @@ The Vim mode indicator in the bottom-left shows:
 ## Tips
 
 - Start with basic navigation (`hjkl`) and mode switching (`i`, `Esc`)
+- Use visual mode (`v`, `V`) to select and manipulate text
 - Use count prefixes to move faster (e.g., `10j` to move down 10 lines)
 - Combine commands with motions (e.g., `d3w` to delete 3 words)
+- Visual mode makes it easy to select and delete/copy text
 - Remember `:wq` to save and exit Vim mode
 - Press **Ctrl+Shift+V** anytime to toggle Vim mode off
 
@@ -152,14 +200,14 @@ Vim mode works alongside BlockNote's rich text features:
 
 ## Limitations
 
-- Some advanced Vim features (text objects, visual block mode, registers for copy/paste) are not yet implemented
+- Some advanced Vim features (text objects, visual block mode, registers for copy/paste) are not yet fully implemented
 - Vim mode is editor-specific and doesn't affect other UI elements
 - Command-line search (/) is planned for future releases
 
 ## Future Enhancements
 
 Planned features for upcoming releases:
-- Visual selection mode with more features
+- Enhanced visual selection features
 - Text objects (e.g., `diw`, `ci"`)
 - Additional commands (`:set`, `:help`)
 - Search and replace with patterns
