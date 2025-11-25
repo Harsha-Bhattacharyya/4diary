@@ -17,6 +17,36 @@ import { test, expect } from '@playwright/test';
  */
 
 test.describe('BlockEditor - Auto-Save Optimization', () => {
+  test.beforeEach(async ({ page }) => {
+    // Mock authentication to allow workspace access
+    await page.route('**/api/auth/session', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          authenticated: true,
+          username: 'testuser',
+        }),
+      });
+    });
+    await page.route('**/api/workspaces', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          workspace: { id: 'test-workspace-id', name: 'Test Workspace' }
+        }),
+      });
+    });
+    await page.route('**/api/documents**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ documents: [] }),
+      });
+    });
+  });
+
   test('should only save when content actually changes', async ({ page }) => {
     await page.goto('/workspace');
     await page.waitForLoadState('networkidle');
@@ -156,6 +186,22 @@ test.describe('BlockEditor - Auto-Save Optimization', () => {
 });
 
 test.describe('BlockEditor - Touch Interaction Improvements', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/auth/session', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ authenticated: true, username: 'testuser' }),
+      });
+    });
+    await page.route('**/api/workspaces', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ workspace: { id: 'test-workspace-id' } }) });
+    });
+    await page.route('**/api/documents**', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ documents: [] }) });
+    });
+  });
+
   test('should have touch-auto class on editor container', async ({ page }) => {
     await page.goto('/workspace');
     await page.waitForLoadState('networkidle');
@@ -250,6 +296,18 @@ test.describe('BlockEditor - Touch Interaction Improvements', () => {
 });
 
 test.describe('BlockEditor - Save Status Display', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/auth/session', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ authenticated: true, username: 'testuser' }) });
+    });
+    await page.route('**/api/workspaces', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ workspace: { id: 'test-workspace-id' } }) });
+    });
+    await page.route('**/api/documents**', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ documents: [] }) });
+    });
+  });
+
   test('should show "Saving..." during save operation', async ({ page }) => {
     await page.goto('/workspace');
     await page.waitForLoadState('networkidle');
@@ -367,6 +425,18 @@ test.describe('BlockEditor - Save Status Display', () => {
 });
 
 test.describe('BlockEditor - Props Configuration', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/auth/session', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ authenticated: true, username: 'testuser' }) });
+    });
+    await page.route('**/api/workspaces', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ workspace: { id: 'test-workspace-id' } }) });
+    });
+    await page.route('**/api/documents**', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ documents: [] }) });
+    });
+  });
+
   test('should respect editable=false prop (read-only mode)', async ({ page }) => {
     // This would be tested via the share page which uses editable=false
     await page.route('**/api/share?id=readonly-test', async (route) => {
@@ -458,6 +528,15 @@ test.describe('BlockEditor - Props Configuration', () => {
 });
 
 test.describe('BlockEditor - Error Handling', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/auth/session', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ authenticated: true, username: 'testuser' }) });
+    });
+    await page.route('**/api/workspaces', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ workspace: { id: 'test-workspace-id' } }) });
+    });
+  });
+
   test('should handle save failures gracefully', async ({ page }) => {
     await page.goto('/workspace');
     await page.waitForLoadState('networkidle');
@@ -529,6 +608,18 @@ test.describe('BlockEditor - Error Handling', () => {
 });
 
 test.describe('BlockEditor - Change Detection Edge Cases', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/auth/session', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ authenticated: true, username: 'testuser' }) });
+    });
+    await page.route('**/api/workspaces', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ workspace: { id: 'test-workspace-id' } }) });
+    });
+    await page.route('**/api/documents**', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ documents: [] }) });
+    });
+  });
+
   test('should handle rapid content changes', async ({ page }) => {
     await page.goto('/workspace');
     await page.waitForLoadState('networkidle');
