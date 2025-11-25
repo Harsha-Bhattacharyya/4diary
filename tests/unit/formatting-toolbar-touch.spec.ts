@@ -210,7 +210,8 @@ test.describe('FormattingToolbar - Text Formatting Buttons', () => {
         const classList = await boldButton.getAttribute('class');
         
         expect(classList).toContain('hover:bg-leather-600');
-        expect(classList).toContain('text-leather-200');
+        expect(classList).toContain('text-leather-800');
+        expect(classList).toContain('bg-leather-200');
       }
     }
   });
