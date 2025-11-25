@@ -66,7 +66,7 @@ export default function VimModeIndicator({ vimState, isEnabled }: VimModeIndicat
   };
 
   return (
-    <div className="fixed bottom-4 left-4 z-50 flex items-center gap-2">
+    <div className="fixed bottom-20 left-4 z-[60] flex items-center gap-2" data-vim-indicator="true">
       {/* Mode Indicator */}
       <div className={`${getModeColor(vimState.mode)} text-white px-3 py-1 rounded-md font-mono text-sm font-bold shadow-lg`}>
         {getModeText(vimState.mode)}

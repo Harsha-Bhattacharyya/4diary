@@ -32,6 +32,7 @@ interface BlockEditorProps {
   editable?: boolean;
   showToolbar?: boolean;
   showLineNumbers?: boolean;
+  toolbarPosition?: 'top' | 'bottom';
 }
 
 /**
@@ -48,6 +49,7 @@ interface BlockEditorProps {
  * @param editable - Whether the editor content is editable (default: `true`).
  * @param showToolbar - Whether to display the formatting toolbar (default: `true`).
  * @param showLineNumbers - Whether to display line numbers (default: `false`).
+ * @param toolbarPosition - Position of the toolbar: 'top' (default) or 'bottom'.
  * @returns The editor's JSX element.
  */
 export default function BlockEditor({
@@ -59,6 +61,7 @@ export default function BlockEditor({
   editable = true,
   showToolbar = true,
   showLineNumbers = false,
+  toolbarPosition = 'top',
 }: BlockEditorProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
@@ -296,8 +299,8 @@ export default function BlockEditor({
       {/* Vim Mode Indicator */}
       {vimEnabled && <VimModeIndicator vimState={vimState} isEnabled={isVimEnabled} />}
 
-      {/* Formatting Toolbar */}
-      {showToolbar && !vimEnabled && <FormattingToolbar editor={editor} />}
+      {/* Formatting Toolbar - Top position */}
+      {showToolbar && !vimEnabled && toolbarPosition === 'top' && <FormattingToolbar editor={editor} position="top" />}
 
       {/* Save status */}
       {autoSave && (
@@ -321,7 +324,7 @@ export default function BlockEditor({
 
       {/* Editor */}
       <div 
-        className={`touch-manipulation ${showLineNumbers ? 'editor-with-line-numbers' : ''}`} 
+        className={`touch-manipulation ${showLineNumbers ? 'editor-with-line-numbers' : ''} ${toolbarPosition === 'bottom' ? 'pb-16' : ''}`} 
         style={{ WebkitTapHighlightColor: 'transparent' }}
       >
         <BlockNoteView
@@ -333,6 +336,9 @@ export default function BlockEditor({
           slashMenu={true}
         />
       </div>
+
+      {/* Formatting Toolbar - Bottom position */}
+      {showToolbar && !vimEnabled && toolbarPosition === 'bottom' && <FormattingToolbar editor={editor} position="bottom" />}
     </div>
   );
 }
