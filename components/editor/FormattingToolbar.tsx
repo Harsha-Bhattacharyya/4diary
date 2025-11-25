@@ -163,10 +163,10 @@ export default function FormattingToolbar({ editor, position = 'top' }: Formatti
   if (position === 'bottom') {
     return (
       <div 
-        className="fixed left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-lg transition-all duration-200"
+        className="fixed left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-lg transition-all duration-200 pb-safe"
         style={{ 
           bottom: keyboardHeight,
-          paddingBottom: `max(env(safe-area-inset-bottom, 0px), 8px)`
+          paddingBottom: keyboardHeight > 0 ? '8px' : undefined
         }}
         data-formatting-toolbar="bottom"
       >

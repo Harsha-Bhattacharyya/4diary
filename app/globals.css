@@ -174,3 +174,8 @@ body {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;  /* Chrome, Safari and Opera */
 }
+
+/* Safe area padding for iOS devices */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 8px);
+}
