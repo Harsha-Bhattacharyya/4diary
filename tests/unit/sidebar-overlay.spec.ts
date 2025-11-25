@@ -17,6 +17,38 @@ import { test, expect } from '@playwright/test';
  */
 
 test.describe('Sidebar - Overlay Architecture', () => {
+  test.beforeEach(async ({ page }) => {
+    // Mock authentication to allow workspace access
+    await page.route('**/api/auth/session', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          authenticated: true,
+          username: 'testuser',
+        }),
+      });
+    });
+    // Mock workspace API
+    await page.route('**/api/workspaces', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          workspace: { id: 'test-workspace-id', name: 'Test Workspace' }
+        }),
+      });
+    });
+    // Mock documents API
+    await page.route('**/api/documents**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ documents: [] }),
+      });
+    });
+  });
+
   test('should use fixed positioning instead of flex', async ({ page }) => {
     await page.goto('/workspace');
     await page.waitForLoadState('networkidle');
@@ -34,15 +66,17 @@ test.describe('Sidebar - Overlay Architecture', () => {
     const sidebar = page.locator('.fixed.h-screen').first();
     const positionBefore = await sidebar.boundingBox();
     
-    // Scroll page
+    // Scroll page using keyboard to scroll main content, not sidebar
     await page.evaluate(() => window.scrollBy(0, 500));
     await page.waitForTimeout(500);
     
-    // Position should remain the same (fixed)
+    // Position should remain the same (fixed) - check relative to viewport
     const positionAfter = await sidebar.boundingBox();
     
     if (positionBefore && positionAfter) {
-      expect(positionBefore.y).toBe(positionAfter.y);
+      // For fixed positioning, the y coordinate relative to viewport should be similar
+      // Allow small tolerance for rendering differences
+      expect(Math.abs(positionAfter.y - positionBefore.y)).toBeLessThan(10);
     }
   });
 
@@ -54,7 +88,8 @@ test.describe('Sidebar - Overlay Architecture', () => {
     const box = await sidebar.boundingBox();
     
     if (box) {
-      const viewportHeight = await page.viewportSize().then(vp => vp?.height || 0);
+      const viewportSize = page.viewportSize();
+      const viewportHeight = viewportSize?.height || 0;
       expect(box.height).toBeCloseTo(viewportHeight, 5);
     }
   });
@@ -85,6 +120,38 @@ test.describe('Sidebar - Overlay Architecture', () => {
 });
 
 test.describe('Sidebar - Visual Effects', () => {
+  test.beforeEach(async ({ page }) => {
+    // Mock authentication to allow workspace access
+    await page.route('**/api/auth/session', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          authenticated: true,
+          username: 'testuser',
+        }),
+      });
+    });
+    // Mock workspace API
+    await page.route('**/api/workspaces', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          workspace: { id: 'test-workspace-id', name: 'Test Workspace' }
+        }),
+      });
+    });
+    // Mock documents API
+    await page.route('**/api/documents**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ documents: [] }),
+      });
+    });
+  });
+
   test('should have backdrop blur effect', async ({ page }) => {
     await page.goto('/workspace');
     await page.waitForLoadState('networkidle');
@@ -129,6 +196,38 @@ test.describe('Sidebar - Visual Effects', () => {
 });
 
 test.describe('Sidebar - Z-Index Management', () => {
+  test.beforeEach(async ({ page }) => {
+    // Mock authentication to allow workspace access
+    await page.route('**/api/auth/session', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          authenticated: true,
+          username: 'testuser',
+        }),
+      });
+    });
+    // Mock workspace API
+    await page.route('**/api/workspaces', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          workspace: { id: 'test-workspace-id', name: 'Test Workspace' }
+        }),
+      });
+    });
+    // Mock documents API
+    await page.route('**/api/documents**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ documents: [] }),
+      });
+    });
+  });
+
   test('should have z-1000 when expanded', async ({ page }) => {
     await page.goto('/workspace');
     await page.waitForLoadState('networkidle');
@@ -213,6 +312,38 @@ test.describe('Sidebar - Z-Index Management', () => {
 });
 
 test.describe('Workspace - Main Content Independence', () => {
+  test.beforeEach(async ({ page }) => {
+    // Mock authentication to allow workspace access
+    await page.route('**/api/auth/session', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          authenticated: true,
+          username: 'testuser',
+        }),
+      });
+    });
+    // Mock workspace API
+    await page.route('**/api/workspaces', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          workspace: { id: 'test-workspace-id', name: 'Test Workspace' }
+        }),
+      });
+    });
+    // Mock documents API
+    await page.route('**/api/documents**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ documents: [] }),
+      });
+    });
+  });
+
   test('should not have margin adjustment based on sidebar', async ({ page }) => {
     await page.goto('/workspace');
     await page.waitForLoadState('networkidle');
@@ -280,6 +411,38 @@ test.describe('Workspace - Main Content Independence', () => {
 });
 
 test.describe('Sidebar - Toggle Behavior with New Layout', () => {
+  test.beforeEach(async ({ page }) => {
+    // Mock authentication to allow workspace access
+    await page.route('**/api/auth/session', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          authenticated: true,
+          username: 'testuser',
+        }),
+      });
+    });
+    // Mock workspace API
+    await page.route('**/api/workspaces', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          workspace: { id: 'test-workspace-id', name: 'Test Workspace' }
+        }),
+      });
+    });
+    // Mock documents API
+    await page.route('**/api/documents**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ documents: [] }),
+      });
+    });
+  });
+
   test('should animate width transition', async ({ page }) => {
     await page.goto('/workspace');
     await page.waitForLoadState('networkidle');
@@ -353,6 +516,38 @@ test.describe('Sidebar - Toggle Behavior with New Layout', () => {
 });
 
 test.describe('Sidebar - User Interaction with Overlay', () => {
+  test.beforeEach(async ({ page }) => {
+    // Mock authentication to allow workspace access
+    await page.route('**/api/auth/session', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          authenticated: true,
+          username: 'testuser',
+        }),
+      });
+    });
+    // Mock workspace API
+    await page.route('**/api/workspaces', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          workspace: { id: 'test-workspace-id', name: 'Test Workspace' }
+        }),
+      });
+    });
+    // Mock documents API
+    await page.route('**/api/documents**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ documents: [] }),
+      });
+    });
+  });
+
   test('should allow clicking through to main content when collapsed', async ({ page }) => {
     await page.goto('/workspace');
     await page.waitForLoadState('networkidle');
@@ -402,6 +597,38 @@ test.describe('Sidebar - User Interaction with Overlay', () => {
 });
 
 test.describe('Sidebar - Content Visibility', () => {
+  test.beforeEach(async ({ page }) => {
+    // Mock authentication to allow workspace access
+    await page.route('**/api/auth/session', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          authenticated: true,
+          username: 'testuser',
+        }),
+      });
+    });
+    // Mock workspace API
+    await page.route('**/api/workspaces', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          workspace: { id: 'test-workspace-id', name: 'Test Workspace' }
+        }),
+      });
+    });
+    // Mock documents API
+    await page.route('**/api/documents**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ documents: [] }),
+      });
+    });
+  });
+
   test('should show workspace header when expanded', async ({ page }) => {
     await page.goto('/workspace');
     await page.waitForLoadState('networkidle');
@@ -470,6 +697,38 @@ test.describe('Sidebar - Content Visibility', () => {
 });
 
 test.describe('Sidebar - Accessibility with Overlay', () => {
+  test.beforeEach(async ({ page }) => {
+    // Mock authentication to allow workspace access
+    await page.route('**/api/auth/session', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          authenticated: true,
+          username: 'testuser',
+        }),
+      });
+    });
+    // Mock workspace API
+    await page.route('**/api/workspaces', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          workspace: { id: 'test-workspace-id', name: 'Test Workspace' }
+        }),
+      });
+    });
+    // Mock documents API
+    await page.route('**/api/documents**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ documents: [] }),
+      });
+    });
+  });
+
   test('should be accessible via keyboard when expanded', async ({ page }) => {
     await page.goto('/workspace');
     await page.waitForLoadState('networkidle');

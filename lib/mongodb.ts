@@ -31,9 +31,14 @@ let clientPromise: Promise<MongoClient>;
 
 if (!uri) {
   // During build time, URI might not be available
-  // Create a placeholder that will throw at runtime if used
+  // Create a placeholder that will fail gracefully at runtime if used
   console.warn("MongoDB URI not found - database operations will fail at runtime");
-  clientPromise = Promise.reject(new Error("Please add your MongoDB URI to .env.local"));
+  // Create a never-resolving promise to prevent unhandled rejection
+  // The actual error will be thrown when trying to use the connection
+  clientPromise = new Promise(() => {
+    // This promise never resolves, but also never rejects
+    // Database operations will fail with a clear error via getDatabase()
+  });
 } else if (process.env.NODE_ENV === "development") {
   // In development mode, use a global variable so the client is preserved across module reloads
   const globalWithMongo = global as typeof globalThis & {
