@@ -136,10 +136,24 @@ export default function BlockEditor({
 
       // If vim mode is enabled, handle vim keybindings
       if (vimEnabled && editorContainerRef.current) {
+        const targetNode = event.target as Node | null;
+        if (!targetNode || !editorContainerRef.current.contains(targetNode)) {
+          return;
+        }
+
         const handled = handleKeyDown(event);
         
         // If not handled by vim mode manager, try navigation handler
         if (!handled && vimState && vimNavigationHandlerRef.current) {
+          const selection = window.getSelection();
+          if (
+            !selection ||
+            !selection.anchorNode ||
+            !editorContainerRef.current.contains(selection.anchorNode)
+          ) {
+            return;
+          }
+
           const navHandler = vimNavigationHandlerRef.current;
           const key = event.key;
           const count = vimState.count || 1;
