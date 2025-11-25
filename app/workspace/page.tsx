@@ -862,9 +862,10 @@ function WorkspaceContent() {
                 initialContent={currentDocument.content}
                 onSave={handleSave}
                 autoSave={true}
-                showToolbar={false}
+                showToolbar={isEditMode}
                 editable={isEditMode}
                 showLineNumbers={showLineNumbers}
+                toolbarPosition="bottom"
               />
             )}
           </div>
@@ -887,7 +888,7 @@ function WorkspaceContent() {
           <button
             type="button"
             onClick={() => setIsEditMode(true)}
-            className="fixed bottom-24 right-6 z-50 p-4 bg-leather-600 hover:bg-leather-700 text-white rounded-full shadow-2xl transition-all hover:scale-110"
+            className="fixed bottom-6 right-6 z-50 p-4 bg-leather-600 hover:bg-leather-700 text-white rounded-full shadow-2xl transition-all hover:scale-110"
             aria-label="Enter edit mode"
             title="Enter edit mode"
           >
@@ -909,74 +910,37 @@ function WorkspaceContent() {
           </button>
         )}
 
-        {/* Bottom Formatting Toolbar - Scrollable - Only show for non-board documents in edit mode */}
+        {/* Edit Mode Bar - Only show for non-board documents in edit mode */}
         {isEditMode && currentDocument.metadata.type !== 'board' && (
-          <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-lg">
-            <div className="max-w-4xl mx-auto px-6 py-3 overflow-x-auto">
-              <div className="flex items-center justify-between gap-2 min-w-max">
-                <div className="flex items-center gap-2">
-                  {/* Edit Mode Indicator */}
-                  <div className="flex items-center gap-2 px-3 py-1 bg-green-100 text-green-700 rounded-lg text-sm font-medium">
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      aria-hidden="true"
-                      focusable="false"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                      />
-                    </svg>
-                    Edit Mode
-                  </div>
-                  {/* Exit Edit Mode Button */}
-                  <button
-                    type="button"
-                    onClick={() => setIsEditMode(false)}
-                    className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-sm"
-                  >
-                    Exit Edit Mode
-                  </button>
-                </div>
-                <div className="flex items-center gap-2">
-                  {/* Text Formatting */}
-                  <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors font-bold flex-shrink-0">
-                    B
-                  </button>
-                  <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors italic flex-shrink-0">
-                    I
-                  </button>
-                  <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors flex-shrink-0">
-                    ⟨/⟩
-                  </button>
-                  <div className="h-6 w-px bg-gray-300 mx-2 flex-shrink-0"></div>
-                  {/* Block Formatting */}
-                  <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors text-sm flex-shrink-0">
-                    H1
-                  </button>
-                  <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors text-sm flex-shrink-0">
-                    H2
-                  </button>
-                  <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors text-sm flex-shrink-0">
-                    H3
-                  </button>
-                  <div className="h-6 w-px bg-gray-300 mx-2 flex-shrink-0"></div>
-                  <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors flex-shrink-0">
-                    •
-                  </button>
-                  <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors flex-shrink-0">
-                    1.
-                  </button>
-                  <button type="button" className="px-3 py-2 hover:bg-gray-100 rounded transition-colors flex-shrink-0">
-                    ☑
-                  </button>
-                </div>
+          <div className="fixed bottom-14 left-0 right-0 z-40 pointer-events-none">
+            <div className="max-w-4xl mx-auto px-6 flex justify-between items-center">
+              {/* Edit Mode Indicator */}
+              <div className="flex items-center gap-2 px-3 py-1 bg-green-100 text-green-700 rounded-lg text-sm font-medium shadow-md pointer-events-auto">
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                  />
+                </svg>
+                Edit Mode
               </div>
+              {/* Exit Edit Mode Button */}
+              <button
+                type="button"
+                onClick={() => setIsEditMode(false)}
+                className="px-3 py-1 bg-white hover:bg-gray-100 rounded-lg transition-colors text-sm shadow-md border border-gray-200 pointer-events-auto"
+              >
+                Exit Edit Mode
+              </button>
             </div>
           </div>
         )}
