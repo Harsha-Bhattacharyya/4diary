@@ -11,13 +11,17 @@
  * modification, are permitted provided that the conditions in the LICENSE file are met.
  */
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useCreateBlockNote } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/mantine/style.css";
 import "./editor.css";
 import FormattingToolbar from "./FormattingToolbar";
+import VimModeIndicator from "./VimModeIndicator";
+import { useVimMode } from "@/lib/vim/useVimMode";
+import { VimMode } from "@/lib/vim/VimMode";
+import { VimNavigationHandler } from "@/lib/vim/VimNavigationHandler";
 
 interface BlockEditorProps {
   initialContent?: unknown[];
@@ -61,10 +65,39 @@ export default function BlockEditor({
   const [hasChanges, setHasChanges] = useState(false);
   const [lastContentHash, setLastContentHash] = useState<number>(0);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [vimEnabled, setVimEnabled] = useState(false);
+  const editorContainerRef = useRef<HTMLDivElement>(null);
+  const vimNavigationHandlerRef = useRef<VimNavigationHandler | null>(null);
 
   // Create editor instance
   const editor = useCreateBlockNote({
     initialContent: initialContent || undefined,
+  });
+
+  // Initialize vim navigation handler
+  useEffect(() => {
+    if (editor && !vimNavigationHandlerRef.current) {
+      vimNavigationHandlerRef.current = new VimNavigationHandler(editor);
+    }
+  }, [editor]);
+
+  // Vim mode integration
+  const { vimState, handleKeyDown, setMode, isVimEnabled } = useVimMode({
+    enabled: vimEnabled,
+    onCommand: (command) => {
+      if (command.action === 'save' || command.action === 'save-and-exit') {
+        if (onSave) {
+          const content = editor.document;
+          onSave(content);
+        }
+      }
+      if (command.action === 'exit' || command.action === 'save-and-exit' || command.action === 'force-exit') {
+        setVimEnabled(false);
+      }
+    },
+    onExit: () => {
+      setVimEnabled(false);
+    },
   });
 
   // Simple fast hash function for content comparison
@@ -91,6 +124,111 @@ export default function BlockEditor({
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Listen for Ctrl+Shift+V to toggle vim mode
+  useEffect(() => {
+    const handleGlobalKeyDown = (event: KeyboardEvent) => {
+      if (event.ctrlKey && event.shiftKey && event.key === 'V') {
+        event.preventDefault();
+        setVimEnabled((prev) => !prev);
+        return;
+      }
+
+      // If vim mode is enabled, handle vim keybindings
+      if (vimEnabled && editorContainerRef.current) {
+        const handled = handleKeyDown(event);
+        
+        // If not handled by vim mode manager, try navigation handler
+        if (!handled && vimState && vimNavigationHandlerRef.current) {
+          const navHandler = vimNavigationHandlerRef.current;
+          const key = event.key;
+          const count = vimState.count || 1;
+          const lastCmd = vimState.lastCommand;
+          
+          // Handle navigation in visual modes
+          if (vimState.mode === VimMode.VISUAL || vimState.mode === VimMode.VISUAL_LINE) {
+            const isLinewise = vimState.mode === VimMode.VISUAL_LINE;
+            
+            // Handle visual mode operations
+            if (lastCmd === 'd' || lastCmd === 'x') {
+              navHandler.deleteVisualSelection();
+              event.preventDefault();
+              return;
+            }
+            
+            if (lastCmd === 'y') {
+              navHandler.yankVisualSelection();
+              event.preventDefault();
+              return;
+            }
+            
+            if (lastCmd === 'c') {
+              navHandler.changeVisualSelection();
+              event.preventDefault();
+              return;
+            }
+            
+            // Handle visual navigation (extends selection)
+            if (navHandler.handleVisualNavigation(key, count, isLinewise)) {
+              event.preventDefault();
+              return;
+            }
+          }
+          
+          // Handle navigation in normal mode
+          if (vimState.mode === VimMode.NORMAL) {
+            // Handle special commands
+            if (lastCmd === 'gg') {
+              navHandler.moveToDocumentStart();
+              event.preventDefault();
+              return;
+            }
+
+            // Handle compound commands (dd, dw, yy, etc.)
+            if (lastCmd && ['dd', 'dw', 'd$', 'd0', 'yy', 'yw', 'cc', 'cw'].includes(lastCmd)) {
+              if (navHandler.handleCompoundCommand(lastCmd, count)) {
+                event.preventDefault();
+                return;
+              }
+            }
+
+            // Handle insert mode positioning
+            if (['I', 'a', 'A', 'o', 'O'].includes(lastCmd)) {
+              navHandler.handleInsertModeCommand(lastCmd as 'i' | 'I' | 'a' | 'A' | 'o' | 'O');
+              event.preventDefault();
+              return;
+            }
+
+            // Handle replace character (r followed by one character)
+            if (lastCmd.startsWith('r') && lastCmd.length === 2) {
+              const char = lastCmd.charAt(1);
+              navHandler.replaceCharacter(char);
+              event.preventDefault();
+              return;
+            }
+
+            // Handle navigation commands
+            if (navHandler.handleNavigation(key, count)) {
+              event.preventDefault();
+              return;
+            }
+
+            // Handle editing commands
+            if (navHandler.handleEdit(key, count)) {
+              event.preventDefault();
+              return;
+            }
+          }
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleGlobalKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleGlobalKeyDown);
+    };
+  }, [vimEnabled, handleKeyDown, vimState]);
+  // Note: Read-only behavior for vim NORMAL/COMMAND/VISUAL modes is enforced via keyboard event interception
 
   // Auto-save functionality - only save when there are changes
   useEffect(() => {
@@ -140,9 +278,12 @@ export default function BlockEditor({
   };
 
   return (
-    <div className="relative w-full h-full touch-auto">
+    <div className="relative w-full h-full touch-auto" ref={editorContainerRef}>
+      {/* Vim Mode Indicator */}
+      {vimEnabled && <VimModeIndicator vimState={vimState} isEnabled={isVimEnabled} />}
+
       {/* Formatting Toolbar */}
-      {showToolbar && <FormattingToolbar editor={editor} />}
+      {showToolbar && !vimEnabled && <FormattingToolbar editor={editor} />}
 
       {/* Save status */}
       {autoSave && (
@@ -154,6 +295,13 @@ export default function BlockEditor({
               ✓ Saved {lastSaved.toLocaleTimeString()}
             </span>
           ) : null}
+        </div>
+      )}
+
+      {/* Vim mode toggle hint */}
+      {!vimEnabled && editable && (
+        <div className="absolute top-4 left-4 z-10 px-3 py-1 rounded-full glass-card text-xs text-gray-500">
+          Press Ctrl+Shift+V for Vim mode
         </div>
       )}
 
