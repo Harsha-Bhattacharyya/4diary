@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+  <!-- Hidden cell - medieval stone tile -->
+  <rect x="1" y="1" width="22" height="22" fill="#8b6f47" rx="1"/>
+  <rect x="2" y="2" width="20" height="20" fill="#a89168" rx="0.5"/>
+  <rect x="3" y="3" width="18" height="18" fill="#c0ae88" rx="0.5"/>
+  <!-- Stone texture -->
+  <path d="M3 8 L21 8" stroke="#a89168" stroke-width="0.5" opacity="0.5"/>
+  <path d="M3 14 L21 14" stroke="#a89168" stroke-width="0.5" opacity="0.5"/>
+  <path d="M8 3 L8 21" stroke="#a89168" stroke-width="0.5" opacity="0.5"/>
+  <path d="M16 3 L16 21" stroke="#a89168" stroke-width="0.5" opacity="0.5"/>
+</svg>

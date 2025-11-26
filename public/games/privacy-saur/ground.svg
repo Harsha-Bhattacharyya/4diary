@@ -1,5 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 12" fill="none">
-  <!-- Ground Line -->
-  <path d="M0 1h600v2H0V1z" fill="#535353"/>
-  <path d="M10 6h6v2h-6zM50 5h10v3H50zM100 7h8v2h-8zM160 6h5v2h-5zM200 5h12v3h-12zM280 7h6v2h-6zM340 6h8v2h-8zM400 5h10v3h-10zM460 7h5v2h-5zM520 6h8v2h-8zM580 5h10v3h-10z" fill="#535353"/>
-</svg>

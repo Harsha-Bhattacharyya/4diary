@@ -16,14 +16,14 @@ import Link from "next/link";
 import LeatherBackground from "@/components/ui/LeatherBackground";
 import GlassCard from "@/components/ui/GlassCard";
 import LeatherButton from "@/components/ui/LeatherButton";
-import PrivacySaur from "@/components/ui/PrivacySaur";
+import HistoricalMinesweeper from "@/components/ui/HistoricalMinesweeper";
 import { motion, AnimatePresence } from "framer-motion";
 
 /**
  * Custom 404 Not Found page with leather-themed styling.
  * 
  * Renders an animated, leather-styled error page when users navigate to a non-existent route.
- * Includes a hidden easter egg game (Privacy Saur) that can be triggered by pressing Space.
+ * Includes a hidden easter egg game (Historical Minesweeper) that can be triggered by pressing Space.
  * 
  * @returns The 404 page React element with leather background, animated icon, and navigation options
  */
@@ -151,7 +151,7 @@ export default function NotFound() {
         </GlassCard>
       </div>
 
-      {/* Privacy Saur Easter Egg Game */}
+      {/* Historical Minesweeper Easter Egg Game */}
       <AnimatePresence>
         {showGame && (
           <motion.div
@@ -159,7 +159,7 @@ export default function NotFound() {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm overflow-auto py-8"
           >
             <div className="relative">
               <button
@@ -169,7 +169,7 @@ export default function NotFound() {
               >
                 Press ESC to close
               </button>
-              <PrivacySaur />
+              <HistoricalMinesweeper />
             </div>
           </motion.div>
         )}
