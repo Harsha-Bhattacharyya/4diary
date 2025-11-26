@@ -148,14 +148,16 @@ export default function BlockEditor({
         
         // In non-INSERT/REPLACE modes, block all text input to prevent typing
         // This ensures vim NORMAL mode truly blocks text input
+        // Note: COMMAND mode is handled by the vim manager which returns handled=true for typing
         if (vimState && vimState.mode !== VimMode.INSERT && vimState.mode !== VimMode.REPLACE) {
           // Allow navigation keys (Arrow keys, Tab, etc.) but block printable characters
           const isModifier = event.ctrlKey || event.altKey || event.metaKey;
-          const isNavKey = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Tab', 'Home', 'End', 'PageUp', 'PageDown'].includes(event.key);
-          const isFunctionKey = event.key.startsWith('F') && event.key.length <= 3;
+          const isNavKey = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Tab', 'Home', 'End', 'PageUp', 'PageDown', 'Escape', 'Backspace', 'Delete', 'Enter'].includes(event.key);
+          const isFunctionKey = /^F\d+$/.test(event.key);
           
           // If it's a printable character (single character key) and not a navigation/modifier/function key
           // and not already handled by vim manager, prevent default to block text input
+          // This includes space ' ' which should not type in NORMAL mode
           if (!handled && !isModifier && !isNavKey && !isFunctionKey && event.key.length === 1) {
             event.preventDefault();
           }
