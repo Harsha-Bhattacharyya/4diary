@@ -10,14 +10,15 @@
  */
 
 /**
- * Enhanced Kanban Board Editor Component
- * Allows adding, editing, and deleting cards and columns
+ * Unified Kanban Board Editor Component
+ * Single interface combining drag-and-drop with inline editing capabilities
  */
 
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { KanbanBoard, KanbanBoardData, KanbanCard, KanbanColumn } from "./Board";
+import React, { useState, useEffect, useCallback } from "react";
+import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
+import { KanbanBoardData, KanbanCard, KanbanColumn } from "./Board";
 
 interface KanbanEditorProps {
   initialData: KanbanBoardData;
@@ -26,15 +27,17 @@ interface KanbanEditorProps {
 }
 
 /**
- * Render an enhanced Kanban board with editor controls for managing cards and columns.
+ * Render a unified Kanban board with integrated drag-and-drop and editing capabilities.
  *
- * Provides UI for adding/editing/deleting cards and columns using a custom implementation
- * that integrates with the drag-and-drop KanbanBoard component.
+ * Provides a single, slick interface for managing cards and columns with:
+ * - Drag-and-drop reordering of cards between columns
+ * - Inline add/edit/delete for cards
+ * - Add/delete columns
  *
  * @param initialData - Initial board data with columns and cards
  * @param onBoardChange - Callback invoked with updated board data after changes
- * @param readOnly - When true, disables all editing controls
- * @returns The enhanced Kanban editor React element
+ * @param readOnly - When true, disables all editing controls and drag-and-drop
+ * @returns The unified Kanban editor React element
  */
 export function KanbanEditor({
   initialData,
@@ -55,9 +58,50 @@ export function KanbanEditor({
     setBoard(initialData);
   }, [initialData]);
 
-  const handleBoardChange = (newBoard: KanbanBoardData) => {
+  const updateBoard = useCallback((newBoard: KanbanBoardData) => {
     setBoard(newBoard);
     onBoardChange(newBoard);
+  }, [onBoardChange]);
+
+  // Helper function to determine if a card should have drag disabled
+  const isCardDragDisabled = useCallback((cardId: string | number): boolean => {
+    return readOnly || editingCard?.cardId === cardId;
+  }, [readOnly, editingCard]);
+
+  const handleDragEnd = (result: DropResult) => {
+    const { destination, source, draggableId } = result;
+
+    // Dropped outside the list
+    if (!destination) return;
+
+    // Dropped in the same position
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    ) {
+      return;
+    }
+
+    const newColumns = board.columns.map(col => ({
+      ...col,
+      cards: [...col.cards]
+    }));
+
+    const sourceCol = newColumns.find(col => col.id.toString() === source.droppableId);
+    const destCol = newColumns.find(col => col.id.toString() === destination.droppableId);
+
+    if (!sourceCol || !destCol) return;
+
+    // Find and remove the card from source
+    const cardIndex = sourceCol.cards.findIndex(c => c.id.toString() === draggableId);
+    if (cardIndex === -1) return;
+    
+    const [movedCard] = sourceCol.cards.splice(cardIndex, 1);
+
+    // Add the card to destination
+    destCol.cards.splice(destination.index, 0, movedCard);
+
+    updateBoard({ columns: newColumns });
   };
 
   const handleAddCard = (columnId: string | number) => {
@@ -78,9 +122,7 @@ export function KanbanEditor({
       return col;
     });
 
-    const newBoard = { columns: newColumns };
-    setBoard(newBoard);
-    onBoardChange(newBoard);
+    updateBoard({ columns: newColumns });
     setIsAddingCard(null);
     setNewCardTitle("");
     setNewCardDescription("");
@@ -106,9 +148,7 @@ export function KanbanEditor({
       return col;
     });
 
-    const newBoard = { columns: newColumns };
-    setBoard(newBoard);
-    onBoardChange(newBoard);
+    updateBoard({ columns: newColumns });
     setEditingCard(null);
     setEditCardTitle("");
     setEditCardDescription("");
@@ -127,9 +167,7 @@ export function KanbanEditor({
       return col;
     });
 
-    const newBoard = { columns: newColumns };
-    setBoard(newBoard);
-    onBoardChange(newBoard);
+    updateBoard({ columns: newColumns });
   };
 
   const handleAddColumn = () => {
@@ -141,12 +179,9 @@ export function KanbanEditor({
       cards: [],
     };
 
-    const newBoard = {
+    updateBoard({
       columns: [...board.columns, newColumn],
-    };
-
-    setBoard(newBoard);
-    onBoardChange(newBoard);
+    });
     setIsAddingColumn(false);
     setNewColumnTitle("");
   };
@@ -156,12 +191,9 @@ export function KanbanEditor({
       return;
     }
 
-    const newBoard = {
+    updateBoard({
       columns: board.columns.filter((col) => col.id !== columnId),
-    };
-
-    setBoard(newBoard);
-    onBoardChange(newBoard);
+    });
   };
 
   const startEditCard = (columnId: string | number, card: KanbanCard) => {
@@ -170,441 +202,564 @@ export function KanbanEditor({
     setEditCardDescription(card.description || "");
   };
 
+  // Render card content
+  const renderCardContent = (card: KanbanCard, columnId: string | number, isDragging: boolean) => {
+    // If this card is being edited, show edit form
+    if (editingCard?.columnId === columnId && editingCard?.cardId === card.id) {
+      return (
+        <div className="unified-card-form" onClick={(e) => e.stopPropagation()}>
+          <input
+            type="text"
+            className="unified-form-input"
+            value={editCardTitle}
+            onChange={(e) => setEditCardTitle(e.target.value)}
+            placeholder="Card title"
+            autoFocus
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleEditCard(columnId, card.id);
+              } else if (e.key === 'Escape') {
+                setEditingCard(null);
+                setEditCardTitle("");
+                setEditCardDescription("");
+              }
+            }}
+          />
+          <textarea
+            className="unified-form-textarea"
+            value={editCardDescription}
+            onChange={(e) => setEditCardDescription(e.target.value)}
+            placeholder="Description (optional)"
+          />
+          <div className="unified-form-actions">
+            <button
+              type="button"
+              className="unified-card-btn"
+              onClick={() => handleEditCard(columnId, card.id)}
+            >
+              💾 Save
+            </button>
+            <button
+              type="button"
+              className="unified-card-btn"
+              onClick={() => {
+                setEditingCard(null);
+                setEditCardTitle("");
+                setEditCardDescription("");
+              }}
+            >
+              ✖️ Cancel
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    // Normal card view
+    return (
+      <div className={`unified-card-content ${isDragging ? 'dragging' : ''}`}>
+        <div className="unified-card-title">{card.title}</div>
+        {card.description && (
+          <div className="unified-card-description">{card.description}</div>
+        )}
+        {!readOnly && (
+          <div className="unified-card-controls">
+            <button
+              type="button"
+              className="unified-card-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                startEditCard(columnId, card);
+              }}
+            >
+              ✏️ Edit
+            </button>
+            <button
+              type="button"
+              className="unified-card-btn delete"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDeleteCard(columnId, card.id);
+              }}
+            >
+              🗑️ Delete
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
-    <div className="kanban-editor-wrapper">
+    <div className="unified-kanban-wrapper">
       <style jsx global>{`
-        .kanban-editor-wrapper {
+        .unified-kanban-wrapper {
           background: #1A1410;
           min-height: 100vh;
           padding: 1rem;
         }
 
-        .editor-controls {
-          display: flex;
-          gap: 1rem;
-          margin-bottom: 1rem;
-          padding: 1rem;
-          background: #2D2416;
-          border: 1px solid #8B7355;
-          border-radius: 8px;
-          max-width: 1200px;
-          margin-left: auto;
-          margin-right: auto;
-        }
-
-        .editor-button {
-          padding: 0.5rem 1rem;
-          background: #6B5539;
-          color: #E8DCC4;
-          border: 1px solid #8B7355;
-          border-radius: 4px;
-          cursor: pointer;
-          transition: all 0.2s;
-          font-size: 0.875rem;
-        }
-
-        .editor-button:hover {
-          background: #8B7355;
-        }
-
-        .custom-board-container {
+        /* Board container */
+        .unified-board {
           display: flex;
           gap: 1rem;
           overflow-x: auto;
           padding: 1rem 0;
+          align-items: flex-start;
         }
 
-        .custom-column {
+        /* Column styling */
+        .unified-column {
           background: #2D2416;
           border: 1px solid #8B7355;
           border-radius: 8px;
-          min-width: 300px;
-          max-width: 300px;
-          padding: 1rem;
+          min-width: 320px;
+          max-width: 320px;
+          display: flex;
+          flex-direction: column;
         }
 
-        .custom-column-header {
-          font-size: 1.125rem;
-          font-weight: 600;
-          color: #E8DCC4;
-          margin-bottom: 1rem;
-          padding-bottom: 0.5rem;
-          border-bottom: 1px solid #8B7355;
+        /* Column header */
+        .unified-column-header {
           display: flex;
           justify-content: space-between;
           align-items: center;
+          padding: 1rem;
+          border-bottom: 1px solid #8B7355;
         }
 
-        .column-delete-btn {
-          padding: 0.25rem 0.5rem;
-          background: #8B4513;
+        .unified-column-title {
+          font-size: 1rem;
+          font-weight: 600;
           color: #E8DCC4;
+        }
+
+        .unified-column-actions {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        .unified-column-count {
+          background: #4D4436;
+          color: #C4B8A0;
+          padding: 0.125rem 0.5rem;
+          border-radius: 10px;
+          font-size: 0.75rem;
+          font-weight: 500;
+        }
+
+        .unified-column-delete-btn {
+          padding: 0.25rem 0.5rem;
+          background: transparent;
+          color: #C4B8A0;
           border: none;
           border-radius: 4px;
           cursor: pointer;
           font-size: 0.75rem;
           transition: all 0.2s;
+          opacity: 0.6;
         }
 
-        .column-delete-btn:hover {
-          background: #A0522D;
+        .unified-column-delete-btn:hover {
+          background: #8B4513;
+          opacity: 1;
         }
 
-        .custom-card {
+        /* Cards container */
+        .unified-cards-container {
+          flex: 1;
+          min-height: 100px;
+          padding: 0.5rem;
+        }
+
+        /* Card styling */
+        .unified-card {
           background: #3D3426;
-          border: 1px solid #8B7355;
+          border: 1px solid #5D4E3A;
           border-radius: 6px;
-          padding: 0.75rem;
           margin-bottom: 0.5rem;
+          transition: all 0.2s ease;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
         }
 
-        .custom-card-title {
+        .unified-card.draggable {
+          cursor: grab;
+        }
+
+        .unified-card.readonly {
+          cursor: default;
+        }
+
+        .unified-card:hover {
+          border-color: #8B7355;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .unified-card.dragging {
+          opacity: 0.9;
+          cursor: grabbing !important;
+          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+          transform: rotate(2deg);
+          border-color: #A08465;
+        }
+
+        /* Card content */
+        .unified-card-content {
+          padding: 0.75rem;
+        }
+
+        .unified-card-title {
           color: #E8DCC4;
           font-weight: 500;
-          margin-bottom: 0.5rem;
+          font-size: 0.9rem;
+          margin-bottom: 0.25rem;
+          word-break: break-word;
         }
 
-        .custom-card-description {
-          color: #C4B8A0;
-          font-size: 0.875rem;
+        .unified-card-description {
+          color: #A89880;
+          font-size: 0.8rem;
           margin-bottom: 0.5rem;
+          word-break: break-word;
+          line-height: 1.4;
         }
 
-        .card-controls {
+        .unified-card-controls {
           display: flex;
-          gap: 0.5rem;
+          gap: 0.25rem;
           padding-top: 0.5rem;
-          border-top: 1px solid #8B7355;
+          border-top: 1px solid #4D4436;
+          margin-top: 0.5rem;
         }
 
-        .card-btn {
+        .unified-card-btn {
           padding: 0.25rem 0.5rem;
-          background: #6B5539;
-          color: #E8DCC4;
+          background: #4D4436;
+          color: #C4B8A0;
           border: none;
           border-radius: 4px;
           cursor: pointer;
-          font-size: 0.75rem;
+          font-size: 0.7rem;
           transition: all 0.2s;
+          flex: 1;
         }
 
-        .card-btn:hover {
-          background: #8B7355;
+        .unified-card-btn:hover {
+          background: #6B5539;
+          color: #E8DCC4;
         }
 
-        .card-btn.delete {
+        .unified-card-btn.delete:hover {
           background: #8B4513;
         }
 
-        .card-btn.delete:hover {
-          background: #A0522D;
-        }
-
-        .add-card-form {
-          background: #3D3426;
-          border: 1px solid #8B7355;
-          border-radius: 6px;
+        /* Card form (add/edit) */
+        .unified-card-form {
           padding: 0.75rem;
-          margin-bottom: 0.5rem;
         }
 
-        .form-input {
+        .unified-form-input {
           width: 100%;
           padding: 0.5rem;
           background: #2D2416;
-          border: 1px solid #8B7355;
+          border: 1px solid #6B5539;
           border-radius: 4px;
           color: #E8DCC4;
           margin-bottom: 0.5rem;
-          font-size: 0.875rem;
+          font-size: 0.85rem;
         }
 
-        .form-textarea {
+        .unified-form-input:focus {
+          outline: none;
+          border-color: #8B7355;
+        }
+
+        .unified-form-textarea {
           width: 100%;
           padding: 0.5rem;
           background: #2D2416;
-          border: 1px solid #8B7355;
+          border: 1px solid #6B5539;
           border-radius: 4px;
           color: #E8DCC4;
           margin-bottom: 0.5rem;
-          font-size: 0.875rem;
+          font-size: 0.85rem;
           resize: vertical;
           min-height: 60px;
         }
 
-        .form-actions {
+        .unified-form-textarea:focus {
+          outline: none;
+          border-color: #8B7355;
+        }
+
+        .unified-form-actions {
           display: flex;
           gap: 0.5rem;
         }
 
-        .add-card-btn {
+        /* Add card section */
+        .unified-add-card-section {
+          padding: 0.5rem;
+          border-top: 1px solid #3D3426;
+        }
+
+        .unified-add-card-btn {
           width: 100%;
           padding: 0.5rem;
-          background: #4D4436;
-          color: #C4B8A0;
-          border: 1px dashed #8B7355;
+          background: transparent;
+          color: #8B7355;
+          border: 1px dashed #5D4E3A;
           border-radius: 6px;
           cursor: pointer;
           transition: all 0.2s;
-          font-size: 0.875rem;
+          font-size: 0.85rem;
         }
 
-        .add-card-btn:hover {
-          background: #5D5446;
-          border-color: #A08465;
+        .unified-add-card-btn:hover {
+          background: #3D3426;
+          border-color: #8B7355;
+          color: #E8DCC4;
+        }
+
+        .unified-add-card-form {
+          background: #3D3426;
+          border: 1px solid #6B5539;
+          border-radius: 6px;
+          padding: 0.75rem;
+        }
+
+        /* Add column section */
+        .unified-add-column-wrapper {
+          min-width: 320px;
+          max-width: 320px;
+          align-self: flex-start;
+        }
+
+        .unified-add-column-btn {
+          width: 100%;
+          padding: 1rem;
+          background: transparent;
+          color: #8B7355;
+          border: 2px dashed #5D4E3A;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: all 0.2s;
+          font-size: 0.9rem;
+          height: 60px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .unified-add-column-btn:hover {
+          background: #2D2416;
+          border-color: #8B7355;
+          color: #E8DCC4;
+        }
+
+        .unified-add-column-form {
+          background: #2D2416;
+          border: 1px solid #8B7355;
+          border-radius: 8px;
+          padding: 1rem;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+          .unified-column {
+            min-width: 280px;
+            max-width: 280px;
+          }
+
+          .unified-add-column-wrapper {
+            min-width: 280px;
+            max-width: 280px;
+          }
         }
       `}</style>
 
-      {!readOnly && (
-        <div className="editor-controls">
-          <button
-            type="button"
-            className="editor-button"
-            onClick={() => setIsAddingColumn(true)}
-          >
-            ➕ Add Column
-          </button>
-        </div>
-      )}
+      <DragDropContext onDragEnd={handleDragEnd}>
+        <div className="unified-board">
+          {board.columns.map((column) => (
+            <div key={column.id} className="unified-column">
+              {/* Column Header */}
+              <div className="unified-column-header">
+                <span className="unified-column-title">{column.title}</span>
+                <div className="unified-column-actions">
+                  <span className="unified-column-count">{column.cards.length}</span>
+                  {!readOnly && board.columns.length > 1 && (
+                    <button
+                      type="button"
+                      className="unified-column-delete-btn"
+                      onClick={() => handleDeleteColumn(column.id)}
+                      title="Delete column"
+                    >
+                      🗑️
+                    </button>
+                  )}
+                </div>
+              </div>
 
-      <div className="custom-board-container">
-        {/* Render columns with editing capabilities */}
-        {board.columns.map((column) => (
-          <div key={column.id} className="custom-column">
-            <div className="custom-column-header">
-              <span>{column.title}</span>
-              {!readOnly && board.columns.length > 1 && (
-                <button
-                  type="button"
-                  className="column-delete-btn"
-                  onClick={() => handleDeleteColumn(column.id)}
-                  title="Delete column"
-                >
-                  🗑️
-                </button>
+              {/* Droppable Cards Area */}
+              <Droppable droppableId={column.id.toString()}>
+                {(provided, snapshot) => (
+                  <div
+                    ref={provided.innerRef}
+                    {...provided.droppableProps}
+                    className="unified-cards-container"
+                    style={{
+                      background: snapshot.isDraggingOver ? '#3D3426' : 'transparent',
+                      transition: 'background 0.2s ease',
+                    }}
+                  >
+                    {column.cards.map((card, index) => {
+                      const dragDisabled = isCardDragDisabled(card.id);
+                      return (
+                        <Draggable
+                          key={card.id.toString()}
+                          draggableId={card.id.toString()}
+                          index={index}
+                          isDragDisabled={dragDisabled}
+                        >
+                          {(provided, snapshot) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              className={`unified-card ${snapshot.isDragging ? 'dragging' : ''} ${dragDisabled ? 'readonly' : 'draggable'}`}
+                            >
+                              {renderCardContent(card, column.id, snapshot.isDragging)}
+                            </div>
+                          )}
+                        </Draggable>
+                      );
+                    })}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+
+              {/* Add Card Section - Inside the column */}
+              {!readOnly && (
+                <div className="unified-add-card-section">
+                  {isAddingCard === column.id ? (
+                    <div className="unified-add-card-form">
+                      <input
+                        type="text"
+                        className="unified-form-input"
+                        value={newCardTitle}
+                        onChange={(e) => setNewCardTitle(e.target.value)}
+                        placeholder="Enter card title..."
+                        autoFocus
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            handleAddCard(column.id);
+                          } else if (e.key === 'Escape') {
+                            setIsAddingCard(null);
+                            setNewCardTitle("");
+                            setNewCardDescription("");
+                          }
+                        }}
+                      />
+                      <textarea
+                        className="unified-form-textarea"
+                        value={newCardDescription}
+                        onChange={(e) => setNewCardDescription(e.target.value)}
+                        placeholder="Description (optional)"
+                      />
+                      <div className="unified-form-actions">
+                        <button
+                          type="button"
+                          className="unified-card-btn"
+                          onClick={() => handleAddCard(column.id)}
+                        >
+                          ➕ Add Card
+                        </button>
+                        <button
+                          type="button"
+                          className="unified-card-btn"
+                          onClick={() => {
+                            setIsAddingCard(null);
+                            setNewCardTitle("");
+                            setNewCardDescription("");
+                          }}
+                        >
+                          ✖️ Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      className="unified-add-card-btn"
+                      onClick={() => setIsAddingCard(column.id)}
+                    >
+                      ➕ Add Card
+                    </button>
+                  )}
+                </div>
               )}
             </div>
+          ))}
 
-            {/* Render cards */}
-            {column.cards.map((card) => (
-              <div key={card.id}>
-                {editingCard?.columnId === column.id && editingCard?.cardId === card.id ? (
-                  <div className="add-card-form">
-                    <input
-                      type="text"
-                      className="form-input"
-                      value={editCardTitle}
-                      onChange={(e) => setEditCardTitle(e.target.value)}
-                      placeholder="Card title"
-                      autoFocus
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                          e.preventDefault();
-                          handleEditCard(column.id, card.id);
-                        } else if (e.key === 'Escape') {
-                          setEditingCard(null);
-                          setEditCardTitle("");
-                          setEditCardDescription("");
-                        }
+          {/* Add Column Section */}
+          {!readOnly && (
+            <div className="unified-add-column-wrapper">
+              {isAddingColumn ? (
+                <div className="unified-add-column-form">
+                  <input
+                    type="text"
+                    className="unified-form-input"
+                    value={newColumnTitle}
+                    onChange={(e) => setNewColumnTitle(e.target.value)}
+                    placeholder="Enter column title..."
+                    autoFocus
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleAddColumn();
+                      } else if (e.key === 'Escape') {
+                        setIsAddingColumn(false);
+                        setNewColumnTitle("");
+                      }
+                    }}
+                  />
+                  <div className="unified-form-actions">
+                    <button
+                      type="button"
+                      className="unified-card-btn"
+                      onClick={handleAddColumn}
+                    >
+                      ➕ Add Column
+                    </button>
+                    <button
+                      type="button"
+                      className="unified-card-btn"
+                      onClick={() => {
+                        setIsAddingColumn(false);
+                        setNewColumnTitle("");
                       }}
-                    />
-                    <textarea
-                      className="form-textarea"
-                      value={editCardDescription}
-                      onChange={(e) => setEditCardDescription(e.target.value)}
-                      placeholder="Description (optional)"
-                    />
-                    <div className="form-actions">
-                      <button
-                        type="button"
-                        className="card-btn"
-                        onClick={() => handleEditCard(column.id, card.id)}
-                      >
-                        💾 Save
-                      </button>
-                      <button
-                        type="button"
-                        className="card-btn"
-                        onClick={() => {
-                          setEditingCard(null);
-                          setEditCardTitle("");
-                          setEditCardDescription("");
-                        }}
-                      >
-                        ✖️ Cancel
-                      </button>
-                    </div>
+                    >
+                      ✖️ Cancel
+                    </button>
                   </div>
-                ) : (
-                  <div className="custom-card">
-                    <div className="custom-card-title">{card.title}</div>
-                    {card.description && (
-                      <div className="custom-card-description">
-                        {card.description}
-                      </div>
-                    )}
-                    {!readOnly && (
-                      <div className="card-controls">
-                        <button
-                          type="button"
-                          className="card-btn"
-                          onClick={() => startEditCard(column.id, card)}
-                        >
-                          ✏️ Edit
-                        </button>
-                        <button
-                          type="button"
-                          className="card-btn delete"
-                          onClick={() => handleDeleteCard(column.id, card.id)}
-                        >
-                          🗑️ Delete
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            ))}
-
-            {/* Add card button/form */}
-            {!readOnly && (
-              <>
-                {isAddingCard === column.id ? (
-                  <div className="add-card-form">
-                    <input
-                      type="text"
-                      className="form-input"
-                      value={newCardTitle}
-                      onChange={(e) => setNewCardTitle(e.target.value)}
-                      placeholder="Card title"
-                      autoFocus
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                          e.preventDefault();
-                          handleAddCard(column.id);
-                        } else if (e.key === 'Escape') {
-                          setIsAddingCard(null);
-                          setNewCardTitle("");
-                          setNewCardDescription("");
-                        }
-                      }}
-                    />
-                    <textarea
-                      className="form-textarea"
-                      value={newCardDescription}
-                      onChange={(e) => setNewCardDescription(e.target.value)}
-                      placeholder="Description (optional)"
-                    />
-                    <div className="form-actions">
-                      <button
-                        type="button"
-                        className="card-btn"
-                        onClick={() => handleAddCard(column.id)}
-                      >
-                        ➕ Add
-                      </button>
-                      <button
-                        type="button"
-                        className="card-btn"
-                        onClick={() => {
-                          setIsAddingCard(null);
-                          setNewCardTitle("");
-                          setNewCardDescription("");
-                        }}
-                      >
-                        ✖️ Cancel
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    className="add-card-btn"
-                    onClick={() => setIsAddingCard(column.id)}
-                  >
-                    ➕ Add Card
-                  </button>
-                )}
-              </>
-            )}
-          </div>
-        ))}
-
-        {/* Add column button/form */}
-        {!readOnly && isAddingColumn && (
-          <div className="custom-column">
-            <div className="add-card-form">
-              <input
-                type="text"
-                className="form-input"
-                value={newColumnTitle}
-                onChange={(e) => setNewColumnTitle(e.target.value)}
-                placeholder="Column title"
-                autoFocus
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleAddColumn();
-                  } else if (e.key === 'Escape') {
-                    setIsAddingColumn(false);
-                    setNewColumnTitle("");
-                  }
-                }}
-              />
-              <div className="form-actions">
+                </div>
+              ) : (
                 <button
                   type="button"
-                  className="card-btn"
-                  onClick={handleAddColumn}
+                  className="unified-add-column-btn"
+                  onClick={() => setIsAddingColumn(true)}
                 >
                   ➕ Add Column
                 </button>
-                <button
-                  type="button"
-                  className="card-btn"
-                  onClick={() => {
-                    setIsAddingColumn(false);
-                    setNewColumnTitle("");
-                  }}
-                >
-                  ✖️ Cancel
-                </button>
-              </div>
+              )}
             </div>
-          </div>
-        )}
-
-        {!readOnly && !isAddingColumn && (
-          <div className="custom-column" style={{ minHeight: 'fit-content' }}>
-            <button
-              type="button"
-              className="add-card-btn"
-              onClick={() => setIsAddingColumn(true)}
-            >
-              ➕ Add Column
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* Render the draggable board below for drag-and-drop functionality */}
-      <div style={{ marginTop: '2rem' }}>
-        <div style={{ 
-          padding: '1rem', 
-          background: '#2D2416', 
-          border: '1px solid #8B7355', 
-          borderRadius: '8px',
-          marginBottom: '1rem',
-          color: '#E8DCC4'
-        }}>
-          <strong>💡 Tip:</strong> Use the controls above to add/edit cards and columns. The board below supports drag-and-drop to reorder cards between columns.
+          )}
         </div>
-        <KanbanBoard
-          initialData={board}
-          onBoardChange={handleBoardChange}
-          readOnly={readOnly}
-        />
-      </div>
+      </DragDropContext>
     </div>
   );
 }
