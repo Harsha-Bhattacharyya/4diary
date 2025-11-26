@@ -416,6 +416,72 @@ function WorkspaceContent() {
     }
   };
 
+  const handleFolderChange = async (newFolder: string) => {
+    if (!currentDocument || !userEmail) return;
+
+    try {
+      const updatedMetadata = {
+        ...currentDocument.metadata,
+        folder: newFolder || undefined, // Don't store empty string
+      };
+
+      await updateDocument({
+        id: currentDocument.id,
+        userId: userEmail,
+        content: currentDocument.content,
+        metadata: updatedMetadata,
+      });
+
+      // Update local state
+      setCurrentDocument({
+        ...currentDocument,
+        metadata: updatedMetadata,
+      });
+
+      // Reload documents list to reflect the folder change
+      if (workspaceId) {
+        const updatedDocs = await listDocuments(workspaceId, userEmail);
+        setDocuments(updatedDocs);
+      }
+    } catch (err) {
+      console.error("Folder update error:", err);
+      setError(err instanceof Error ? err.message : "Failed to update folder");
+    }
+  };
+
+  const handleTagsChange = async (newTags: string[]) => {
+    if (!currentDocument || !userEmail) return;
+
+    try {
+      const updatedMetadata = {
+        ...currentDocument.metadata,
+        tags: newTags,
+      };
+
+      await updateDocument({
+        id: currentDocument.id,
+        userId: userEmail,
+        content: currentDocument.content,
+        metadata: updatedMetadata,
+      });
+
+      // Update local state
+      setCurrentDocument({
+        ...currentDocument,
+        metadata: updatedMetadata,
+      });
+
+      // Reload documents list to reflect the tags change
+      if (workspaceId) {
+        const updatedDocs = await listDocuments(workspaceId, userEmail);
+        setDocuments(updatedDocs);
+      }
+    } catch (err) {
+      console.error("Tags update error:", err);
+      setError(err instanceof Error ? err.message : "Failed to update tags");
+    }
+  };
+
   const handleExportDocument = async () => {
     if (!currentDocument || !userEmail) return;
 
@@ -982,6 +1048,10 @@ function WorkspaceContent() {
         onClose={() => setShowNoteSettings(false)}
         showLineNumbers={showLineNumbers}
         onToggleLineNumbers={setShowLineNumbers}
+        folder={currentDocument.metadata.folder}
+        tags={currentDocument.metadata.tags}
+        onUpdateFolder={handleFolderChange}
+        onUpdateTags={handleTagsChange}
       />
 
       {/* Version History Modal */}
@@ -1051,6 +1121,7 @@ function WorkspaceContent() {
             folder: doc.metadata.folder,
             favorite: doc.favorite,
             sortOrder: doc.sortOrder,
+            tags: doc.metadata.tags,
           }))}
           onDocumentClick={handleOpenDocument}
           collapsed={sidebarCollapsed}
