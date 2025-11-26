@@ -11,7 +11,7 @@
 
 "use client";
 
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 interface NoteSettingsProps {
   content: unknown[];
@@ -20,13 +20,17 @@ interface NoteSettingsProps {
   onClose: () => void;
   showLineNumbers: boolean;
   onToggleLineNumbers: (show: boolean) => void;
+  folder?: string;
+  tags?: string[];
+  onUpdateFolder?: (folder: string) => void;
+  onUpdateTags?: (tags: string[]) => void;
 }
 
 /**
- * Displays note statistics and settings in a modal dialog.
+ * Displays note statistics, settings, folder, and tags in a modal dialog.
  * 
  * Shows word count, line count, character count, file size, and last modified date.
- * Allows toggling line numbers on/off.
+ * Allows toggling line numbers on/off, setting folder, and managing tags.
  * 
  * @param content - The document content to analyze
  * @param lastModified - Last modified date/time
@@ -34,6 +38,10 @@ interface NoteSettingsProps {
  * @param onClose - Callback to close the modal
  * @param showLineNumbers - Current state of line numbers toggle
  * @param onToggleLineNumbers - Callback to toggle line numbers
+ * @param folder - Current folder of the document
+ * @param tags - Current tags of the document
+ * @param onUpdateFolder - Callback to update the folder
+ * @param onUpdateTags - Callback to update the tags
  */
 export default function NoteSettings({
   content,
@@ -42,7 +50,15 @@ export default function NoteSettings({
   onClose,
   showLineNumbers,
   onToggleLineNumbers,
+  folder = "",
+  tags = [],
+  onUpdateFolder,
+  onUpdateTags,
 }: NoteSettingsProps) {
+  // For folder and tags, we work directly with props
+  // The parent component manages the state and passes callbacks
+  const [tagInput, setTagInput] = useState("");
+
   // Calculate statistics
   const stats = useMemo(() => {
     if (!content || !Array.isArray(content)) {
@@ -127,6 +143,41 @@ export default function NoteSettings({
     });
   }, [lastModified]);
 
+  // Handle adding a tag
+  const handleAddTag = () => {
+    const trimmedTag = tagInput.trim();
+    if (trimmedTag && !tags.includes(trimmedTag)) {
+      const newTags = [...tags, trimmedTag];
+      setTagInput("");
+      if (onUpdateTags) {
+        onUpdateTags(newTags);
+      }
+    }
+  };
+
+  // Handle removing a tag
+  const handleRemoveTag = (tagToRemove: string) => {
+    const newTags = tags.filter((tag) => tag !== tagToRemove);
+    if (onUpdateTags) {
+      onUpdateTags(newTags);
+    }
+  };
+
+  // Handle folder change
+  const handleFolderChange = (newFolder: string) => {
+    if (onUpdateFolder) {
+      onUpdateFolder(newFolder);
+    }
+  };
+
+  // Handle tag input keydown
+  const handleTagKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleAddTag();
+    }
+  };
+
   // Close on Escape key
   useEffect(() => {
     if (!isOpen) return;
@@ -152,7 +203,7 @@ export default function NoteSettings({
       aria-labelledby="note-settings-title"
     >
       <div
-        className="bg-white rounded-lg shadow-2xl max-w-md w-full p-6"
+        className="bg-white rounded-lg shadow-2xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -224,6 +275,84 @@ export default function NoteSettings({
             <div className="text-base font-medium text-gray-900">
               {formattedDate}
             </div>
+          </div>
+        </div>
+
+        {/* Organization */}
+        <div className="border-t border-gray-200 pt-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            Organization
+          </h3>
+
+          {/* Folder */}
+          <div className="mb-4">
+            <label
+              htmlFor="note-folder"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
+              📁 Folder
+            </label>
+            <input
+              id="note-folder"
+              type="text"
+              value={folder}
+              onChange={(e) => handleFolderChange(e.target.value)}
+              placeholder="Enter folder name (e.g., Work, Personal)"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-leather-500 focus:border-leather-500 text-gray-900 placeholder-gray-400"
+            />
+            <p className="mt-1 text-xs text-gray-500">
+              Leave empty to keep note in &quot;Unfiled&quot;
+            </p>
+          </div>
+
+          {/* Tags */}
+          <div>
+            <label
+              htmlFor="note-tags"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
+              🏷️ Tags
+            </label>
+            <div className="flex gap-2 mb-2">
+              <input
+                id="note-tags"
+                type="text"
+                value={tagInput}
+                onChange={(e) => setTagInput(e.target.value)}
+                onKeyDown={handleTagKeyDown}
+                placeholder="Add a tag and press Enter"
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-leather-500 focus:border-leather-500 text-gray-900 placeholder-gray-400"
+              />
+              <button
+                type="button"
+                onClick={handleAddTag}
+                disabled={!tagInput.trim()}
+                className="px-4 py-2 bg-leather-600 text-white rounded-lg hover:bg-leather-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Add
+              </button>
+            </div>
+            {/* Tags list */}
+            {tags.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-2">
+                {tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="inline-flex items-center gap-1 px-2 py-1 bg-leather-100 text-leather-800 rounded-full text-sm"
+                  >
+                    {tag}
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveTag(tag)}
+                      className="w-4 h-4 flex items-center justify-center rounded-full hover:bg-leather-200 transition-colors"
+                      aria-label={`Remove tag ${tag}`}
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 

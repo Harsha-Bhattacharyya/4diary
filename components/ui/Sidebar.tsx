@@ -24,6 +24,7 @@ interface Document {
   folder?: string;
   favorite?: boolean;
   sortOrder?: number;
+  tags?: string[];
 }
 
 interface SidebarProps {
@@ -212,34 +213,56 @@ export default function Sidebar({
                       dragOverDoc === doc.id ? 'border-2 border-[#8B7355] bg-[#3D3426]/50' : ''
                     } ${draggedDoc === doc.id ? 'opacity-50' : ''}`}
                   >
-                    <button
-                      type="button"
+                    <div
+                      role="button"
+                      tabIndex={0}
                       onClick={() => onDocumentClick(doc.id)}
-                      className="group w-full text-left px-3 py-2 text-[#E8DCC4] hover:bg-[#3D3426] transition-colors flex items-center gap-2 rounded-md"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          onDocumentClick(doc.id);
+                        }
+                      }}
+                      className="group w-full text-left px-3 py-2 text-[#E8DCC4] hover:bg-[#3D3426] transition-colors rounded-md cursor-pointer"
                     >
-                      {/* Star icon */}
-                      {onToggleFavorite && (
-                        <button
-                          type="button"
-                          onClick={(e) => handleStarClick(e, doc.id, doc.favorite || false)}
-                          className="flex-shrink-0 text-base hover:scale-110 transition-transform"
-                          aria-label={doc.favorite ? "Unstar" : "Star"}
-                          title={doc.favorite ? "Unstar" : "Star"}
-                        >
-                          {doc.favorite ? "⭐" : "☆"}
-                        </button>
+                      <div className="flex items-center gap-2">
+                        {/* Star icon */}
+                        {onToggleFavorite && (
+                          <button
+                            type="button"
+                            onClick={(e) => handleStarClick(e, doc.id, doc.favorite || false)}
+                            className="flex-shrink-0 text-base hover:scale-110 transition-transform"
+                            aria-label={doc.favorite ? "Unstar" : "Star"}
+                            title={doc.favorite ? "Unstar" : "Star"}
+                          >
+                            {doc.favorite ? "⭐" : "☆"}
+                          </button>
+                        )}
+                        
+                        <span className="text-sm">📄</span>
+                        <span className="text-sm truncate flex-1">{doc.title}</span>
+                        
+                        {/* Drag handle */}
+                        {onReorder && (
+                          <span className="text-xs text-[#A08465] opacity-0 group-hover:opacity-100 transition-opacity cursor-move">
+                            ⋮⋮
+                          </span>
+                        )}
+                      </div>
+                      {/* Tags display under document name */}
+                      {doc.tags && doc.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-1 ml-7">
+                          {doc.tags.map((tag) => (
+                            <span
+                              key={tag}
+                              className="inline-block px-1.5 py-0.5 text-[10px] bg-[#8B7355]/30 text-[#C4B8A0] rounded"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
                       )}
-                      
-                      <span className="text-sm">📄</span>
-                      <span className="text-sm truncate flex-1">{doc.title}</span>
-                      
-                      {/* Drag handle */}
-                      {onReorder && (
-                        <span className="text-xs text-[#A08465] opacity-0 group-hover:opacity-100 transition-opacity cursor-move">
-                          ⋮⋮
-                        </span>
-                      )}
-                    </button>
+                    </div>
                   </div>
                 ))}
               </div>
