@@ -146,6 +146,21 @@ export default function BlockEditor({
 
         const handled = handleKeyDown(event);
         
+        // In non-INSERT/REPLACE modes, block all text input to prevent typing
+        // This ensures vim NORMAL mode truly blocks text input
+        if (vimState && vimState.mode !== VimMode.INSERT && vimState.mode !== VimMode.REPLACE) {
+          // Allow navigation keys (Arrow keys, Tab, etc.) but block printable characters
+          const isModifier = event.ctrlKey || event.altKey || event.metaKey;
+          const isNavKey = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Tab', 'Home', 'End', 'PageUp', 'PageDown'].includes(event.key);
+          const isFunctionKey = event.key.startsWith('F') && event.key.length <= 3;
+          
+          // If it's a printable character (single character key) and not a navigation/modifier/function key
+          // and not already handled by vim manager, prevent default to block text input
+          if (!handled && !isModifier && !isNavKey && !isFunctionKey && event.key.length === 1) {
+            event.preventDefault();
+          }
+        }
+        
         // If not handled by vim mode manager, try navigation handler
         if (!handled && vimState && vimNavigationHandlerRef.current) {
           const selection = window.getSelection();
@@ -312,13 +327,6 @@ export default function BlockEditor({
               ✓ Saved {lastSaved.toLocaleTimeString()}
             </span>
           ) : null}
-        </div>
-      )}
-
-      {/* Vim mode toggle hint */}
-      {!vimEnabled && editable && (
-        <div className="absolute top-4 left-4 z-10 px-3 py-1 rounded-full glass-card text-xs text-gray-500">
-          Press Ctrl+Shift+V for Vim mode
         </div>
       )}
 

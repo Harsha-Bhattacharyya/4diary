@@ -236,12 +236,10 @@ test.describe('Vim Mode - UI Changes', () => {
     await page.waitForTimeout(500);
   });
 
-  test('should show vim mode toggle hint when disabled', async ({ page }) => {
+  test('should not show vim mode toggle hint (removed for cleaner UI)', async ({ page }) => {
     const hint = page.locator('text=Press Ctrl+Shift+V for Vim mode');
-    // Hint might not always be visible depending on editor state
-    const isVisible = await hint.isVisible().catch(() => false);
-    // Just check that test passes - hint visibility is conditional
-    expect(true).toBe(true);
+    // The hint was removed as per issue requirements
+    await expect(hint).not.toBeVisible();
   });
 
   test('should toggle vim mode off when pressing Ctrl+Shift+V again', async ({ page }) => {
