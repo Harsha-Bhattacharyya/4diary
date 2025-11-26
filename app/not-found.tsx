@@ -160,6 +160,9 @@ export default function NotFound() {
             exit={{ opacity: 0, scale: 0.8 }}
             transition={{ duration: 0.3 }}
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm overflow-auto py-8"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="game-title"
           >
             <div className="relative">
               <button

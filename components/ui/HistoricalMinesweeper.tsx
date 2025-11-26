@@ -46,7 +46,10 @@ type Difficulty = keyof typeof DIFFICULTIES;
  * @returns The Historical Minesweeper game component
  */
 
-// Initialize game board - defined outside component to avoid hook ordering issues
+// Maximum display value for timer (shown as 999 when exceeded)
+const MAX_DISPLAY_TIME = 999;
+
+// Initialize game board - defined outside component to avoid creating new function reference on each render
 function createInitialGameState(diff: Difficulty): GameState {
   const { rows, cols, mines } = DIFFICULTIES[diff];
   const board: Cell[][] = Array(rows)
@@ -191,10 +194,9 @@ export default function HistoricalMinesweeper() {
     [gameState.gameOver, gameState.won, difficulty, bestTimes]
   );
 
-  // Toggle flag
-  const toggleFlag = useCallback(
-    (row: number, col: number, e: React.MouseEvent) => {
-      e.preventDefault();
+  // Toggle flag - works with both mouse and keyboard
+  const toggleFlagForCell = useCallback(
+    (row: number, col: number) => {
       if (gameState.gameOver || gameState.won) return;
 
       setGameState((prev) => {
@@ -210,6 +212,26 @@ export default function HistoricalMinesweeper() {
       });
     },
     [gameState.gameOver, gameState.won]
+  );
+
+  // Toggle flag on right-click
+  const toggleFlag = useCallback(
+    (row: number, col: number, e: React.MouseEvent) => {
+      e.preventDefault();
+      toggleFlagForCell(row, col);
+    },
+    [toggleFlagForCell]
+  );
+
+  // Handle keyboard flag (F key or Shift+Click)
+  const handleCellKeyDown = useCallback(
+    (row: number, col: number, e: React.KeyboardEvent) => {
+      if (e.key.toLowerCase() === "f") {
+        e.preventDefault();
+        toggleFlagForCell(row, col);
+      }
+    },
+    [toggleFlagForCell]
   );
 
   // Reset game
@@ -245,7 +267,7 @@ export default function HistoricalMinesweeper() {
     <div className="flex flex-col items-center p-4 bg-leather-100 rounded-lg border-2 border-leather-600 shadow-leather">
       {/* Header */}
       <div className="w-full mb-4">
-        <h2 className="text-2xl font-bold text-leather-800 text-center mb-2">
+        <h2 id="game-title" className="text-2xl font-bold text-leather-800 text-center mb-2">
           Historical Minesweeper
         </h2>
         <p className="text-leather-600 text-sm text-center italic">
@@ -293,7 +315,7 @@ export default function HistoricalMinesweeper() {
         <div className="flex items-center gap-2">
           <span className="text-leather-600 text-sm">Time:</span>
           <span className="font-mono text-leather-800 text-lg">
-            {String(Math.min(gameState.timer, 999)).padStart(3, "0")}
+            {String(Math.min(gameState.timer, MAX_DISPLAY_TIME)).padStart(3, "0")}
           </span>
         </div>
       </div>
@@ -305,6 +327,8 @@ export default function HistoricalMinesweeper() {
           gridTemplateColumns: `repeat(${cols}, ${cellSize}px)`,
           gridTemplateRows: `repeat(${rows}, ${cellSize}px)`,
         }}
+        role="grid"
+        aria-label="Minesweeper game board"
       >
         {gameState.board.map((row, rowIdx) =>
           row.map((cell, colIdx) => (
@@ -312,7 +336,19 @@ export default function HistoricalMinesweeper() {
               key={`${rowIdx}-${colIdx}`}
               onClick={() => revealCell(rowIdx, colIdx)}
               onContextMenu={(e) => toggleFlag(rowIdx, colIdx, e)}
+              onKeyDown={(e) => handleCellKeyDown(rowIdx, colIdx, e)}
               disabled={cell.isRevealed}
+              aria-label={
+                cell.isRevealed
+                  ? cell.isMine
+                    ? "Mine"
+                    : cell.adjacentMines > 0
+                    ? `${cell.adjacentMines} adjacent mines`
+                    : "Empty"
+                  : cell.isFlagged
+                  ? "Flagged cell, press F to unflag"
+                  : "Hidden cell, press F to flag"
+              }
               className={`flex items-center justify-center transition-all ${
                 cell.isRevealed
                   ? "bg-leather-200 cursor-default"
@@ -376,7 +412,7 @@ export default function HistoricalMinesweeper() {
 
       {/* Instructions */}
       <div className="mt-4 text-center text-leather-600 text-xs">
-        <p>Left click to reveal • Right click to flag</p>
+        <p>Left click to reveal • Right click or F key to flag</p>
       </div>
     </div>
   );
