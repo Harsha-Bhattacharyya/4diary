@@ -63,9 +63,12 @@ export function KanbanEditor({
     onBoardChange(newBoard);
   }, [onBoardChange]);
 
+  // Helper function to determine if a card should have drag disabled
+  const isCardDragDisabled = useCallback((cardId: string | number): boolean => {
+    return readOnly || editingCard?.cardId === cardId;
+  }, [readOnly, editingCard]);
+
   const handleDragEnd = (result: DropResult) => {
-    if (readOnly) return;
-    
     const { destination, source, draggableId } = result;
 
     // Dropped outside the list
@@ -377,9 +380,16 @@ export function KanbanEditor({
           border: 1px solid #5D4E3A;
           border-radius: 6px;
           margin-bottom: 0.5rem;
-          cursor: ${readOnly ? "default" : "grab"};
           transition: all 0.2s ease;
           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        .unified-card.draggable {
+          cursor: grab;
+        }
+
+        .unified-card.readonly {
+          cursor: default;
         }
 
         .unified-card:hover {
@@ -604,25 +614,28 @@ export function KanbanEditor({
                       transition: 'background 0.2s ease',
                     }}
                   >
-                    {column.cards.map((card, index) => (
-                      <Draggable
-                        key={card.id.toString()}
-                        draggableId={card.id.toString()}
-                        index={index}
-                        isDragDisabled={readOnly || editingCard?.cardId === card.id}
-                      >
-                        {(provided, snapshot) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            className={`unified-card ${snapshot.isDragging ? 'dragging' : ''}`}
-                          >
-                            {renderCardContent(card, column.id, snapshot.isDragging)}
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
+                    {column.cards.map((card, index) => {
+                      const dragDisabled = isCardDragDisabled(card.id);
+                      return (
+                        <Draggable
+                          key={card.id.toString()}
+                          draggableId={card.id.toString()}
+                          index={index}
+                          isDragDisabled={dragDisabled}
+                        >
+                          {(provided, snapshot) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              className={`unified-card ${snapshot.isDragging ? 'dragging' : ''} ${dragDisabled ? 'readonly' : 'draggable'}`}
+                            >
+                              {renderCardContent(card, column.id, snapshot.isDragging)}
+                            </div>
+                          )}
+                        </Draggable>
+                      );
+                    })}
                     {provided.placeholder}
                   </div>
                 )}
