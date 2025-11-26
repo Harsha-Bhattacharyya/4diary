@@ -722,6 +722,13 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${imFellDWPica.variable} ${imFellEnglish.variable}`}>
       <head>
+        {process.env.NODE_ENV === "development" && (
+          <Script
+            src="//unpkg.com/react-grab/dist/index.global.js"
+            crossOrigin="anonymous"
+            strategy="beforeInteractive"
+          />
+        )}
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#f59e0b" />
         <link rel="apple-touch-icon" href="/4diary.png" />
