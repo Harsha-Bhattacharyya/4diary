@@ -183,4 +183,118 @@ test.describe("Note Settings Component", () => {
     // Verify settings modal is closed
     await expect(page.locator("#note-settings-title")).not.toBeVisible();
   });
+
+  test("should display folder input in note settings", async ({ page }) => {
+    await page.goto("/workspace");
+
+    await page.waitForSelector("text=Test Document", { timeout: 10000 });
+    await page.click("text=Test Document");
+    await page.waitForSelector(".bn-editor", { timeout: 5000 });
+
+    // Open note settings
+    await page.click('[aria-label="Toggle menu"]');
+    await page.click("text=⚙️ Note Settings");
+
+    // Verify folder input is displayed
+    await expect(page.locator("text=📁 Folder")).toBeVisible();
+    await expect(page.locator("#note-folder")).toBeVisible();
+  });
+
+  test("should display tags input in note settings", async ({ page }) => {
+    await page.goto("/workspace");
+
+    await page.waitForSelector("text=Test Document", { timeout: 10000 });
+    await page.click("text=Test Document");
+    await page.waitForSelector(".bn-editor", { timeout: 5000 });
+
+    // Open note settings
+    await page.click('[aria-label="Toggle menu"]');
+    await page.click("text=⚙️ Note Settings");
+
+    // Verify tags input is displayed
+    await expect(page.locator("text=🏷️ Tags")).toBeVisible();
+    await expect(page.locator("#note-tags")).toBeVisible();
+    await expect(page.locator("button:has-text('Add')")).toBeVisible();
+  });
+
+  test("should add a tag when clicking Add button", async ({ page }) => {
+    await page.goto("/workspace");
+
+    await page.waitForSelector("text=Test Document", { timeout: 10000 });
+    await page.click("text=Test Document");
+    await page.waitForSelector(".bn-editor", { timeout: 5000 });
+
+    // Mock the PUT request for updating document
+    await page.route("**/api/documents", async (route) => {
+      if (route.request().method() === "PUT") {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({ success: true }),
+        });
+      } else {
+        await route.continue();
+      }
+    });
+
+    // Open note settings
+    await page.click('[aria-label="Toggle menu"]');
+    await page.click("text=⚙️ Note Settings");
+
+    // Type a tag
+    await page.fill("#note-tags", "important");
+
+    // Click Add button
+    await page.click("button:has-text('Add')");
+
+    // Verify tag is displayed
+    await expect(page.locator("text=important").first()).toBeVisible();
+  });
+
+  test("should add a tag when pressing Enter", async ({ page }) => {
+    await page.goto("/workspace");
+
+    await page.waitForSelector("text=Test Document", { timeout: 10000 });
+    await page.click("text=Test Document");
+    await page.waitForSelector(".bn-editor", { timeout: 5000 });
+
+    // Mock the PUT request for updating document
+    await page.route("**/api/documents", async (route) => {
+      if (route.request().method() === "PUT") {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({ success: true }),
+        });
+      } else {
+        await route.continue();
+      }
+    });
+
+    // Open note settings
+    await page.click('[aria-label="Toggle menu"]');
+    await page.click("text=⚙️ Note Settings");
+
+    // Type a tag and press Enter
+    await page.fill("#note-tags", "work");
+    await page.press("#note-tags", "Enter");
+
+    // Verify tag is displayed
+    await expect(page.locator("text=work").first()).toBeVisible();
+  });
+
+  test("should display Organization section in note settings", async ({ page }) => {
+    await page.goto("/workspace");
+
+    await page.waitForSelector("text=Test Document", { timeout: 10000 });
+    await page.click("text=Test Document");
+    await page.waitForSelector(".bn-editor", { timeout: 5000 });
+
+    // Open note settings
+    await page.click('[aria-label="Toggle menu"]');
+    await page.click("text=⚙️ Note Settings");
+
+    // Verify Organization section header is displayed
+    await expect(page.locator("text=Organization")).toBeVisible();
+  });
 });

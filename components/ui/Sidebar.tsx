@@ -213,10 +213,17 @@ export default function Sidebar({
                       dragOverDoc === doc.id ? 'border-2 border-[#8B7355] bg-[#3D3426]/50' : ''
                     } ${draggedDoc === doc.id ? 'opacity-50' : ''}`}
                   >
-                    <button
-                      type="button"
+                    <div
+                      role="button"
+                      tabIndex={0}
                       onClick={() => onDocumentClick(doc.id)}
-                      className="group w-full text-left px-3 py-2 text-[#E8DCC4] hover:bg-[#3D3426] transition-colors rounded-md"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          onDocumentClick(doc.id);
+                        }
+                      }}
+                      className="group w-full text-left px-3 py-2 text-[#E8DCC4] hover:bg-[#3D3426] transition-colors rounded-md cursor-pointer"
                     >
                       <div className="flex items-center gap-2">
                         {/* Star icon */}
@@ -255,7 +262,7 @@ export default function Sidebar({
                           ))}
                         </div>
                       )}
-                    </button>
+                    </div>
                   </div>
                 ))}
               </div>
