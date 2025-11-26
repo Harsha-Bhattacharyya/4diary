@@ -55,25 +55,9 @@ export default function NoteSettings({
   onUpdateFolder,
   onUpdateTags,
 }: NoteSettingsProps) {
-  const [folderInput, setFolderInput] = useState(folder);
+  // For folder and tags, we work directly with props
+  // The parent component manages the state and passes callbacks
   const [tagInput, setTagInput] = useState("");
-  const [localTags, setLocalTags] = useState<string[]>(tags);
-  const [lastOpenState, setLastOpenState] = useState(false);
-
-  // Sync local state with props when modal opens (using pattern that avoids the linter error)
-  if (isOpen && !lastOpenState) {
-    // Modal just opened, sync state
-    if (folderInput !== folder) {
-      setFolderInput(folder);
-    }
-    if (JSON.stringify(localTags) !== JSON.stringify(tags)) {
-      setLocalTags(tags);
-    }
-    setLastOpenState(true);
-  } else if (!isOpen && lastOpenState) {
-    // Modal just closed
-    setLastOpenState(false);
-  }
 
   // Calculate statistics
   const stats = useMemo(() => {
@@ -162,9 +146,8 @@ export default function NoteSettings({
   // Handle adding a tag
   const handleAddTag = () => {
     const trimmedTag = tagInput.trim();
-    if (trimmedTag && !localTags.includes(trimmedTag)) {
-      const newTags = [...localTags, trimmedTag];
-      setLocalTags(newTags);
+    if (trimmedTag && !tags.includes(trimmedTag)) {
+      const newTags = [...tags, trimmedTag];
       setTagInput("");
       if (onUpdateTags) {
         onUpdateTags(newTags);
@@ -174,8 +157,7 @@ export default function NoteSettings({
 
   // Handle removing a tag
   const handleRemoveTag = (tagToRemove: string) => {
-    const newTags = localTags.filter((tag) => tag !== tagToRemove);
-    setLocalTags(newTags);
+    const newTags = tags.filter((tag) => tag !== tagToRemove);
     if (onUpdateTags) {
       onUpdateTags(newTags);
     }
@@ -183,7 +165,6 @@ export default function NoteSettings({
 
   // Handle folder change
   const handleFolderChange = (newFolder: string) => {
-    setFolderInput(newFolder);
     if (onUpdateFolder) {
       onUpdateFolder(newFolder);
     }
@@ -314,7 +295,7 @@ export default function NoteSettings({
             <input
               id="note-folder"
               type="text"
-              value={folderInput}
+              value={folder}
               onChange={(e) => handleFolderChange(e.target.value)}
               placeholder="Enter folder name (e.g., Work, Personal)"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-leather-500 focus:border-leather-500 text-gray-900 placeholder-gray-400"
@@ -352,9 +333,9 @@ export default function NoteSettings({
               </button>
             </div>
             {/* Tags list */}
-            {localTags.length > 0 && (
+            {tags.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-2">
-                {localTags.map((tag) => (
+                {tags.map((tag) => (
                   <span
                     key={tag}
                     className="inline-flex items-center gap-1 px-2 py-1 bg-leather-100 text-leather-800 rounded-full text-sm"

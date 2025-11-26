@@ -81,8 +81,8 @@ test.describe("Sidebar - Tags Display", () => {
     await page.goto("/workspace");
     await page.waitForLoadState("networkidle");
 
-    // Wait for sidebar to load
-    await page.waitForTimeout(2000);
+    // Wait for sidebar to be visible
+    await page.waitForSelector('h2:has-text("Workspace")', { timeout: 10000 });
 
     // Check that tags are displayed in sidebar
     // Note: Due to encryption, we may need to mock the decryption or check UI elements differently
@@ -127,7 +127,9 @@ test.describe("Sidebar - Tags Display", () => {
 
     await page.goto("/workspace");
     await page.waitForLoadState("networkidle");
-    await page.waitForTimeout(2000);
+
+    // Wait for sidebar to be visible
+    await page.waitForSelector('h2:has-text("Workspace")', { timeout: 10000 });
 
     // Check that the sidebar has folder grouping structure
     // The folder headers should be uppercase text
@@ -171,13 +173,16 @@ test.describe("Sidebar - Tags Display", () => {
 
     await page.goto("/workspace");
     await page.waitForLoadState("networkidle");
-    await page.waitForTimeout(2000);
+
+    // Wait for sidebar to be visible
+    await page.waitForSelector('h2:has-text("Workspace")', { timeout: 10000 });
 
     // Collapse sidebar
     const collapseButton = page.locator('button[aria-label="Collapse sidebar"]');
     if (await collapseButton.isVisible()) {
       await collapseButton.click();
-      await page.waitForTimeout(500);
+      // Wait for collapse animation
+      await page.waitForSelector('button[aria-label="Expand sidebar"]', { timeout: 5000 });
     }
 
     // In collapsed view, tags should not be displayed
@@ -280,7 +285,9 @@ test.describe("Sidebar - Folder Grouping", () => {
 
     await page.goto("/workspace");
     await page.waitForLoadState("networkidle");
-    await page.waitForTimeout(2000);
+
+    // Wait for sidebar to be visible
+    await page.waitForSelector('h2:has-text("Workspace")', { timeout: 10000 });
 
     // Check sidebar has the foldering structure
     const sidebarContent = page.locator(".overflow-y-auto");
