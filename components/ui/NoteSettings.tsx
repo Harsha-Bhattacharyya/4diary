@@ -11,7 +11,8 @@
 
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
+import { generateAllHashes } from "@/lib/crypto/hash";
 
 interface NoteSettingsProps {
   content: unknown[];
@@ -58,6 +59,16 @@ export default function NoteSettings({
   // For folder and tags, we work directly with props
   // The parent component manages the state and passes callbacks
   const [tagInput, setTagInput] = useState("");
+  
+  // Hash generation state
+  const [hashes, setHashes] = useState<{
+    md5: string;
+    sha1: string;
+    sha256: string;
+    sha512: string;
+  } | null>(null);
+  const [generatingHashes, setGeneratingHashes] = useState(false);
+  const [copiedHash, setCopiedHash] = useState<string | null>(null);
 
   // Calculate statistics
   const stats = useMemo(() => {
@@ -175,6 +186,33 @@ export default function NoteSettings({
     if (e.key === "Enter") {
       e.preventDefault();
       handleAddTag();
+    }
+  };
+
+  // Generate hashes for the content
+  const handleGenerateHashes = useCallback(async () => {
+    if (!content || !Array.isArray(content)) return;
+    
+    setGeneratingHashes(true);
+    try {
+      const contentString = JSON.stringify(content);
+      const generatedHashes = await generateAllHashes(contentString);
+      setHashes(generatedHashes);
+    } catch (err) {
+      console.error("Error generating hashes:", err);
+    } finally {
+      setGeneratingHashes(false);
+    }
+  }, [content]);
+
+  // Copy hash to clipboard
+  const copyHashToClipboard = async (hash: string, type: string) => {
+    try {
+      await navigator.clipboard.writeText(hash);
+      setCopiedHash(type);
+      setTimeout(() => setCopiedHash(null), 2000);
+    } catch (err) {
+      console.error("Failed to copy hash:", err);
     }
   };
 
@@ -385,6 +423,98 @@ export default function NoteSettings({
               />
             </button>
           </div>
+        </div>
+
+        {/* Hash Generation */}
+        <div className="border-t border-gray-200 pt-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            🔐 Hash Generation
+          </h3>
+          
+          <p className="text-sm text-gray-600 mb-4">
+            Generate cryptographic hashes of your note content for verification or integrity checking.
+          </p>
+
+          <button
+            type="button"
+            onClick={handleGenerateHashes}
+            disabled={generatingHashes}
+            className="w-full px-4 py-2 bg-leather-600 text-white rounded-lg hover:bg-leather-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mb-4"
+          >
+            {generatingHashes ? "Generating..." : "Generate Hashes"}
+          </button>
+
+          {hashes && (
+            <div className="space-y-3">
+              {/* MD5 */}
+              <div className="p-3 bg-gray-50 rounded-lg">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-sm font-medium text-gray-700">MD5</span>
+                  <button
+                    type="button"
+                    onClick={() => copyHashToClipboard(hashes.md5, "md5")}
+                    className="text-xs text-leather-600 hover:text-leather-800"
+                  >
+                    {copiedHash === "md5" ? "✓ Copied!" : "Copy"}
+                  </button>
+                </div>
+                <code className="text-xs text-gray-600 break-all font-mono">
+                  {hashes.md5}
+                </code>
+              </div>
+
+              {/* SHA-1 */}
+              <div className="p-3 bg-gray-50 rounded-lg">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-sm font-medium text-gray-700">SHA-1</span>
+                  <button
+                    type="button"
+                    onClick={() => copyHashToClipboard(hashes.sha1, "sha1")}
+                    className="text-xs text-leather-600 hover:text-leather-800"
+                  >
+                    {copiedHash === "sha1" ? "✓ Copied!" : "Copy"}
+                  </button>
+                </div>
+                <code className="text-xs text-gray-600 break-all font-mono">
+                  {hashes.sha1}
+                </code>
+              </div>
+
+              {/* SHA-256 */}
+              <div className="p-3 bg-gray-50 rounded-lg">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-sm font-medium text-gray-700">SHA-256</span>
+                  <button
+                    type="button"
+                    onClick={() => copyHashToClipboard(hashes.sha256, "sha256")}
+                    className="text-xs text-leather-600 hover:text-leather-800"
+                  >
+                    {copiedHash === "sha256" ? "✓ Copied!" : "Copy"}
+                  </button>
+                </div>
+                <code className="text-xs text-gray-600 break-all font-mono">
+                  {hashes.sha256}
+                </code>
+              </div>
+
+              {/* SHA-512 */}
+              <div className="p-3 bg-gray-50 rounded-lg">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-sm font-medium text-gray-700">SHA-512</span>
+                  <button
+                    type="button"
+                    onClick={() => copyHashToClipboard(hashes.sha512, "sha512")}
+                    className="text-xs text-leather-600 hover:text-leather-800"
+                  >
+                    {copiedHash === "sha512" ? "✓ Copied!" : "Copy"}
+                  </button>
+                </div>
+                <code className="text-xs text-gray-600 break-all font-mono">
+                  {hashes.sha512}
+                </code>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Close Button */}

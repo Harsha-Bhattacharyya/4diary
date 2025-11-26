@@ -297,4 +297,66 @@ test.describe("Note Settings Component", () => {
     // Verify Organization section header is displayed
     await expect(page.locator("text=Organization")).toBeVisible();
   });
+
+  test("should display Hash Generation section", async ({ page }) => {
+    await page.goto("/workspace");
+
+    await page.waitForSelector("text=Test Document", { timeout: 10000 });
+    await page.click("text=Test Document");
+    await page.waitForSelector(".bn-editor", { timeout: 5000 });
+
+    // Open note settings
+    await page.click('[aria-label="Toggle menu"]');
+    await page.click("text=⚙️ Note Settings");
+
+    // Verify Hash Generation section is displayed
+    await expect(page.locator("text=🔐 Hash Generation")).toBeVisible();
+    await expect(page.locator("button:has-text('Generate Hashes')")).toBeVisible();
+  });
+
+  test("should generate hashes when clicking Generate Hashes button", async ({ page }) => {
+    await page.goto("/workspace");
+
+    await page.waitForSelector("text=Test Document", { timeout: 10000 });
+    await page.click("text=Test Document");
+    await page.waitForSelector(".bn-editor", { timeout: 5000 });
+
+    // Open note settings
+    await page.click('[aria-label="Toggle menu"]');
+    await page.click("text=⚙️ Note Settings");
+
+    // Click Generate Hashes button
+    await page.click("button:has-text('Generate Hashes')");
+
+    // Wait for hashes to be generated and displayed
+    await expect(page.locator("text=MD5").first()).toBeVisible({ timeout: 5000 });
+    await expect(page.locator("text=SHA-1").first()).toBeVisible();
+    await expect(page.locator("text=SHA-256").first()).toBeVisible();
+    await expect(page.locator("text=SHA-512").first()).toBeVisible();
+  });
+
+  test("should copy hash to clipboard when clicking Copy button", async ({ page }) => {
+    await page.goto("/workspace");
+
+    await page.waitForSelector("text=Test Document", { timeout: 10000 });
+    await page.click("text=Test Document");
+    await page.waitForSelector(".bn-editor", { timeout: 5000 });
+
+    // Open note settings
+    await page.click('[aria-label="Toggle menu"]');
+    await page.click("text=⚙️ Note Settings");
+
+    // Generate hashes first
+    await page.click("button:has-text('Generate Hashes')");
+
+    // Wait for hashes to be generated
+    await expect(page.locator("text=MD5").first()).toBeVisible({ timeout: 5000 });
+
+    // Click Copy button for MD5
+    const copyButton = page.locator("text=Copy").first();
+    await copyButton.click();
+
+    // Verify the copied confirmation is shown
+    await expect(page.locator("text=✓ Copied!").first()).toBeVisible({ timeout: 2000 });
+  });
 });
