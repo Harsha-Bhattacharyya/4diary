@@ -22,6 +22,14 @@ export enum VimMode {
 }
 
 /**
+ * Recorded key interface for macro playback
+ */
+export interface RecordedKey {
+  key: string;
+  modifiers: { ctrl?: boolean; shift?: boolean; alt?: boolean };
+}
+
+/**
  * Vim State Interface
  */
 export interface VimState {
@@ -30,8 +38,10 @@ export interface VimState {
   register: string;
   lastCommand: string;
   count: number;
-  macro: { [key: string]: string[] };
+  macro: { [key: string]: RecordedKey[] };
   recording: string | null;
+  lastMacroRegister: string | null;
+  playingMacro: boolean;
   lastSearchPattern: string;
   visualStart: { node: Node | null; offset: number } | null;
   visualEnd: { node: Node | null; offset: number } | null;
@@ -48,6 +58,8 @@ export const initialVimState: VimState = {
   count: 0,
   macro: {},
   recording: null,
+  lastMacroRegister: null,
+  playingMacro: false,
   lastSearchPattern: '',
   visualStart: null,
   visualEnd: null,
@@ -93,21 +105,45 @@ export class VimModeManager {
    * Handle key press in vim mode
    */
   handleKeyPress(key: string, modifiers: { ctrl?: boolean; shift?: boolean; alt?: boolean }): boolean {
+    // Record key if macro recording is active (unless currently playing a macro)
+    // We need to record BEFORE processing to capture the actual key presses
+    // But we don't record while playing a macro to avoid infinite loops
+    const shouldRecord = this.state.recording && !this.state.playingMacro;
+    
+    let handled = false;
     switch (this.state.mode) {
       case VimMode.NORMAL:
-        return this.handleNormalMode(key, modifiers);
+        handled = this.handleNormalMode(key, modifiers);
+        break;
       case VimMode.INSERT:
-        return this.handleInsertMode(key, modifiers);
+        handled = this.handleInsertMode(key, modifiers);
+        break;
       case VimMode.REPLACE:
-        return this.handleReplaceMode(key, modifiers);
+        handled = this.handleReplaceMode(key, modifiers);
+        break;
       case VimMode.COMMAND:
-        return this.handleCommandMode(key, modifiers);
+        handled = this.handleCommandMode(key, modifiers);
+        break;
       case VimMode.VISUAL:
       case VimMode.VISUAL_LINE:
-        return this.handleVisualMode(key, modifiers);
+        handled = this.handleVisualMode(key, modifiers);
+        break;
       default:
-        return false;
+        handled = false;
     }
+    
+    // Record the key after processing (so we know if it was valid)
+    // Don't record 'q' that starts/stops recording, or '@' macro play commands
+    if (shouldRecord && this.state.recording) {
+      const isRecordingControl = key === 'q' && (this.state.commandBuffer === '' || this.state.commandBuffer === 'q');
+      const isMacroPlay = key === '@' || (this.state.commandBuffer === '@' && /^[a-z@]$/.test(key));
+      
+      if (!isRecordingControl && !isMacroPlay) {
+        this.state.macro[this.state.recording].push({ key, modifiers: { ...modifiers } });
+      }
+    }
+    
+    return handled;
   }
 
   /**
@@ -120,6 +156,40 @@ export class VimModeManager {
       this.state.count = 0;
       this.notifyStateChange();
       return true;
+    }
+
+    // Handle pending 'q' command for macro recording (must be checked before other key handlers)
+    if (this.state.commandBuffer === 'q' && /^[a-z]$/.test(key)) {
+      // Start recording to register
+      this.state.recording = key;
+      this.state.macro[key] = [];
+      this.state.commandBuffer = '';
+      this.notifyStateChange();
+      return true;
+    }
+
+    // Handle pending '@' command for macro playback (must be checked before other key handlers)
+    if (this.state.commandBuffer === '@') {
+      if (/^[a-z]$/.test(key)) {
+        // Play macro from register
+        const register = key;
+        if (this.state.macro[register] && this.state.macro[register].length > 0) {
+          this.state.lastMacroRegister = register;
+          this.state.playingMacro = true;
+        }
+        this.state.commandBuffer = '';
+        this.notifyStateChange();
+        return true;
+      } else if (key === '@') {
+        // @@ - repeat last macro
+        if (this.state.lastMacroRegister && this.state.macro[this.state.lastMacroRegister] && 
+            this.state.macro[this.state.lastMacroRegister].length > 0) {
+          this.state.playingMacro = true;
+        }
+        this.state.commandBuffer = '';
+        this.notifyStateChange();
+        return true;
+      }
     }
 
     // Handle count prefix (1-9)
@@ -194,42 +264,23 @@ export class VimModeManager {
       return true;
     }
 
-    // Macro recording
+    // Macro recording - 'q' key handling
     if (key === 'q') {
       if (this.state.recording) {
         // Stop recording
         this.state.recording = null;
         this.notifyStateChange();
-      } else if (this.state.commandBuffer.startsWith('q')) {
-        // Start recording to register
-        const register = this.state.commandBuffer.slice(1);
-        if (register.length === 1) {
-          this.state.recording = register;
-          this.state.macro[register] = [];
-          this.state.commandBuffer = '';
-          this.notifyStateChange();
-        }
-      } else {
+      } else if (this.state.commandBuffer === '') {
+        // Start waiting for register key
         this.state.commandBuffer = 'q';
         this.notifyStateChange();
       }
       return true;
     }
 
-    // Play macro
+    // Start macro playback command
     if (key === '@' && this.state.commandBuffer === '') {
       this.state.commandBuffer = '@';
-      this.notifyStateChange();
-      return true;
-    }
-    if (this.state.commandBuffer === '@' && /^[a-z]$/.test(key)) {
-      // Play macro from register
-      const register = key;
-      if (this.state.macro[register]) {
-        // TODO: Implement macro playback
-        console.log(`Playing macro from register ${register}`);
-      }
-      this.state.commandBuffer = '';
       this.notifyStateChange();
       return true;
     }
@@ -261,11 +312,7 @@ export class VimModeManager {
       return true;
     }
 
-    // Record keys if macro recording
-    if (this.state.recording) {
-      this.state.macro[this.state.recording].push(key);
-    }
-
+    // Key recording is now handled in handleKeyPress for all modes
     return false; // Let editor handle regular typing
   }
 
@@ -396,7 +443,7 @@ export class VimModeManager {
   /**
    * Execute vim command
    */
-  executeCommand(command: string): { action: string; args?: any } | null {
+  executeCommand(command: string): { action: string; args?: unknown } | null {
     // Exit commands
     if (command === 'q' || command === 'quit') {
       return { action: 'exit' };
@@ -442,6 +489,65 @@ export class VimModeManager {
   clearCommandBuffer(): void {
     this.state.commandBuffer = '';
     this.notifyStateChange();
+  }
+
+  /**
+   * Get macro to play (if macro playback is pending)
+   * Returns the macro keys and clears the playingMacro flag
+   */
+  getMacroToPlay(): RecordedKey[] | null {
+    if (!this.state.playingMacro || !this.state.lastMacroRegister) {
+      return null;
+    }
+    
+    const macro = this.state.macro[this.state.lastMacroRegister];
+    if (!macro || macro.length === 0) {
+      this.state.playingMacro = false;
+      this.notifyStateChange();
+      return null;
+    }
+    
+    // Return a copy of the macro keys
+    // Note: playingMacro will be cleared by finishMacroPlayback()
+    return [...macro];
+  }
+
+  /**
+   * Signal that macro playback has finished
+   */
+  finishMacroPlayback(): void {
+    this.state.playingMacro = false;
+    this.notifyStateChange();
+  }
+
+  /**
+   * Check if currently recording a macro
+   */
+  isRecording(): boolean {
+    return this.state.recording !== null;
+  }
+
+  /**
+   * Check if a macro is currently being played
+   */
+  isPlayingMacro(): boolean {
+    return this.state.playingMacro;
+  }
+
+  /**
+   * Get the current recording register (if recording)
+   */
+  getRecordingRegister(): string | null {
+    return this.state.recording;
+  }
+
+  /**
+   * Get the list of available macro registers
+   */
+  getMacroRegisters(): string[] {
+    return Object.keys(this.state.macro).filter(
+      (key) => this.state.macro[key] && this.state.macro[key].length > 0
+    );
   }
 
   /**

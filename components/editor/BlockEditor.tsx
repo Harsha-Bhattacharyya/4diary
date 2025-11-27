@@ -11,7 +11,7 @@
  * modification, are permitted provided that the conditions in the LICENSE file are met.
  */
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useCreateBlockNote } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/core/fonts/inter.css";
@@ -20,7 +20,7 @@ import "./editor.css";
 import FormattingToolbar from "./FormattingToolbar";
 import VimModeIndicator from "./VimModeIndicator";
 import { useVimMode } from "@/lib/vim/useVimMode";
-import { VimMode } from "@/lib/vim/VimMode";
+import { VimMode, RecordedKey } from "@/lib/vim/VimMode";
 import { VimNavigationHandler } from "@/lib/vim/VimNavigationHandler";
 
 import type { EditorFontType } from "@/components/ui/NoteSettings";
@@ -89,8 +89,41 @@ export default function BlockEditor({
     }
   }, [editor]);
 
+  // Macro playback handler
+  const handleMacroPlayback = useCallback((keys: RecordedKey[]) => {
+    if (!editorContainerRef.current) return;
+    
+    // Play macro keys sequentially with a small delay between each key
+    // to allow the editor to process each key properly
+    const playKeysSequentially = async () => {
+      for (const recordedKey of keys) {
+        // Create and dispatch a keyboard event for each recorded key
+        const event = new KeyboardEvent('keydown', {
+          key: recordedKey.key,
+          code: recordedKey.key.length === 1 ? `Key${recordedKey.key.toUpperCase()}` : recordedKey.key,
+          ctrlKey: recordedKey.modifiers.ctrl || false,
+          shiftKey: recordedKey.modifiers.shift || false,
+          altKey: recordedKey.modifiers.alt || false,
+          bubbles: true,
+          cancelable: true,
+        });
+        
+        // Find the focused element within the editor or use the editor container
+        const targetElement = document.activeElement || editorContainerRef.current;
+        if (targetElement) {
+          targetElement.dispatchEvent(event);
+        }
+        
+        // Small delay to allow the event to be processed
+        await new Promise((resolve) => setTimeout(resolve, 10));
+      }
+    };
+    
+    playKeysSequentially();
+  }, []);
+
   // Vim mode integration
-  const { vimState, handleKeyDown, setMode, isVimEnabled } = useVimMode({
+  const { vimState, handleKeyDown, isVimEnabled } = useVimMode({
     enabled: vimEnabled,
     onCommand: (command) => {
       if (command.action === 'save' || command.action === 'save-and-exit') {
@@ -106,6 +139,7 @@ export default function BlockEditor({
     onExit: () => {
       setVimEnabled(false);
     },
+    onMacroPlayback: handleMacroPlayback,
   });
 
   // Simple fast hash function for content comparison

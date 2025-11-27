@@ -12,18 +12,19 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { VimModeManager, VimMode, VimState } from './VimMode';
+import { VimModeManager, VimMode, VimState, RecordedKey } from './VimMode';
 
 export interface UseVimModeOptions {
   enabled: boolean;
-  onCommand?: (command: { action: string; args?: any }) => void;
+  onCommand?: (command: { action: string; args?: unknown }) => void;
   onExit?: () => void;
+  onMacroPlayback?: (keys: RecordedKey[]) => void;
 }
 
 /**
  * React hook for managing vim mode
  */
-export function useVimMode({ enabled, onCommand, onExit }: UseVimModeOptions) {
+export function useVimMode({ enabled, onCommand, onExit, onMacroPlayback }: UseVimModeOptions) {
   const [vimState, setVimState] = useState<VimState | null>(null);
   const vimManagerRef = useRef<VimModeManager | null>(null);
 
@@ -47,6 +48,19 @@ export function useVimMode({ enabled, onCommand, onExit }: UseVimModeOptions) {
       }
     };
   }, [enabled]);
+
+  // Check for pending macro playback
+  useEffect(() => {
+    if (vimState?.playingMacro && vimManagerRef.current && onMacroPlayback) {
+      const macro = vimManagerRef.current.getMacroToPlay();
+      if (macro && macro.length > 0) {
+        // Trigger macro playback callback
+        onMacroPlayback(macro);
+      }
+      // Finish macro playback
+      vimManagerRef.current.finishMacroPlayback();
+    }
+  }, [vimState?.playingMacro, onMacroPlayback]);
 
   // Handle key down events
   const handleKeyDown = useCallback((event: KeyboardEvent): boolean => {
@@ -101,11 +115,17 @@ export function useVimMode({ enabled, onCommand, onExit }: UseVimModeOptions) {
     return vimManagerRef.current ? vimManagerRef.current.getMode() : null;
   }, []);
 
+  // Get the vim manager for direct access
+  const getManager = useCallback((): VimModeManager | null => {
+    return vimManagerRef.current;
+  }, []);
+
   return {
     vimState,
     handleKeyDown,
     setMode,
     getMode,
+    getManager,
     isVimEnabled: enabled,
   };
 }
