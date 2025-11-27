@@ -69,6 +69,70 @@ const PlaywriterMode = dynamic(() => import("@/components/ui/PlaywriterMode").th
 });
 
 /**
+ * Extracts plain text from BlockNote content structure.
+ * @param content - BlockNote content array
+ * @returns Plain text string with line breaks preserved
+ */
+function extractTextFromContent(content: unknown[]): string {
+  if (!content || !Array.isArray(content)) return "";
+  
+  const textParts: string[] = [];
+  const stack: unknown[] = [...content];
+  
+  while (stack.length > 0) {
+    const block = stack.pop();
+    if (!block || typeof block !== "object") continue;
+    
+    const objBlock = block as Record<string, unknown>;
+    
+    // Handle text content directly in block
+    if (objBlock.text && typeof objBlock.text === "string") {
+      textParts.push(objBlock.text);
+    }
+    
+    // Handle content array (inline content)
+    if (Array.isArray(objBlock.content)) {
+      const inlineText = objBlock.content
+        .map((item: unknown) => {
+          if (typeof item === "string") return item;
+          if (item && typeof item === "object" && (item as Record<string, unknown>).text) {
+            return (item as Record<string, unknown>).text as string;
+          }
+          return "";
+        })
+        .join("");
+      if (inlineText) textParts.push(inlineText);
+    }
+    
+    // Handle children/nested blocks
+    if (Array.isArray(objBlock.children)) {
+      stack.push(...objBlock.children);
+    }
+  }
+  
+  return textParts.join("\n").trim();
+}
+
+/**
+ * Converts plain text back to BlockNote content structure.
+ * Preserves line breaks as separate paragraphs for screenplay formatting.
+ * @param text - Plain text string
+ * @returns BlockNote content array
+ */
+function convertTextToContent(text: string): unknown[] {
+  if (!text.trim()) {
+    return [{ type: "paragraph", content: [] }];
+  }
+  
+  // Split by line breaks and create a paragraph for each line
+  const lines = text.split("\n");
+  return lines.map(line => ({
+    type: "paragraph",
+    content: line ? [{ type: "text", text: line }] : [],
+  }));
+}
+
+/**
  * Render the workspace UI and manage authentication, encryption initialization, workspace lifecycle, and document operations.
  *
  * Shows a full-screen editor when a document is open; otherwise presents the workspace overview including the sidebar, stats, quick actions, and document lists. Exposes handlers for creating, opening, saving, sharing, renaming, exporting, and templating documents and surfaces loading/error states.
@@ -117,45 +181,6 @@ function WorkspaceContent() {
     if (typeof window !== 'undefined') {
       localStorage.setItem('4diary-editor-font', font);
     }
-  }, []);
-
-  // Helper function to extract text from BlockNote content
-  const extractTextFromContent = useCallback((content: unknown[]): string => {
-    if (!content || !Array.isArray(content)) return "";
-    
-    let text = "";
-    const stack: unknown[] = [...content];
-    
-    while (stack.length > 0) {
-      const block = stack.pop();
-      if (!block || typeof block !== "object") continue;
-      
-      const objBlock = block as Record<string, unknown>;
-      
-      // Handle text content directly in block
-      if (objBlock.text && typeof objBlock.text === "string") {
-        text += objBlock.text + "\n";
-      }
-      
-      // Handle content array
-      if (Array.isArray(objBlock.content)) {
-        objBlock.content.forEach((item: unknown) => {
-          if (typeof item === "string") {
-            text += item;
-          } else if (item && typeof item === "object") {
-            stack.push(item);
-          }
-        });
-        text += "\n";
-      }
-      
-      // Handle children/nested blocks
-      if (Array.isArray(objBlock.children)) {
-        stack.push(...objBlock.children);
-      }
-    }
-    
-    return text.trim();
   }, []);
 
   // Check authentication
@@ -1149,13 +1174,8 @@ function WorkspaceContent() {
           title={currentDocument.metadata.title}
           onClose={() => setShowPlaywriterMode(false)}
           onSave={async (textContent) => {
-            // Convert the text back to BlockNote content format
-            const newContent = [
-              {
-                type: "paragraph",
-                content: [{ type: "text", text: textContent }],
-              },
-            ];
+            // Convert the text back to BlockNote content format preserving line breaks
+            const newContent = convertTextToContent(textContent);
             await handleSave(newContent);
           }}
         />

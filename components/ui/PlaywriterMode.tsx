@@ -277,7 +277,7 @@ The door OPENS. JOHN enters, scanning the room...`}
 
         {/* Word count */}
         <div className="mt-4 text-sm text-[#A08465] text-right">
-          {editableContent.split(/\s+/).filter(w => w.length > 0).length} words
+          {editableContent.trim() ? editableContent.trim().split(/\s+/).filter(w => w.length > 0).length : 0} words
         </div>
       </div>
 
