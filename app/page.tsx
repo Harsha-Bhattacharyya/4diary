@@ -19,9 +19,10 @@ import TopMenu from "@/components/ui/TopMenu";
 import Image from "next/image";
 
 /**
- * Render the homepage containing the hero, feature cards, and footer.
+ * Render the homepage containing the hero, feature cards, story sections, and footer.
  *
- * Renders a centered hero section with branding and primary call-to-action buttons (links to /workspace and /docs), a responsive features grid of cards, and a footer with country/region.
+ * Renders a long-scrolling landing page with multiple sections including hero, storytelling,
+ * feature highlights, and call-to-action sections.
  *
  * @returns The React element representing the homepage layout.
  */
@@ -217,67 +218,169 @@ export default function Home() {
         <TopMenu currentPage="Home" />
       </div>
       
-      <main className="relative z-10 flex min-h-[calc(100vh-80px)] flex-col items-center justify-center px-6 py-12">
+      <main className="relative z-10">
         {/* Hero Section */}
-        <div className="max-w-4xl mx-auto text-center mb-16 fade-in">
-          {/* Logo Image */}
-          <div className="mb-6 flex justify-center">
-            <Image
-              src="/4diary.png"
-              alt="4Diary Logo"
-              width={400}
-              height={150}
-              priority
-              className="w-auto h-auto max-w-full"
-            />
+        <section className="min-h-screen flex flex-col items-center justify-center px-6 py-12">
+          <div className="max-w-4xl mx-auto text-center fade-in">
+            {/* Logo Image */}
+            <div className="mb-6 flex justify-center">
+              <Image
+                src="/4diary.png"
+                alt="4Diary Logo"
+                width={400}
+                height={150}
+                priority
+                className="w-auto h-auto max-w-full"
+              />
+            </div>
+            
+            {/* Tagline in Header Style with Quotes */}
+            <h2 className="text-3xl md:text-4xl font-serif italic text-leather-100 mb-12 fade-in-delay-1">
+              &ldquo;Catering to your note needs with privacy and style.&rdquo;
+            </h2>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center fade-in-delay-2">
+              <Link href="/workspace">
+                <LeatherButton variant="gradient" size="lg">
+                  Get Started
+                </LeatherButton>
+              </Link>
+              <Link href="/docs">
+                <LeatherButton variant="parchment" size="lg">
+                  View Docs
+                </LeatherButton>
+              </Link>
+            </div>
+            
+            {/* Scroll Indicator */}
+            <div className="mt-16 fade-in-delay-3 animate-bounce">
+              <svg className="w-8 h-8 mx-auto text-leather-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+              </svg>
+            </div>
           </div>
-          
-          {/* Tagline in Header Style with Quotes */}
-          <h2 className="text-3xl md:text-4xl font-serif italic text-leather-100 mb-12 fade-in-delay-1">
-            &ldquo;Catering to your note needs with privacy and style.&rdquo;
-          </h2>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-20 fade-in-delay-2">
-            <Link href="/workspace">
-              <LeatherButton variant="gradient" size="lg">
-                Get Started
-              </LeatherButton>
-            </Link>
-            <Link href="/docs">
-              <LeatherButton variant="parchment" size="lg">
-                View Docs
-              </LeatherButton>
-            </Link>
-          </div>
+        </section>
 
-          {/* Why 4Diary Section - Darker, More Professional */}
-          <div className="bg-black bg-opacity-50 backdrop-blur-sm rounded-2xl p-8 md:p-12 border border-leather-400 shadow-2xl fade-in-delay-3">
-            <h2 className="text-3xl md:text-4xl font-bold text-leather-100 mb-8 tracking-wide">
+        {/* The Problem Section */}
+        <section className="min-h-screen flex flex-col items-center justify-center px-6 py-20 bg-black/30">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-4xl md:text-5xl font-bold text-leather-100 mb-8 text-center">
+              The Growing Need for Privacy
+            </h2>
+            <div className="space-y-8 text-lg md:text-xl text-leather-200 leading-relaxed">
+              <p className="text-center">
+                In our modern day and age, the note-taking industry is growing faster than ever.
+              </p>
+              <p className="text-center text-2xl md:text-3xl text-leather-100 font-serif italic py-4">
+                Notes are like paper but better and faster.
+              </p>
+              <p className="text-center">
+                One&apos;s notes are the gateway to one&apos;s thoughts, beliefs and life...
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* The Question Section */}
+        <section className="min-h-screen flex flex-col items-center justify-center px-6 py-20">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-4xl md:text-6xl font-bold text-leather-100 mb-12">
+              But what if someone got access to these?
+            </h2>
+            <p className="text-2xl md:text-3xl text-leather-200 mb-8">
+              Just what if someone knew your deepest darkest secrets?
+            </p>
+            <div className="w-32 h-1 bg-leather-400 mx-auto my-12"></div>
+            <p className="text-3xl md:text-4xl text-leather-100 font-bold">
+              Well with 4diary you don&apos;t have to worry anymore.
+            </p>
+          </div>
+        </section>
+
+        {/* E2E Encryption Section */}
+        <section className="min-h-screen flex flex-col items-center justify-center px-6 py-20 bg-black/30">
+          <div className="max-w-4xl mx-auto text-center">
+            <div className="text-8xl md:text-9xl mb-8">🔐</div>
+            <h2 className="text-4xl md:text-5xl font-bold text-leather-100 mb-8">
+              E2E Encryption
+            </h2>
+            <p className="text-xl md:text-2xl text-leather-200 leading-relaxed">
+              With our E2E encryption model not even the server knows what you write.
+            </p>
+          </div>
+        </section>
+
+        {/* No Password Storage Section */}
+        <section className="min-h-screen flex flex-col items-center justify-center px-6 py-20">
+          <div className="max-w-4xl mx-auto text-center">
+            <div className="text-8xl md:text-9xl mb-8">🔑</div>
+            <h2 className="text-4xl md:text-5xl font-bold text-leather-100 mb-8">
+              Password Leaks? No Problem.
+            </h2>
+            <p className="text-xl md:text-2xl text-leather-200 leading-relaxed">
+              4diary doesn&apos;t store your password in our databases.
+            </p>
+          </div>
+        </section>
+
+        {/* Web App Section */}
+        <section className="min-h-screen flex flex-col items-center justify-center px-6 py-20 bg-black/30">
+          <div className="max-w-4xl mx-auto text-center">
+            <div className="text-8xl md:text-9xl mb-8">🌐</div>
+            <h2 className="text-4xl md:text-5xl font-bold text-leather-100 mb-8">
+              Works Everywhere
+            </h2>
+            <p className="text-xl md:text-2xl text-leather-200 leading-relaxed">
+              Working on an obscure platform? 4diary is a web app so you only need a browser.
+            </p>
+          </div>
+        </section>
+
+        {/* FLOSS Section */}
+        <section className="min-h-screen flex flex-col items-center justify-center px-6 py-20">
+          <div className="max-w-4xl mx-auto text-center">
+            <div className="text-8xl md:text-9xl mb-8">💻</div>
+            <h2 className="text-4xl md:text-5xl font-bold text-leather-100 mb-8">
+              Don&apos;t Trust Us? You Don&apos;t Have To!
+            </h2>
+            <p className="text-xl md:text-2xl text-leather-200 leading-relaxed mb-8">
+              We are FLOSS and fully self-hostable.
+            </p>
+            <p className="text-lg text-leather-300">
+              Free/Libre Open Source Software means you can verify every line of code.
+            </p>
+          </div>
+        </section>
+
+        {/* Why 4Diary Feature Cards Section */}
+        <section className="min-h-screen flex flex-col items-center justify-center px-6 py-20 bg-black/30">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-4xl md:text-5xl font-bold text-leather-100 mb-12 text-center">
               Why 4Diary?
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
-              <div className="flex items-start gap-4 p-4 rounded-lg bg-leather-600 bg-opacity-30 hover:bg-opacity-50 transition-all">
+              <div className="flex items-start gap-4 p-6 rounded-lg bg-leather-600 bg-opacity-30 hover:bg-opacity-50 transition-all border border-leather-500/30">
                 <span className="text-3xl font-bold text-leather-100 flex-shrink-0">①</span>
                 <div>
                   <h3 className="font-bold text-xl text-leather-100 mb-2">AES Encryption</h3>
                   <p className="text-leather-200">Military-grade security for your data</p>
                 </div>
               </div>
-              <div className="flex items-start gap-4 p-4 rounded-lg bg-leather-600 bg-opacity-30 hover:bg-opacity-50 transition-all">
+              <div className="flex items-start gap-4 p-6 rounded-lg bg-leather-600 bg-opacity-30 hover:bg-opacity-50 transition-all border border-leather-500/30">
                 <span className="text-3xl font-bold text-leather-100 flex-shrink-0">②</span>
                 <div>
                   <h3 className="font-bold text-xl text-leather-100 mb-2">Zero-Knowledge</h3>
                   <p className="text-leather-200">Server never sees your writing</p>
                 </div>
               </div>
-              <div className="flex items-start gap-4 p-4 rounded-lg bg-leather-600 bg-opacity-30 hover:bg-opacity-50 transition-all">
+              <div className="flex items-start gap-4 p-6 rounded-lg bg-leather-600 bg-opacity-30 hover:bg-opacity-50 transition-all border border-leather-500/30">
                 <span className="text-3xl font-bold text-leather-100 flex-shrink-0">③</span>
                 <div>
                   <h3 className="font-bold text-xl text-leather-100 mb-2">Self-Hostable</h3>
                   <p className="text-leather-200">Run it yourself, own your data</p>
                 </div>
               </div>
-              <div className="flex items-start gap-4 p-4 rounded-lg bg-leather-600 bg-opacity-30 hover:bg-opacity-50 transition-all">
+              <div className="flex items-start gap-4 p-6 rounded-lg bg-leather-600 bg-opacity-30 hover:bg-opacity-50 transition-all border border-leather-500/30">
                 <span className="text-3xl font-bold text-leather-100 flex-shrink-0">④</span>
                 <div>
                   <h3 className="font-bold text-xl text-leather-100 mb-2">FLOSS</h3>
@@ -286,10 +389,34 @@ export default function Home() {
               </div>
             </div>
           </div>
-        </div>
+        </section>
+
+        {/* Final CTA Section */}
+        <section className="min-h-screen flex flex-col items-center justify-center px-6 py-20">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-4xl md:text-6xl font-bold text-leather-100 mb-8">
+              Let&apos;s keep our thoughts to ourselves
+            </h2>
+            <p className="text-2xl md:text-3xl text-leather-200 mb-12 font-serif italic">
+              with 4diary.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Link href="/workspace">
+                <LeatherButton variant="gradient" size="lg">
+                  Get Started Now
+                </LeatherButton>
+              </Link>
+              <Link href="/docs">
+                <LeatherButton variant="parchment" size="lg">
+                  Learn More
+                </LeatherButton>
+              </Link>
+            </div>
+          </div>
+        </section>
 
         {/* Footer */}
-        <footer className="text-center text-leather-300 text-sm fade-in-delay-2 mt-8">
+        <footer className="text-center text-leather-300 text-sm py-12 bg-black/40">
           <p>Made with ❤️ in 🇮🇳</p>
         </footer>
       </main>
