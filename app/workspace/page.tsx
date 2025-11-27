@@ -64,6 +64,10 @@ const Backlinks = dynamic(() => import("@/components/ui/Backlinks"), {
   ssr: false,
 });
 
+const PlaywriterMode = dynamic(() => import("@/components/ui/PlaywriterMode").then(mod => ({ default: mod.PlaywriterMode })), {
+  ssr: false,
+});
+
 /**
  * Render the workspace UI and manage authentication, encryption initialization, workspace lifecycle, and document operations.
  *
@@ -95,6 +99,7 @@ function WorkspaceContent() {
   const [showNoteSettings, setShowNoteSettings] = useState(false);
   const [showLineNumbers, setShowLineNumbers] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showPlaywriterMode, setShowPlaywriterMode] = useState(false);
   const [editorFont, setEditorFont] = useState<EditorFontType>(() => {
     // Hydrate from localStorage on initial mount (client-side only)
     if (typeof window !== 'undefined') {
@@ -112,6 +117,45 @@ function WorkspaceContent() {
     if (typeof window !== 'undefined') {
       localStorage.setItem('4diary-editor-font', font);
     }
+  }, []);
+
+  // Helper function to extract text from BlockNote content
+  const extractTextFromContent = useCallback((content: unknown[]): string => {
+    if (!content || !Array.isArray(content)) return "";
+    
+    let text = "";
+    const stack: unknown[] = [...content];
+    
+    while (stack.length > 0) {
+      const block = stack.pop();
+      if (!block || typeof block !== "object") continue;
+      
+      const objBlock = block as Record<string, unknown>;
+      
+      // Handle text content directly in block
+      if (objBlock.text && typeof objBlock.text === "string") {
+        text += objBlock.text + "\n";
+      }
+      
+      // Handle content array
+      if (Array.isArray(objBlock.content)) {
+        objBlock.content.forEach((item: unknown) => {
+          if (typeof item === "string") {
+            text += item;
+          } else if (item && typeof item === "object") {
+            stack.push(item);
+          }
+        });
+        text += "\n";
+      }
+      
+      // Handle children/nested blocks
+      if (Array.isArray(objBlock.children)) {
+        stack.push(...objBlock.children);
+      }
+    }
+    
+    return text.trim();
   }, []);
 
   // Check authentication
@@ -860,6 +904,16 @@ function WorkspaceContent() {
               >
                 🔗 {showBacklinks ? "Hide" : "Show"} Backlinks
               </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowPlaywriterMode(true);
+                  setDropdownOpen(false);
+                }}
+                className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+              >
+                🎭 Playwriter Mode
+              </button>
               <div className="border-t border-gray-200 my-2"></div>
               <button
                 type="button"
@@ -1085,6 +1139,25 @@ function WorkspaceContent() {
             setShowVersionHistory(false);
           }}
           onClose={() => setShowVersionHistory(false)}
+        />
+      )}
+
+      {/* Playwriter Mode Modal */}
+      {showPlaywriterMode && currentDocument && (
+        <PlaywriterMode
+          content={extractTextFromContent(currentDocument.content)}
+          title={currentDocument.metadata.title}
+          onClose={() => setShowPlaywriterMode(false)}
+          onSave={async (textContent) => {
+            // Convert the text back to BlockNote content format
+            const newContent = [
+              {
+                type: "paragraph",
+                content: [{ type: "text", text: textContent }],
+              },
+            ];
+            await handleSave(newContent);
+          }}
         />
       )}
 
