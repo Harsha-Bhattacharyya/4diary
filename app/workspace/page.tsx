@@ -70,6 +70,7 @@ const PlaywriterMode = dynamic(() => import("@/components/ui/PlaywriterMode").th
 
 /**
  * Extracts plain text from BlockNote content structure.
+ * Uses forward-order iteration to preserve original block order and empty lines.
  * @param content - BlockNote content array
  * @returns Plain text string with line breaks preserved
  */
@@ -77,10 +78,12 @@ function extractTextFromContent(content: unknown[]): string {
   if (!content || !Array.isArray(content)) return "";
   
   const textParts: string[] = [];
-  const stack: unknown[] = [...content];
   
-  while (stack.length > 0) {
-    const block = stack.pop();
+  // Process blocks in forward order using a queue (FIFO)
+  const queue: unknown[] = [...content];
+  
+  while (queue.length > 0) {
+    const block = queue.shift(); // Use shift for FIFO order
     if (!block || typeof block !== "object") continue;
     
     const objBlock = block as Record<string, unknown>;
@@ -101,12 +104,13 @@ function extractTextFromContent(content: unknown[]): string {
           return "";
         })
         .join("");
-      if (inlineText) textParts.push(inlineText);
+      // Always push the line (even if empty) to preserve blank paragraphs
+      textParts.push(inlineText);
     }
     
-    // Handle children/nested blocks
+    // Handle children/nested blocks - add to end of queue to maintain order
     if (Array.isArray(objBlock.children)) {
-      stack.push(...objBlock.children);
+      queue.push(...objBlock.children);
     }
   }
   
@@ -929,16 +933,18 @@ function WorkspaceContent() {
               >
                 🔗 {showBacklinks ? "Hide" : "Show"} Backlinks
               </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setShowPlaywriterMode(true);
-                  setDropdownOpen(false);
-                }}
-                className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
-              >
-                🎭 Playwriter Mode
-              </button>
+              {currentDocument.metadata.type !== 'board' && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowPlaywriterMode(true);
+                    setDropdownOpen(false);
+                  }}
+                  className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+                >
+                  🎭 Playwriter Mode
+                </button>
+              )}
               <div className="border-t border-gray-200 my-2"></div>
               <button
                 type="button"
