@@ -37,8 +37,8 @@ test.describe("Playwriter Mode", () => {
       })
     );
 
-    // Mock documents
-    await page.route("**/api/documents**", (route) => {
+    // Mock documents collection (with query params like ?workspaceId=...)
+    await page.route("**/api/documents?*", (route) => {
       if (route.request().method() === "GET") {
         route.fulfill({
           status: 200,
