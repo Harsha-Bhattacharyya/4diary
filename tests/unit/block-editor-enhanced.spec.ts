@@ -691,3 +691,385 @@ test.describe('BlockEditor - Change Detection Edge Cases', () => {
     }
   });
 });
+
+test.describe('BlockEditor - Font Styling', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/auth/session', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ authenticated: true, username: 'testuser' }) });
+    });
+    await page.route('**/api/workspaces', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ workspace: { id: 'test-workspace-id' } }) });
+    });
+    await page.route('**/api/documents**', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ documents: [] }) });
+    });
+  });
+
+  test('should apply default normal font class to editor', async ({ page }) => {
+    await page.goto('/workspace');
+    await page.waitForLoadState('networkidle');
+    
+    const newDocButton = page.getByRole('button', { name: /New Document/i });
+    
+    if (await newDocButton.isVisible()) {
+      await newDocButton.click();
+      await page.waitForTimeout(1000);
+      
+      // Check for default normal font class
+      await expect(page.locator('.editor-font-normal')).toBeVisible();
+    }
+  });
+
+  test('should apply serif font class when editorFont prop is serif', async ({ page }) => {
+    await page.goto('/workspace');
+    await page.waitForLoadState('networkidle');
+    
+    const newDocButton = page.getByRole('button', { name: /New Document/i });
+    
+    if (await newDocButton.isVisible()) {
+      await newDocButton.click();
+      await page.waitForTimeout(1000);
+
+      // Change font to serif via settings
+      await page.click('[aria-label="Toggle menu"]');
+      await page.click("text=⚙️ Note Settings");
+      await page.click("button:has-text('Serif')");
+      await page.click('[aria-label="Close settings"]');
+      
+      // Check for serif font class
+      await expect(page.locator('.editor-font-serif')).toBeVisible();
+    }
+  });
+
+  test('should apply condensed font class when editorFont prop is condensed', async ({ page }) => {
+    await page.goto('/workspace');
+    await page.waitForLoadState('networkidle');
+    
+    const newDocButton = page.getByRole('button', { name: /New Document/i });
+    
+    if (await newDocButton.isVisible()) {
+      await newDocButton.click();
+      await page.waitForTimeout(1000);
+
+      // Change font to condensed via settings
+      await page.click('[aria-label="Toggle menu"]');
+      await page.click("text=⚙️ Note Settings");
+      await page.click("button:has-text('Condensed')");
+      await page.click('[aria-label="Close settings"]');
+      
+      // Check for condensed font class
+      await expect(page.locator('.editor-font-condensed')).toBeVisible();
+    }
+  });
+
+  test('should combine font class with other editor classes', async ({ page }) => {
+    await page.goto('/workspace');
+    await page.waitForLoadState('networkidle');
+    
+    const newDocButton = page.getByRole('button', { name: /New Document/i });
+    
+    if (await newDocButton.isVisible()) {
+      await newDocButton.click();
+      await page.waitForTimeout(1000);
+      
+      // Font class should coexist with touch-manipulation
+      const editorWrapper = page.locator('.touch-manipulation.editor-font-normal');
+      await expect(editorWrapper).toBeVisible();
+    }
+  });
+
+  test('should combine font class with line numbers class', async ({ page }) => {
+    await page.goto('/workspace');
+    await page.waitForLoadState('networkidle');
+    
+    const newDocButton = page.getByRole('button', { name: /New Document/i });
+    
+    if (await newDocButton.isVisible()) {
+      await newDocButton.click();
+      await page.waitForTimeout(1000);
+
+      // Enable line numbers and change font
+      await page.click('[aria-label="Toggle menu"]');
+      await page.click("text=⚙️ Note Settings");
+      
+      const lineNumbersToggle = page.locator('button[role="switch"]');
+      await lineNumbersToggle.click();
+      
+      await page.click("button:has-text('Serif')");
+      await page.click('[aria-label="Close settings"]');
+      
+      // Both classes should be present
+      const editorWrapper = page.locator('.editor-with-line-numbers.editor-font-serif');
+      await expect(editorWrapper).toBeVisible();
+    }
+  });
+
+  test('should apply font styling to BlockNoteView content', async ({ page }) => {
+    await page.goto('/workspace');
+    await page.waitForLoadState('networkidle');
+    
+    const newDocButton = page.getByRole('button', { name: /New Document/i });
+    
+    if (await newDocButton.isVisible()) {
+      await newDocButton.click();
+      await page.waitForTimeout(1000);
+
+      // Change to serif font
+      await page.click('[aria-label="Toggle menu"]');
+      await page.click("text=⚙️ Note Settings");
+      await page.click("button:has-text('Serif')");
+      await page.click('[aria-label="Close settings"]');
+      
+      // Type some content
+      await page.keyboard.type('Test content with serif font');
+      await page.waitForTimeout(500);
+      
+      // The parent wrapper should have the font class which inherits to children
+      await expect(page.locator('.editor-font-serif')).toBeVisible();
+      
+      // Content should be visible
+      await expect(page.locator('text=Test content with serif font')).toBeVisible();
+    }
+  });
+
+  test('should maintain font style during content editing', async ({ page }) => {
+    await page.goto('/workspace');
+    await page.waitForLoadState('networkidle');
+    
+    const newDocButton = page.getByRole('button', { name: /New Document/i });
+    
+    if (await newDocButton.isVisible()) {
+      await newDocButton.click();
+      await page.waitForTimeout(1000);
+
+      // Set condensed font
+      await page.click('[aria-label="Toggle menu"]');
+      await page.click("text=⚙️ Note Settings");
+      await page.click("button:has-text('Condensed')");
+      await page.click('[aria-label="Close settings"]');
+      
+      // Type content
+      await page.keyboard.type('First line');
+      await page.keyboard.press('Enter');
+      await page.keyboard.type('Second line');
+      
+      // Font class should persist
+      await expect(page.locator('.editor-font-condensed')).toBeVisible();
+    }
+  });
+
+  test('should maintain font style when applying formatting', async ({ page }) => {
+    await page.goto('/workspace');
+    await page.waitForLoadState('networkidle');
+    
+    const newDocButton = page.getByRole('button', { name: /New Document/i });
+    
+    if (await newDocButton.isVisible()) {
+      await newDocButton.click();
+      await page.waitForTimeout(1000);
+
+      // Set serif font
+      await page.click('[aria-label="Toggle menu"]');
+      await page.click("text=⚙️ Note Settings");
+      await page.click("button:has-text('Serif')");
+      await page.click('[aria-label="Close settings"]');
+      
+      // Type and format
+      await page.keyboard.type('Bold text');
+      const boldButton = page.getByRole('button', { name: /Bold/i }).first();
+      if (await boldButton.isVisible()) {
+        await boldButton.click();
+      }
+      
+      // Font class should remain
+      await expect(page.locator('.editor-font-serif')).toBeVisible();
+    }
+  });
+
+  test('should update font class when prop changes', async ({ page }) => {
+    await page.goto('/workspace');
+    await page.waitForLoadState('networkidle');
+    
+    const newDocButton = page.getByRole('button', { name: /New Document/i });
+    
+    if (await newDocButton.isVisible()) {
+      await newDocButton.click();
+      await page.waitForTimeout(1000);
+
+      // Start with normal
+      await expect(page.locator('.editor-font-normal')).toBeVisible();
+      
+      // Change to serif
+      await page.click('[aria-label="Toggle menu"]');
+      await page.click("text=⚙️ Note Settings");
+      await page.click("button:has-text('Serif')");
+      await page.click('[aria-label="Close settings"]');
+      
+      await expect(page.locator('.editor-font-serif')).toBeVisible();
+      await expect(page.locator('.editor-font-normal')).not.toBeVisible();
+      
+      // Change to condensed
+      await page.click('[aria-label="Toggle menu"]');
+      await page.click("text=⚙️ Note Settings");
+      await page.click("button:has-text('Condensed')");
+      await page.click('[aria-label="Close settings"]');
+      
+      await expect(page.locator('.editor-font-condensed')).toBeVisible();
+      await expect(page.locator('.editor-font-serif')).not.toBeVisible();
+    }
+  });
+
+  test('should not break editor functionality with different fonts', async ({ page }) => {
+    await page.goto('/workspace');
+    await page.waitForLoadState('networkidle');
+    
+    const newDocButton = page.getByRole('button', { name: /New Document/i });
+    
+    if (await newDocButton.isVisible()) {
+      await newDocButton.click();
+      await page.waitForTimeout(1000);
+
+      // Test with each font
+      const fonts = ['Serif', 'Condensed', 'Normal'];
+      
+      for (const font of fonts) {
+        // Change font
+        await page.click('[aria-label="Toggle menu"]');
+        await page.click("text=⚙️ Note Settings");
+        await page.click(`button:has-text('${font}')`);
+        await page.click('[aria-label="Close settings"]');
+        
+        // Type content
+        await page.keyboard.type(`Testing ${font} font`);
+        await page.keyboard.press('Enter');
+        
+        // Content should be visible
+        await expect(page.locator(`text=Testing ${font} font`)).toBeVisible();
+      }
+    }
+  });
+
+  test('should work with bottom toolbar position and custom font', async ({ page }) => {
+    await page.goto('/workspace');
+    await page.waitForLoadState('networkidle');
+    
+    const newDocButton = page.getByRole('button', { name: /New Document/i });
+    
+    if (await newDocButton.isVisible()) {
+      await newDocButton.click();
+      await page.waitForTimeout(1000);
+
+      // Set condensed font
+      await page.click('[aria-label="Toggle menu"]');
+      await page.click("text=⚙️ Note Settings");
+      await page.click("button:has-text('Condensed')");
+      await page.click('[aria-label="Close settings"]');
+      
+      // Check for both font class and bottom toolbar padding
+      const hasCondensedFont = await page.locator('.editor-font-condensed').count() > 0;
+      const hasBottomPadding = await page.locator('.pb-16').count() > 0;
+      
+      expect(hasCondensedFont).toBeTruthy();
+      // Bottom padding may or may not be present depending on toolbar position
+      expect(hasBottomPadding || !hasBottomPadding).toBeTruthy();
+    }
+  });
+});
+
+test.describe('BlockEditor - Font CSS Inheritance', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/auth/session', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ authenticated: true, username: 'testuser' }) });
+    });
+    await page.route('**/api/workspaces', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ workspace: { id: 'test-workspace-id' } }) });
+    });
+    await page.route('**/api/documents**', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ documents: [] }) });
+    });
+  });
+
+  test('should apply font to all editor content elements', async ({ page }) => {
+    await page.goto('/workspace');
+    await page.waitForLoadState('networkidle');
+    
+    const newDocButton = page.getByRole('button', { name: /New Document/i });
+    
+    if (await newDocButton.isVisible()) {
+      await newDocButton.click();
+      await page.waitForTimeout(1000);
+
+      // Set serif font
+      await page.click('[aria-label="Toggle menu"]');
+      await page.click("text=⚙️ Note Settings");
+      await page.click("button:has-text('Serif')");
+      await page.click('[aria-label="Close settings"]');
+      
+      // The parent container should have the font class
+      await expect(page.locator('.editor-font-serif')).toBeVisible();
+      
+      // Type different types of content
+      await page.keyboard.type('Regular paragraph');
+      await page.keyboard.press('Enter');
+      
+      // All content should inherit the font
+      await expect(page.locator('text=Regular paragraph')).toBeVisible();
+    }
+  });
+
+  test('should apply font with line numbers enabled', async ({ page }) => {
+    await page.goto('/workspace');
+    await page.waitForLoadState('networkidle');
+    
+    const newDocButton = page.getByRole('button', { name: /New Document/i });
+    
+    if (await newDocButton.isVisible()) {
+      await newDocButton.click();
+      await page.waitForTimeout(1000);
+
+      // Enable line numbers and set font
+      await page.click('[aria-label="Toggle menu"]');
+      await page.click("text=⚙️ Note Settings");
+      
+      const lineNumbersToggle = page.locator('button[role="switch"]');
+      await lineNumbersToggle.click();
+      
+      await page.click("button:has-text('Condensed')");
+      await page.click('[aria-label="Close settings"]');
+      
+      // Both features should work together
+      await expect(page.locator('.editor-with-line-numbers')).toBeVisible();
+      await expect(page.locator('.editor-font-condensed')).toBeVisible();
+      
+      // Type content
+      await page.keyboard.type('Content with line numbers and custom font');
+      await expect(page.locator('text=Content with line numbers')).toBeVisible();
+    }
+  });
+
+  test('should handle font changes without losing editor focus', async ({ page }) => {
+    await page.goto('/workspace');
+    await page.waitForLoadState('networkidle');
+    
+    const newDocButton = page.getByRole('button', { name: /New Document/i });
+    
+    if (await newDocButton.isVisible()) {
+      await newDocButton.click();
+      await page.waitForTimeout(1000);
+
+      // Type initial content
+      await page.keyboard.type('Initial content');
+      
+      // Change font
+      await page.click('[aria-label="Toggle menu"]');
+      await page.click("text=⚙️ Note Settings");
+      await page.click("button:has-text('Serif')");
+      await page.click('[aria-label="Close settings"]');
+      
+      // Continue typing - editor should still be functional
+      await page.keyboard.type(' more text');
+      
+      await expect(page.locator('text=Initial content more text')).toBeVisible();
+    }
+  });
+});

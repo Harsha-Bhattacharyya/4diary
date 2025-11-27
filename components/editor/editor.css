@@ -83,3 +83,19 @@
   user-select: none;
   counter-increment: line-number;
 }
+
+/* Font styles for editor content - inherit from global .editor-font-* classes */
+.editor-font-normal .bn-editor,
+.editor-font-normal .bn-block-content,
+.editor-font-normal .bn-inline-content,
+.editor-font-normal [data-content-type],
+.editor-font-serif .bn-editor,
+.editor-font-serif .bn-block-content,
+.editor-font-serif .bn-inline-content,
+.editor-font-serif [data-content-type],
+.editor-font-condensed .bn-editor,
+.editor-font-condensed .bn-block-content,
+.editor-font-condensed .bn-inline-content,
+.editor-font-condensed [data-content-type] {
+  font-family: inherit;
+}

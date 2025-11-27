@@ -85,6 +85,19 @@ body {
   touch-action: manipulation;
 }
 
+/* Editor font options */
+.editor-font-normal {
+  font-family: var(--font-jetbrains-mono), 'JetBrains Mono', 'Fira Code', 'Monaco', monospace !important;
+}
+
+.editor-font-serif {
+  font-family: Arial, Helvetica, sans-serif !important;
+}
+
+.editor-font-condensed {
+  font-family: var(--font-roboto-condensed), 'Roboto Condensed', 'Arial Narrow', sans-serif !important;
+}
+
 /* Touch-friendly improvements for mobile */
 @media (hover: none) and (pointer: coarse) {
   button, a, [role="button"] {

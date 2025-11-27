@@ -14,6 +14,8 @@
 import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { generateAllHashes } from "@/lib/crypto/hash";
 
+export type EditorFontType = "normal" | "serif" | "condensed";
+
 interface NoteSettingsProps {
   content: unknown[];
   lastModified?: Date | string;
@@ -25,13 +27,15 @@ interface NoteSettingsProps {
   tags?: string[];
   onUpdateFolder?: (folder: string) => void;
   onUpdateTags?: (tags: string[]) => void;
+  editorFont?: EditorFontType;
+  onFontChange?: (font: EditorFontType) => void;
 }
 
 /**
  * Displays note statistics, settings, folder, and tags in a modal dialog.
  * 
  * Shows word count, line count, character count, file size, and last modified date.
- * Allows toggling line numbers on/off, setting folder, and managing tags.
+ * Allows toggling line numbers on/off, setting folder, managing tags, and choosing editor font.
  * 
  * @param content - The document content to analyze
  * @param lastModified - Last modified date/time
@@ -43,6 +47,8 @@ interface NoteSettingsProps {
  * @param tags - Current tags of the document
  * @param onUpdateFolder - Callback to update the folder
  * @param onUpdateTags - Callback to update the tags
+ * @param editorFont - Current editor font selection
+ * @param onFontChange - Callback to change the editor font
  */
 export default function NoteSettings({
   content,
@@ -55,6 +61,8 @@ export default function NoteSettings({
   tags = [],
   onUpdateFolder,
   onUpdateTags,
+  editorFont = "normal",
+  onFontChange,
 }: NoteSettingsProps) {
   // For folder and tags, we work directly with props
   // The parent component manages the state and passes callbacks
@@ -422,6 +430,54 @@ export default function NoteSettings({
                 }`}
               />
             </button>
+          </div>
+
+          {/* Font Selection */}
+          <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+            <div className="mb-3">
+              <div className="font-medium text-gray-900">Editor Font</div>
+              <div className="text-sm text-gray-600">
+                Choose your preferred font style
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => onFontChange?.("normal")}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  editorFont === "normal"
+                    ? "bg-leather-600 text-white"
+                    : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-100"
+                }`}
+                style={{ fontFamily: "'JetBrains Mono', monospace" }}
+              >
+                Normal
+              </button>
+              <button
+                type="button"
+                onClick={() => onFontChange?.("serif")}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  editorFont === "serif"
+                    ? "bg-leather-600 text-white"
+                    : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-100"
+                }`}
+                style={{ fontFamily: "Arial, Helvetica, sans-serif" }}
+              >
+                Serif
+              </button>
+              <button
+                type="button"
+                onClick={() => onFontChange?.("condensed")}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  editorFont === "condensed"
+                    ? "bg-leather-600 text-white"
+                    : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-100"
+                }`}
+                style={{ fontFamily: "'Roboto Condensed', 'Arial Narrow', sans-serif" }}
+              >
+                Condensed
+              </button>
+            </div>
           </div>
         </div>
 
