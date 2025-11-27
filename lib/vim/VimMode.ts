@@ -152,7 +152,7 @@ export class VimModeManager {
   /**
    * Handle Normal mode keys
    */
-  private handleNormalMode(key: string, modifiers: { ctrl?: boolean; shift?: boolean; alt?: boolean }): boolean {
+  private handleNormalMode(key: string, _modifiers: { ctrl?: boolean; shift?: boolean; alt?: boolean }): boolean {
     // ESC always returns to normal mode
     if (key === 'Escape') {
       this.state.commandBuffer = '';
@@ -309,7 +309,7 @@ export class VimModeManager {
   /**
    * Handle Insert mode keys
    */
-  private handleInsertMode(key: string, modifiers: { ctrl?: boolean; shift?: boolean; alt?: boolean }): boolean {
+  private handleInsertMode(key: string, _modifiers: { ctrl?: boolean; shift?: boolean; alt?: boolean }): boolean {
     if (key === 'Escape') {
       this.setMode(VimMode.NORMAL);
       return true;
@@ -322,7 +322,7 @@ export class VimModeManager {
   /**
    * Handle Replace mode keys
    */
-  private handleReplaceMode(key: string, modifiers: { ctrl?: boolean; shift?: boolean; alt?: boolean }): boolean {
+  private handleReplaceMode(key: string, _modifiers: { ctrl?: boolean; shift?: boolean; alt?: boolean }): boolean {
     if (key === 'Escape') {
       this.setMode(VimMode.NORMAL);
       return true;
@@ -334,7 +334,7 @@ export class VimModeManager {
   /**
    * Handle Visual mode keys
    */
-  private handleVisualMode(key: string, modifiers: { ctrl?: boolean; shift?: boolean; alt?: boolean }): boolean {
+  private handleVisualMode(key: string, _modifiers: { ctrl?: boolean; shift?: boolean; alt?: boolean }): boolean {
     // ESC returns to normal mode
     if (key === 'Escape') {
       this.state.visualStart = null;
@@ -415,7 +415,7 @@ export class VimModeManager {
   /**
    * Handle Command mode keys
    */
-  private handleCommandMode(key: string, modifiers: { ctrl?: boolean; shift?: boolean; alt?: boolean }): boolean {
+  private handleCommandMode(key: string, _modifiers: { ctrl?: boolean; shift?: boolean; alt?: boolean }): boolean {
     if (key === 'Escape') {
       this.setMode(VimMode.NORMAL);
       return true;

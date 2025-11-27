@@ -335,6 +335,7 @@ export default function BlockEditor({
     }, autoSaveInterval);
 
     return () => clearTimeout(timeoutId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- editor.document is intentionally accessed inside timeout for latest value
   }, [hasChanges, autoSave, onSave, autoSaveInterval, lastContentHash, isInitialized]);
 
   // Handle changes - lightweight change detection
