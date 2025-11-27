@@ -18,6 +18,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import { summarize, SummaryResult } from "@/lib/summarizer";
 
 interface QuickReadProps {
   content: string;
@@ -61,7 +62,7 @@ export function QuickRead({
     }
     return DEFAULT_FONT_SIZE;
   });
-  const [summary, setSummary] = useState<string | null>(null);
+  const [summary, setSummary] = useState<SummaryResult | null>(null);
   const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
@@ -92,18 +93,21 @@ export function QuickRead({
       return;
     }
 
+    if (!content || content.trim().length === 0) {
+      alert("No content to summarize.");
+      return;
+    }
+
     setIsGeneratingSummary(true);
     try {
-      // Placeholder for summarizer API call
-      // In a real implementation, this would call a privacy-preserving endpoint
-      // that doesn't log content or send it to third parties
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setSummary(
-        "Summary feature is not yet implemented. When enabled, it will provide privacy-preserving summaries without sending your content to third parties."
-      );
+      // Use local summarizer - no data is sent to external services
+      const result = await summarize(content);
+      setSummary(result);
     } catch (error) {
       console.error("Failed to generate summary:", error);
-      alert("Failed to generate summary");
+      const errorMessage = error instanceof Error ? error.message : 
+        "Failed to generate summary. Text must have at least 2 sentences.";
+      alert(errorMessage);
     } finally {
       setIsGeneratingSummary(false);
     }
@@ -225,11 +229,22 @@ export function QuickRead({
 
         {summary && (
           <div className="mb-8 p-4 bg-[#2D2416] border border-[#8B7355] rounded-lg">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-xl">✨</span>
-              <span className="font-semibold text-[#E8DCC4]">Summary</span>
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <span className="text-xl">✨</span>
+                <span className="font-semibold text-[#E8DCC4]">Summary</span>
+              </div>
+              <span className="text-sm text-[#8B7355]">
+                {summary.reductionPercentage > 0 && (
+                  <>Reduced by {summary.reductionPercentage.toFixed(0)}%</>
+                )}
+              </span>
             </div>
-            <p className="text-[#C4B8A0]">{summary}</p>
+            <p className="text-[#C4B8A0]">{summary.summary}</p>
+            <p className="text-xs text-[#8B7355] mt-2">
+              Method: {summary.method === 'textrank' ? 'TextRank' : 'Frequency-based'} • 
+              All processing happens locally
+            </p>
           </div>
         )}
 

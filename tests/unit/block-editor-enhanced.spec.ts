@@ -321,8 +321,8 @@ test.describe('BlockEditor - Save Status Display', () => {
       // Type to trigger save
       await page.keyboard.type('Trigger save');
       
-      // May catch "Saving..." state
-      const savingIndicator = page.locator('text=💾 Saving...');
+      // May catch "Saving..." state - indicator used for later assertions
+      const _savingIndicator = page.locator('text=💾 Saving...');
       
       // Wait for auto-save interval
       await page.waitForTimeout(2500);

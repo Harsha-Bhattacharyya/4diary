@@ -169,7 +169,7 @@ test.describe('Theme Toggle Feature', () => {
 
     // Toggle to light theme
     const themeButton = page.locator('button').filter({ hasText: /Dark|Light/ });
-    const initialText = await themeButton.textContent();
+    const _initialText = await themeButton.textContent();
     
     await themeButton.click();
     await page.waitForTimeout(500);
