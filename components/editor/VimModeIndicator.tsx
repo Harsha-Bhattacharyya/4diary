@@ -87,6 +87,13 @@ export default function VimModeIndicator({ vimState, isEnabled }: VimModeIndicat
         </div>
       )}
 
+      {/* Macro Playback Indicator */}
+      {vimState.playingMacro && vimState.lastMacroRegister && (
+        <div className="bg-orange-500 text-white px-3 py-1 rounded-md font-mono text-sm font-bold shadow-lg">
+          ▶ Playing @{vimState.lastMacroRegister}
+        </div>
+      )}
+
       {/* Count Display */}
       {vimState.count > 0 && vimState.mode === VimMode.NORMAL && (
         <div className="glass-card px-3 py-1 rounded-md font-mono text-sm">

@@ -213,7 +213,7 @@ test.describe('Vim Mode - Macro Recording', () => {
     await page.waitForTimeout(100);
     
     const recordingIndicator = page.locator('text=Recording @a');
-    await expect(recordingIndicator).toBeVisible();
+    await expect(recordingIndicator).toBeVisible({ timeout: 3000 });
   });
 
   test('should stop recording when pressing q again', async ({ page }) => {
