@@ -119,7 +119,9 @@ export default function BlockEditor({
       }
     };
     
-    playKeysSequentially();
+    playKeysSequentially().catch((error) => {
+      console.error('Macro playback failed:', error);
+    });
   }, []);
 
   // Vim mode integration
