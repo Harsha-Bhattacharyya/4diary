@@ -12,34 +12,49 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Home Page', () => {
-  test('should load successfully', async ({ page }) => {
+  test('should load successfully with hero section', async ({ page }) => {
     await page.goto('/');
     
-    // Check that the page title is visible
-    await expect(page.getByText('Privacy-First Note-Taking')).toBeVisible();
+    // Check that the tagline is visible
+    await expect(page.getByText(/Catering to your note needs with privacy and style/i)).toBeVisible();
     
-    // Check that the main buttons are present
-    await expect(page.getByRole('link', { name: /Get Started/i })).toBeVisible();
-    await expect(page.getByRole('link', { name: /Browse Templates/i })).toBeVisible();
+    // Check that the main buttons are present in the hero
+    await expect(page.getByRole('link', { name: /Get Started/i }).first()).toBeVisible();
+    await expect(page.getByRole('link', { name: /View Docs/i }).first()).toBeVisible();
   });
 
-  test('should have all feature cards', async ({ page }) => {
+  test('should have long scroll sections with key content', async ({ page }) => {
     await page.goto('/');
     
-    // Check for feature cards
-    await expect(page.getByText('End-to-End Encrypted')).toBeVisible();
-    await expect(page.getByText('Notion-like Editor')).toBeVisible();
-    await expect(page.getByText('Self-Hostable')).toBeVisible();
-    await expect(page.getByText('Smart Organization')).toBeVisible();
-    await expect(page.getByText('Export Freedom')).toBeVisible();
-    await expect(page.getByText('Beautiful Design')).toBeVisible();
+    // Check for hero section content
+    await expect(page.getByText(/Catering to your note needs/i)).toBeVisible();
+    
+    // Scroll to see the problem section
+    await page.getByRole('heading', { name: /The Growing Need for Privacy/i }).scrollIntoViewIfNeeded();
+    await expect(page.getByRole('heading', { name: /The Growing Need for Privacy/i })).toBeVisible();
+    await expect(page.getByText(/Notes are like paper but better and faster/i)).toBeVisible();
+    
+    // Check for the security question section
+    await page.getByRole('heading', { name: /But what if someone got access to these/i }).scrollIntoViewIfNeeded();
+    await expect(page.getByRole('heading', { name: /But what if someone got access to these/i })).toBeVisible();
+    
+    // Check for the E2E encryption section
+    await page.getByRole('heading', { name: 'E2E Encryption' }).scrollIntoViewIfNeeded();
+    await expect(page.getByRole('heading', { name: 'E2E Encryption' })).toBeVisible();
+    
+    // Check for the Why 4Diary feature cards
+    await page.getByRole('heading', { name: /Why 4Diary/i }).scrollIntoViewIfNeeded();
+    await expect(page.getByRole('heading', { name: 'AES Encryption' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Zero-Knowledge' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Self-Hostable' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'FLOSS' })).toBeVisible();
   });
 
   test('should navigate to workspace', async ({ page }) => {
     await page.goto('/');
     
-    // Click on "Get Started" button
-    await page.getByRole('link', { name: /Get Started/i }).click();
+    // Click on "Get Started" button (first occurrence in hero section)
+    await page.getByRole('link', { name: /Get Started/i }).first().click();
     
     // Wait for navigation
     await page.waitForURL('/workspace');
@@ -48,16 +63,16 @@ test.describe('Home Page', () => {
     await expect(page.getByText(/Workspace|Initializing encryption keys/i)).toBeVisible();
   });
 
-  test('should navigate to templates', async ({ page }) => {
+  test('should navigate to docs', async ({ page }) => {
     await page.goto('/');
     
-    // Click on "Browse Templates" button
-    await page.getByRole('link', { name: /Browse Templates/i }).click();
+    // Click on "View Docs" button (first occurrence in hero section)
+    await page.getByRole('link', { name: /View Docs/i }).first().click();
     
     // Wait for navigation
-    await page.waitForURL('/templates');
+    await page.waitForURL('/docs');
     
-    // Check that templates page loaded
-    await expect(page.getByText(/Document Templates/i)).toBeVisible();
+    // Check that docs page loaded - use more specific selector
+    await expect(page.getByRole('heading', { name: /Documentation/i }).first()).toBeVisible();
   });
 });
