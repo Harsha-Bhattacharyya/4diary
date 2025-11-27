@@ -11,7 +11,7 @@
  * modification, are permitted provided that the conditions in the LICENSE file are met.
  */
 
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect, Suspense, useCallback } from "react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import LeatherBackground from "@/components/ui/LeatherBackground";
@@ -95,7 +95,24 @@ function WorkspaceContent() {
   const [showNoteSettings, setShowNoteSettings] = useState(false);
   const [showLineNumbers, setShowLineNumbers] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [editorFont, setEditorFont] = useState<EditorFontType>("normal");
+  const [editorFont, setEditorFont] = useState<EditorFontType>(() => {
+    // Hydrate from localStorage on initial mount (client-side only)
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('4diary-editor-font');
+      if (saved === 'normal' || saved === 'serif' || saved === 'condensed') {
+        return saved;
+      }
+    }
+    return "normal";
+  });
+
+  // Persist font preference to localStorage
+  const handleFontChange = useCallback((font: EditorFontType) => {
+    setEditorFont(font);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('4diary-editor-font', font);
+    }
+  }, []);
 
   // Check authentication
   useEffect(() => {
@@ -1056,7 +1073,7 @@ function WorkspaceContent() {
         onUpdateFolder={handleFolderChange}
         onUpdateTags={handleTagsChange}
         editorFont={editorFont}
-        onFontChange={setEditorFont}
+        onFontChange={handleFontChange}
       />
 
       {/* Version History Modal */}
