@@ -18,6 +18,12 @@
 
 // Note: node-summarizer uses CommonJS, imported dynamically for Next.js compatibility
 
+/** Maximum length for fallback summary when summarization fails */
+const FALLBACK_SUMMARY_MAX_LENGTH = 200;
+
+/** Minimum number of sentences required for summarization */
+const MIN_SENTENCES_FOR_SUMMARY = 2;
+
 export interface SummaryResult {
   summary: string;
   reductionPercentage: number;
@@ -64,6 +70,12 @@ export async function summarizeByFrequency(
     throw new Error('Cannot summarize empty text');
   }
 
+  // Check if text has enough sentences to summarize
+  const sentenceCount = (text.match(/[.!?]+/g) || []).length;
+  if (sentenceCount < MIN_SENTENCES_FOR_SUMMARY) {
+    throw new Error(`Text must have at least ${MIN_SENTENCES_FOR_SUMMARY} sentences to summarize`);
+  }
+
   const sentences = numSentences || calculateOptimalSentenceCount(text);
   
   // Dynamic import for node-summarizer (CommonJS module)
@@ -71,10 +83,20 @@ export async function summarizeByFrequency(
   
   const summarizer = new SummarizerManager(text, sentences);
   const result = summarizer.getSummaryByFrequency();
+  const reductionResult = summarizer.getFrequencyReduction();
+  
+  // Parse reduction percentage from string like "68.7%"
+  let reductionPercentage = 0;
+  if (reductionResult.reduction) {
+    const match = reductionResult.reduction.match(/(\d+\.?\d*)/);
+    if (match) {
+      reductionPercentage = parseFloat(match[1]);
+    }
+  }
   
   return {
-    summary: result.summary || text.substring(0, 200) + '...',
-    reductionPercentage: result.reduction ? parseFloat(result.reduction) : 0,
+    summary: result.summary || text.substring(0, FALLBACK_SUMMARY_MAX_LENGTH) + '...',
+    reductionPercentage,
     originalLength: text.length,
     summaryLength: result.summary?.length || 0,
     method: 'frequency',
@@ -97,6 +119,12 @@ export async function summarizeByRank(
     throw new Error('Cannot summarize empty text');
   }
 
+  // Check if text has enough sentences to summarize
+  const sentenceCount = (text.match(/[.!?]+/g) || []).length;
+  if (sentenceCount < MIN_SENTENCES_FOR_SUMMARY) {
+    throw new Error(`Text must have at least ${MIN_SENTENCES_FOR_SUMMARY} sentences to summarize`);
+  }
+
   const sentences = numSentences || calculateOptimalSentenceCount(text);
   
   // Dynamic import for node-summarizer (CommonJS module)
@@ -104,10 +132,20 @@ export async function summarizeByRank(
   
   const summarizer = new SummarizerManager(text, sentences);
   const result = await summarizer.getSummaryByRank();
+  const reductionResult = await summarizer.getRankReduction();
+  
+  // Parse reduction percentage from string like "68.7%"
+  let reductionPercentage = 0;
+  if (reductionResult.reduction) {
+    const match = reductionResult.reduction.match(/(\d+\.?\d*)/);
+    if (match) {
+      reductionPercentage = parseFloat(match[1]);
+    }
+  }
   
   return {
-    summary: result.summary || text.substring(0, 200) + '...',
-    reductionPercentage: result.reduction ? parseFloat(result.reduction) : 0,
+    summary: result.summary || text.substring(0, FALLBACK_SUMMARY_MAX_LENGTH) + '...',
+    reductionPercentage,
     originalLength: text.length,
     summaryLength: result.summary?.length || 0,
     method: 'textrank',

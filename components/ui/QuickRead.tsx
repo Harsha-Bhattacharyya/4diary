@@ -105,7 +105,9 @@ export function QuickRead({
       setSummary(result);
     } catch (error) {
       console.error("Failed to generate summary:", error);
-      alert("Failed to generate summary. The text may be too short or in an unsupported format.");
+      const errorMessage = error instanceof Error ? error.message : 
+        "Failed to generate summary. Text must have at least 2 sentences.";
+      alert(errorMessage);
     } finally {
       setIsGeneratingSummary(false);
     }
