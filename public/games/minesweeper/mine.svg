@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+  <!-- Medieval bomb/mine -->
+  <circle cx="12" cy="14" r="7" fill="#2b1f16"/>
+  <circle cx="12" cy="14" r="5.5" fill="#4a3b28"/>
+  <ellipse cx="10" cy="12" rx="2" ry="1.5" fill="#6b5539" opacity="0.6"/>
+  <!-- Fuse -->
+  <path d="M12 7 Q14 5 15 3" stroke="#4a3b28" stroke-width="1.5" fill="none"/>
+  <circle cx="15" cy="3" r="1.5" fill="#ff6b35"/>
+  <circle cx="15" cy="3" r="1" fill="#ffd93d"/>
+  <!-- Spikes -->
+  <line x1="12" y1="6" x2="12" y2="4" stroke="#2b1f16" stroke-width="1.5"/>
+  <line x1="5" y1="14" x2="3" y2="14" stroke="#2b1f16" stroke-width="1.5"/>
+  <line x1="19" y1="14" x2="21" y2="14" stroke="#2b1f16" stroke-width="1.5"/>
+  <line x1="12" y1="21" x2="12" y2="23" stroke="#2b1f16" stroke-width="1.5"/>
+  <line x1="6.5" y1="9" x2="5" y2="7.5" stroke="#2b1f16" stroke-width="1.5"/>
+  <line x1="17.5" y1="9" x2="19" y2="7.5" stroke="#2b1f16" stroke-width="1.5"/>
+  <line x1="6.5" y1="19" x2="5" y2="20.5" stroke="#2b1f16" stroke-width="1.5"/>
+  <line x1="17.5" y1="19" x2="19" y2="20.5" stroke="#2b1f16" stroke-width="1.5"/>
+</svg>

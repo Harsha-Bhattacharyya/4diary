@@ -11,21 +11,47 @@
  * modification, are permitted provided that the conditions in the LICENSE file are met.
  */
 
-import React from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import LeatherBackground from "@/components/ui/LeatherBackground";
 import GlassCard from "@/components/ui/GlassCard";
 import LeatherButton from "@/components/ui/LeatherButton";
-import { motion } from "framer-motion";
+import HistoricalMinesweeper from "@/components/ui/HistoricalMinesweeper";
+import { motion, AnimatePresence } from "framer-motion";
 
 /**
  * Custom 404 Not Found page with leather-themed styling.
  * 
  * Renders an animated, leather-styled error page when users navigate to a non-existent route.
+ * Includes a hidden easter egg game (Historical Minesweeper) that can be triggered by pressing Space.
  * 
  * @returns The 404 page React element with leather background, animated icon, and navigation options
  */
 export default function NotFound() {
+  const [showGame, setShowGame] = useState(false);
+
+  // Listen for space key to toggle game
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    // Only toggle game visibility if space is pressed and game is not shown yet
+    // Once game is shown, let the game component handle space presses
+    if (e.code === "Space" && !showGame) {
+      e.preventDefault();
+      setShowGame(true);
+    }
+    // ESC to close the game
+    if (e.code === "Escape" && showGame) {
+      e.preventDefault();
+      setShowGame(false);
+    }
+  }, [showGame]);
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [handleKeyDown]);
+
   return (
     <div className="min-h-screen relative flex items-center justify-center">
       <LeatherBackground />
@@ -112,8 +138,45 @@ export default function NotFound() {
               </Link>
             </div>
           </motion.div>
+
+          {/* Hidden hint for easter egg */}
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.5, duration: 0.5 }}
+            className="mt-6 text-leather-500/50 text-xs italic"
+          >
+            Feeling bored? Press SPACE for a surprise...
+          </motion.p>
         </GlassCard>
       </div>
+
+      {/* Historical Minesweeper Easter Egg Game */}
+      <AnimatePresence>
+        {showGame && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm overflow-auto py-8"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="game-title"
+          >
+            <div className="relative">
+              <button
+                onClick={() => setShowGame(false)}
+                className="absolute -top-10 right-0 text-leather-200 hover:text-leather-100 text-sm transition-colors"
+                aria-label="Close game"
+              >
+                Press ESC to close
+              </button>
+              <HistoricalMinesweeper />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
