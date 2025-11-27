@@ -136,7 +136,8 @@ export class VimModeManager {
     // Don't record 'q' that starts/stops recording, or '@' macro play commands
     if (shouldRecord && this.state.recording) {
       const isRecordingControl = key === 'q' && (this.state.commandBuffer === '' || this.state.commandBuffer === 'q');
-      const isMacroPlay = key === '@' || (this.state.commandBuffer === '@' && /^[a-z@]$/.test(key));
+      const isMacroPlay = this.state.mode === VimMode.NORMAL && 
+        (key === '@' || (this.state.commandBuffer === '@' && /^[a-z@]$/.test(key)));
       
       if (!isRecordingControl && !isMacroPlay) {
         this.state.macro[this.state.recording].push({ key, modifiers: { ...modifiers } });
