@@ -37,7 +37,7 @@ import {
 } from "@/lib/documentService";
 import { getOrCreateDefaultWorkspace } from "@/lib/workspaceService";
 import { createDocumentFromTemplate } from "@/lib/templateService";
-import { exportDocumentAsMarkdown, exportDocumentsAsZip } from "@/lib/exportService";
+import { exportDocumentAsMarkdown, exportEncryptedWorkspaceAsZip } from "@/lib/exportService";
 import { saveDocumentVersion } from "@/lib/versionService";
 import type { KanbanBoardData } from "@/components/kanban/Board";
 
@@ -509,7 +509,8 @@ function WorkspaceContent() {
       );
       const data = await response.json();
 
-      await exportDocumentsAsZip("My Workspace", data.documents);
+      // Export encrypted blobs and master key
+      await exportEncryptedWorkspaceAsZip("My Workspace", data.documents);
     } catch (err) {
       console.error("Export error:", err);
       setError(err instanceof Error ? err.message : "Failed to export workspace");
