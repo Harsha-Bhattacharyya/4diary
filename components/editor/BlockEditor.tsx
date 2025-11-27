@@ -23,6 +23,8 @@ import { useVimMode } from "@/lib/vim/useVimMode";
 import { VimMode } from "@/lib/vim/VimMode";
 import { VimNavigationHandler } from "@/lib/vim/VimNavigationHandler";
 
+import type { EditorFontType } from "@/components/ui/NoteSettings";
+
 interface BlockEditorProps {
   initialContent?: unknown[];
   onChange?: (content: unknown[]) => void;
@@ -33,6 +35,7 @@ interface BlockEditorProps {
   showToolbar?: boolean;
   showLineNumbers?: boolean;
   toolbarPosition?: 'top' | 'bottom';
+  editorFont?: EditorFontType;
 }
 
 /**
@@ -50,6 +53,7 @@ interface BlockEditorProps {
  * @param showToolbar - Whether to display the formatting toolbar (default: `true`).
  * @param showLineNumbers - Whether to display line numbers (default: `false`).
  * @param toolbarPosition - Position of the toolbar: 'top' (default) or 'bottom'.
+ * @param editorFont - The font style for the editor content (default: `normal`).
  * @returns The editor's JSX element.
  */
 export default function BlockEditor({
@@ -62,6 +66,7 @@ export default function BlockEditor({
   showToolbar = true,
   showLineNumbers = false,
   toolbarPosition = 'top',
+  editorFont = 'normal',
 }: BlockEditorProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
@@ -334,7 +339,7 @@ export default function BlockEditor({
 
       {/* Editor */}
       <div 
-        className={`touch-manipulation ${showLineNumbers ? 'editor-with-line-numbers' : ''} ${toolbarPosition === 'bottom' ? 'pb-16' : ''}`} 
+        className={`touch-manipulation ${showLineNumbers ? 'editor-with-line-numbers' : ''} ${toolbarPosition === 'bottom' ? 'pb-16' : ''} editor-font-${editorFont}`} 
         style={{ WebkitTapHighlightColor: 'transparent' }}
       >
         <BlockNoteView

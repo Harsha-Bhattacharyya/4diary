@@ -10,7 +10,7 @@
  */
 
 import type { Metadata, Viewport } from "next";
-import { IM_Fell_DW_Pica, IM_Fell_English } from "next/font/google";
+import { IM_Fell_DW_Pica, IM_Fell_English, JetBrains_Mono, Roboto_Condensed } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import Script from "next/script";
@@ -30,6 +30,22 @@ const imFellEnglish = IM_Fell_English({
   style: ["normal", "italic"],
   subsets: ["latin"],
   variable: "--font-fell-english",
+});
+
+// JetBrains Mono for "Normal" monospace font option
+const jetbrainsMono = JetBrains_Mono({
+  weight: ["400", "500", "700"],
+  style: ["normal", "italic"],
+  subsets: ["latin"],
+  variable: "--font-jetbrains-mono",
+});
+
+// Roboto Condensed for "Condensed" font option
+const robotoCondensed = Roboto_Condensed({
+  weight: ["400", "500", "700"],
+  style: ["normal", "italic"],
+  subsets: ["latin"],
+  variable: "--font-roboto-condensed",
 });
 
 export const viewport: Viewport = {
@@ -720,7 +736,7 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="en" className={`${imFellDWPica.variable} ${imFellEnglish.variable}`}>
+    <html lang="en" className={`${imFellDWPica.variable} ${imFellEnglish.variable} ${jetbrainsMono.variable} ${robotoCondensed.variable}`}>
       <head>
         {process.env.NODE_ENV === "development" && (
           <Script

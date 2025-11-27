@@ -22,7 +22,7 @@ import EditableTitle from "@/components/ui/EditableTitle";
 import { EmojiPickerComponent } from "@/components/ui/EmojiPicker";
 import { QuickNote } from "@/components/ui/QuickNote";
 import SaveTemplateModal from "@/components/ui/SaveTemplateModal";
-import NoteSettings from "@/components/ui/NoteSettings";
+import NoteSettings, { type EditorFontType } from "@/components/ui/NoteSettings";
 import PWAInstallPrompt from "@/components/ui/PWAInstallPrompt";
 import PWAInit from "@/components/ui/PWAInit";
 import dynamic from "next/dynamic";
@@ -95,6 +95,7 @@ function WorkspaceContent() {
   const [showNoteSettings, setShowNoteSettings] = useState(false);
   const [showLineNumbers, setShowLineNumbers] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [editorFont, setEditorFont] = useState<EditorFontType>("normal");
 
   // Check authentication
   useEffect(() => {
@@ -933,6 +934,7 @@ function WorkspaceContent() {
                 editable={isEditMode}
                 showLineNumbers={showLineNumbers}
                 toolbarPosition="bottom"
+                editorFont={editorFont}
               />
             )}
           </div>
@@ -1053,6 +1055,8 @@ function WorkspaceContent() {
         tags={currentDocument.metadata.tags}
         onUpdateFolder={handleFolderChange}
         onUpdateTags={handleTagsChange}
+        editorFont={editorFont}
+        onFontChange={setEditorFont}
       />
 
       {/* Version History Modal */}
