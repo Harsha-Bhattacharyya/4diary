@@ -64,6 +64,78 @@ const Backlinks = dynamic(() => import("@/components/ui/Backlinks"), {
   ssr: false,
 });
 
+const PlaywriterMode = dynamic(() => import("@/components/ui/PlaywriterMode").then(mod => ({ default: mod.PlaywriterMode })), {
+  ssr: false,
+});
+
+/**
+ * Extracts plain text from BlockNote content structure.
+ * Uses forward-order iteration to preserve original block order and empty lines.
+ * @param content - BlockNote content array
+ * @returns Plain text string with line breaks preserved
+ */
+function extractTextFromContent(content: unknown[]): string {
+  if (!content || !Array.isArray(content)) return "";
+  
+  const textParts: string[] = [];
+  
+  // Process blocks in forward order using a queue (FIFO)
+  const queue: unknown[] = [...content];
+  
+  while (queue.length > 0) {
+    const block = queue.shift(); // Use shift for FIFO order
+    if (!block || typeof block !== "object") continue;
+    
+    const objBlock = block as Record<string, unknown>;
+    
+    // Handle text content directly in block
+    if (objBlock.text && typeof objBlock.text === "string") {
+      textParts.push(objBlock.text);
+    }
+    
+    // Handle content array (inline content)
+    if (Array.isArray(objBlock.content)) {
+      const inlineText = objBlock.content
+        .map((item: unknown) => {
+          if (typeof item === "string") return item;
+          if (item && typeof item === "object" && (item as Record<string, unknown>).text) {
+            return (item as Record<string, unknown>).text as string;
+          }
+          return "";
+        })
+        .join("");
+      // Always push the line (even if empty) to preserve blank paragraphs
+      textParts.push(inlineText);
+    }
+    
+    // Handle children/nested blocks - add to end of queue to maintain order
+    if (Array.isArray(objBlock.children)) {
+      queue.push(...objBlock.children);
+    }
+  }
+  
+  return textParts.join("\n").trim();
+}
+
+/**
+ * Converts plain text back to BlockNote content structure.
+ * Preserves line breaks as separate paragraphs for screenplay formatting.
+ * @param text - Plain text string
+ * @returns BlockNote content array
+ */
+function convertTextToContent(text: string): unknown[] {
+  if (!text.trim()) {
+    return [{ type: "paragraph", content: [] }];
+  }
+  
+  // Split by line breaks and create a paragraph for each line
+  const lines = text.split("\n");
+  return lines.map(line => ({
+    type: "paragraph",
+    content: line ? [{ type: "text", text: line }] : [],
+  }));
+}
+
 /**
  * Render the workspace UI and manage authentication, encryption initialization, workspace lifecycle, and document operations.
  *
@@ -95,6 +167,7 @@ function WorkspaceContent() {
   const [showNoteSettings, setShowNoteSettings] = useState(false);
   const [showLineNumbers, setShowLineNumbers] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showPlaywriterMode, setShowPlaywriterMode] = useState(false);
   const [editorFont, setEditorFont] = useState<EditorFontType>(() => {
     // Hydrate from localStorage on initial mount (client-side only)
     if (typeof window !== 'undefined') {
@@ -860,6 +933,18 @@ function WorkspaceContent() {
               >
                 🔗 {showBacklinks ? "Hide" : "Show"} Backlinks
               </button>
+              {currentDocument.metadata.type !== 'board' && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowPlaywriterMode(true);
+                    setDropdownOpen(false);
+                  }}
+                  className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+                >
+                  🎭 Playwriter Mode
+                </button>
+              )}
               <div className="border-t border-gray-200 my-2"></div>
               <button
                 type="button"
@@ -1085,6 +1170,20 @@ function WorkspaceContent() {
             setShowVersionHistory(false);
           }}
           onClose={() => setShowVersionHistory(false)}
+        />
+      )}
+
+      {/* Playwriter Mode Modal */}
+      {showPlaywriterMode && currentDocument && (
+        <PlaywriterMode
+          content={extractTextFromContent(currentDocument.content)}
+          title={currentDocument.metadata.title}
+          onClose={() => setShowPlaywriterMode(false)}
+          onSave={async (textContent) => {
+            // Convert the text back to BlockNote content format preserving line breaks
+            const newContent = convertTextToContent(textContent);
+            await handleSave(newContent);
+          }}
         />
       )}
 
