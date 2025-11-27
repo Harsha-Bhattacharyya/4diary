@@ -134,8 +134,10 @@ export class VimModeManager {
     
     // Record the key after processing (so we know if it was valid)
     // Don't record 'q' that starts/stops recording, or '@' macro play commands
+    // These control keys only apply in NORMAL mode - in INSERT mode, 'q' is just a regular character
     if (shouldRecord && this.state.recording) {
-      const isRecordingControl = key === 'q' && (this.state.commandBuffer === '' || this.state.commandBuffer === 'q');
+      const isRecordingControl = this.state.mode === VimMode.NORMAL && 
+        key === 'q' && (this.state.commandBuffer === '' || this.state.commandBuffer === 'q');
       const isMacroPlay = this.state.mode === VimMode.NORMAL && 
         (key === '@' || (this.state.commandBuffer === '@' && /^[a-z@]$/.test(key)));
       
