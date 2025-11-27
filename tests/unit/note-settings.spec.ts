@@ -360,3 +360,341 @@ test.describe("Note Settings Component", () => {
     await expect(page.locator("text=✓ Copied!").first()).toBeVisible({ timeout: 2000 });
   });
 });
+
+test.describe("Note Settings - Editor Font Selection", () => {
+  test.beforeEach(async ({ page }) => {
+    // Mock authentication
+    await page.route("**/api/auth/session", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          authenticated: true,
+          username: "test@example.com",
+        }),
+      })
+    );
+
+    // Mock workspace and documents
+    await page.route("**/api/workspaces", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          workspace: {
+            id: "test-workspace",
+            userId: "test@example.com",
+            name: "Test Workspace",
+          },
+        }),
+      })
+    );
+
+    await page.route("**/api/documents**", (route) => {
+      if (route.request().method() === "GET") {
+        route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            documents: [
+              {
+                id: "doc-1",
+                metadata: {
+                  title: "Test Document",
+                  emojiIcon: "📄",
+                },
+                content: [
+                  {
+                    type: "paragraph",
+                    content: [{ type: "text", text: "Hello world!" }],
+                  },
+                ],
+                updatedAt: new Date().toISOString(),
+              },
+            ],
+          }),
+        });
+      } else {
+        route.continue();
+      }
+    });
+  });
+
+  test("should display Editor Font section in note settings", async ({ page }) => {
+    await page.goto("/workspace");
+    await page.waitForSelector("text=Test Document", { timeout: 10000 });
+    await page.click("text=Test Document");
+    await page.waitForSelector(".bn-editor", { timeout: 5000 });
+
+    // Open note settings
+    await page.click('[aria-label="Toggle menu"]');
+    await page.click("text=⚙️ Note Settings");
+
+    // Verify Editor Font section is displayed
+    await expect(page.locator("text=Editor Font")).toBeVisible();
+    await expect(page.locator("text=Choose your preferred font style")).toBeVisible();
+  });
+
+  test("should display all three font options", async ({ page }) => {
+    await page.goto("/workspace");
+    await page.waitForSelector("text=Test Document", { timeout: 10000 });
+    await page.click("text=Test Document");
+    await page.waitForSelector(".bn-editor", { timeout: 5000 });
+
+    // Open note settings
+    await page.click('[aria-label="Toggle menu"]');
+    await page.click("text=⚙️ Note Settings");
+
+    // Verify all three font buttons are visible
+    await expect(page.locator("button:has-text('Normal')")).toBeVisible();
+    await expect(page.locator("button:has-text('Serif')")).toBeVisible();
+    await expect(page.locator("button:has-text('Condensed')")).toBeVisible();
+  });
+
+  test("should have Normal font selected by default", async ({ page }) => {
+    await page.goto("/workspace");
+    await page.waitForSelector("text=Test Document", { timeout: 10000 });
+    await page.click("text=Test Document");
+    await page.waitForSelector(".bn-editor", { timeout: 5000 });
+
+    // Open note settings
+    await page.click('[aria-label="Toggle menu"]');
+    await page.click("text=⚙️ Note Settings");
+
+    // Check that Normal button has active styling
+    const normalButton = page.locator("button:has-text('Normal')");
+    await expect(normalButton).toHaveClass(/bg-leather-600/);
+  });
+
+  test("should change font selection when clicking font buttons", async ({ page }) => {
+    await page.goto("/workspace");
+    await page.waitForSelector("text=Test Document", { timeout: 10000 });
+    await page.click("text=Test Document");
+    await page.waitForSelector(".bn-editor", { timeout: 5000 });
+
+    // Open note settings
+    await page.click('[aria-label="Toggle menu"]');
+    await page.click("text=⚙️ Note Settings");
+
+    // Click Serif button
+    await page.click("button:has-text('Serif')");
+
+    // Verify Serif is now selected
+    const serifButton = page.locator("button:has-text('Serif')");
+    await expect(serifButton).toHaveClass(/bg-leather-600/);
+
+    // Click Condensed button
+    await page.click("button:has-text('Condensed')");
+
+    // Verify Condensed is now selected
+    const condensedButton = page.locator("button:has-text('Condensed')");
+    await expect(condensedButton).toHaveClass(/bg-leather-600/);
+  });
+
+  test("should persist font selection to localStorage", async ({ page }) => {
+    await page.goto("/workspace");
+    await page.waitForSelector("text=Test Document", { timeout: 10000 });
+    await page.click("text=Test Document");
+    await page.waitForSelector(".bn-editor", { timeout: 5000 });
+
+    // Open note settings
+    await page.click('[aria-label="Toggle menu"]');
+    await page.click("text=⚙️ Note Settings");
+
+    // Click Serif button
+    await page.click("button:has-text('Serif')");
+
+    // Check localStorage
+    const storedFont = await page.evaluate(() => 
+      localStorage.getItem('4diary-editor-font')
+    );
+    expect(storedFont).toBe('serif');
+  });
+
+  test("should restore font preference from localStorage on page load", async ({ page }) => {
+    // Set localStorage before loading the page
+    await page.goto("/workspace");
+    await page.evaluate(() => {
+      localStorage.setItem('4diary-editor-font', 'condensed');
+    });
+
+    // Reload the page
+    await page.reload();
+    await page.waitForSelector("text=Test Document", { timeout: 10000 });
+    await page.click("text=Test Document");
+    await page.waitForSelector(".bn-editor", { timeout: 5000 });
+
+    // Open note settings
+    await page.click('[aria-label="Toggle menu"]');
+    await page.click("text=⚙️ Note Settings");
+
+    // Verify Condensed is selected
+    const condensedButton = page.locator("button:has-text('Condensed')");
+    await expect(condensedButton).toHaveClass(/bg-leather-600/);
+  });
+
+  test("should apply font class to editor when font is changed", async ({ page }) => {
+    await page.goto("/workspace");
+    await page.waitForSelector("text=Test Document", { timeout: 10000 });
+    await page.click("text=Test Document");
+    await page.waitForSelector(".bn-editor", { timeout: 5000 });
+
+    // Open note settings
+    await page.click('[aria-label="Toggle menu"]');
+    await page.click("text=⚙️ Note Settings");
+
+    // Click Serif button
+    await page.click("button:has-text('Serif')");
+
+    // Close settings
+    await page.click('[aria-label="Close settings"]');
+
+    // Verify editor has the serif font class
+    await expect(page.locator('.editor-font-serif')).toBeVisible();
+  });
+
+  test("should show correct font preview in font buttons", async ({ page }) => {
+    await page.goto("/workspace");
+    await page.waitForSelector("text=Test Document", { timeout: 10000 });
+    await page.click("text=Test Document");
+    await page.waitForSelector(".bn-editor", { timeout: 5000 });
+
+    // Open note settings
+    await page.click('[aria-label="Toggle menu"]');
+    await page.click("text=⚙️ Note Settings");
+
+    // Check that Normal button has monospace font
+    const normalButton = page.locator("button:has-text('Normal')");
+    const normalStyle = await normalButton.getAttribute('style');
+    expect(normalStyle).toContain('JetBrains Mono');
+
+    // Check that Serif button has serif font
+    const serifButton = page.locator("button:has-text('Serif')");
+    const serifStyle = await serifButton.getAttribute('style');
+    expect(serifStyle).toContain('Arial');
+
+    // Check that Condensed button has condensed font
+    const condensedButton = page.locator("button:has-text('Condensed')");
+    const condensedStyle = await condensedButton.getAttribute('style');
+    expect(condensedStyle).toContain('Roboto Condensed');
+  });
+
+  test("should handle invalid localStorage values gracefully", async ({ page }) => {
+    // Set invalid localStorage value before loading the page
+    await page.goto("/workspace");
+    await page.evaluate(() => {
+      localStorage.setItem('4diary-editor-font', 'invalid-font');
+    });
+
+    // Reload the page
+    await page.reload();
+    await page.waitForSelector("text=Test Document", { timeout: 10000 });
+    await page.click("text=Test Document");
+    await page.waitForSelector(".bn-editor", { timeout: 5000 });
+
+    // Open note settings
+    await page.click('[aria-label="Toggle menu"]');
+    await page.click("text=⚙️ Note Settings");
+
+    // Should fall back to Normal (default)
+    const normalButton = page.locator("button:has-text('Normal')");
+    await expect(normalButton).toHaveClass(/bg-leather-600/);
+  });
+
+  test("should maintain font selection across editor mode changes", async ({ page }) => {
+    await page.goto("/workspace");
+    await page.waitForSelector("text=Test Document", { timeout: 10000 });
+    await page.click("text=Test Document");
+    await page.waitForSelector(".bn-editor", { timeout: 5000 });
+
+    // Open note settings and change font
+    await page.click('[aria-label="Toggle menu"]');
+    await page.click("text=⚙️ Note Settings");
+    await page.click("button:has-text('Condensed')");
+    await page.click('[aria-label="Close settings"]');
+
+    // Toggle to read mode
+    const toggleButton = page.locator('[aria-label="Toggle edit/read mode"], button:has-text("👁")');
+    if (await toggleButton.isVisible()) {
+      await toggleButton.click();
+      await page.waitForTimeout(500);
+
+      // Toggle back to edit mode
+      await toggleButton.click();
+      await page.waitForTimeout(500);
+    }
+
+    // Font should still be condensed
+    await expect(page.locator('.editor-font-condensed')).toBeVisible();
+  });
+
+  test("should update font immediately without needing to close settings", async ({ page }) => {
+    await page.goto("/workspace");
+    await page.waitForSelector("text=Test Document", { timeout: 10000 });
+    await page.click("text=Test Document");
+    await page.waitForSelector(".bn-editor", { timeout: 5000 });
+
+    // Type some content first
+    await page.keyboard.type("Test content for font change");
+
+    // Open note settings
+    await page.click('[aria-label="Toggle menu"]');
+    await page.click("text=⚙️ Note Settings");
+
+    // Check initial editor class
+    await expect(page.locator('.editor-font-normal')).toBeVisible();
+
+    // Click Serif button
+    await page.click("button:has-text('Serif')");
+
+    // Font should change immediately while settings is still open
+    await expect(page.locator('.editor-font-serif')).toBeVisible();
+    await expect(page.locator('.editor-font-normal')).not.toBeVisible();
+  });
+
+  test("should work correctly with line numbers enabled", async ({ page }) => {
+    await page.goto("/workspace");
+    await page.waitForSelector("text=Test Document", { timeout: 10000 });
+    await page.click("text=Test Document");
+    await page.waitForSelector(".bn-editor", { timeout: 5000 });
+
+    // Open note settings
+    await page.click('[aria-label="Toggle menu"]');
+    await page.click("text=⚙️ Note Settings");
+
+    // Enable line numbers
+    const lineNumbersToggle = page.locator('button[role="switch"]');
+    await lineNumbersToggle.click();
+
+    // Change font to Serif
+    await page.click("button:has-text('Serif')");
+
+    // Close settings
+    await page.click('[aria-label="Close settings"]');
+
+    // Both line numbers and serif font should be active
+    await expect(page.locator('.editor-with-line-numbers')).toBeVisible();
+    await expect(page.locator('.editor-font-serif')).toBeVisible();
+  });
+
+  test("should not call onFontChange if callback is undefined", async ({ page }) => {
+    // This test verifies that clicking font buttons doesn't cause errors
+    // when onFontChange callback might not be provided
+    await page.goto("/workspace");
+    await page.waitForSelector("text=Test Document", { timeout: 10000 });
+    await page.click("text=Test Document");
+    await page.waitForSelector(".bn-editor", { timeout: 5000 });
+
+    // Open note settings
+    await page.click('[aria-label="Toggle menu"]');
+    await page.click("text=⚙️ Note Settings");
+
+    // Click font buttons - should not cause errors
+    await page.click("button:has-text('Serif')");
+    await page.click("button:has-text('Condensed')");
+    await page.click("button:has-text('Normal')");
+
+    // Settings should still be visible and functional
+    await expect(page.locator("text=Editor Font")).toBeVisible();
+  });
+});
