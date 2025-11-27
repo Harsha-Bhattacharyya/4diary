@@ -54,10 +54,12 @@ export function useVimMode({ enabled, onCommand, onExit, onMacroPlayback }: UseV
     if (vimState?.playingMacro && vimManagerRef.current && onMacroPlayback) {
       const macro = vimManagerRef.current.getMacroToPlay();
       if (macro && macro.length > 0) {
-        // Trigger macro playback callback
-        onMacroPlayback(macro);
+        // Trigger macro playback callback and wait for completion
+        Promise.resolve(onMacroPlayback(macro)).finally(() => {
+          vimManagerRef.current?.finishMacroPlayback();
+        });
+        return;
       }
-      // Finish macro playback
       vimManagerRef.current.finishMacroPlayback();
     }
   }, [vimState?.playingMacro, onMacroPlayback]);
