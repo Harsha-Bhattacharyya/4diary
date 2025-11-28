@@ -1,6 +1,6 @@
-# 4diary Screenshots - Hack This Fall 2025
+# 4diary Screenshots
 
-This directory contains comprehensive screenshots of the 4diary application showcasing its key features and user interface for the Hack This Fall 2025 submission.
+This directory contains comprehensive screenshots of the 4diary application showcasing its key features and user interface.
 
 ## Screenshots
 
@@ -14,31 +14,31 @@ The main landing page featuring:
 ### 02-login-page.png
 Login page showing:
 - Clean authentication interface
-- Email and password input fields
+- Username and password input fields
 - Password visibility toggle button
 - Link to sign-up page
-- Privacy commitment message
+- End-to-end encryption notice
 
 ### 03-signup-page.png
 Sign-up page featuring:
-- User registration form with email, password, and optional name fields
+- User registration form with username, password, and optional name fields
 - Privacy Code of Conduct checkbox agreement
-- Information about default name behavior
+- Password generator option
 - End-to-end encryption notice
 
 ### 04-docs-page.png
 Documentation page interface:
-- Documentation sidebar
-- Main content area
-- Navigation structure
+- Documentation sidebar with collapsible sections
+- Main content area showing Encryption Deep Dive documentation
+- Navigation structure for Advanced, Architecture, Getting Started, and Guides
 
 ### 05-templates-page.png
 Templates showcase displaying:
 - **Journal category**: Daily Note, Journal Entry templates
 - **Work category**: Meeting Notes, Project Plan templates
-- **Productivity category**: Task List template
+- **Productivity category**: Task List, Ideas & Brainstorming templates
+- **Notes category**: Research Notes template
 - Custom template creation option
-- Visual icons for each template type
 
 ### 06-navigation-menu.png
 Mobile/responsive navigation menu showing:
@@ -52,32 +52,39 @@ Mobile/responsive navigation menu showing:
 ### 07-about-page.png
 About page featuring:
 - Project description
-- Mission statement emphasizing privacy, encryption, and open-source values
+- Privacy & Security features
+- Features overview
+- Self-Hosting information
+- Tech Stack details
+- Lead developer information
+- Hack This Fall 2025 badge
 
-### 08-features-section.png
-Detailed view of the features section highlighting:
-- ① AES Encryption - Military-grade security
-- ② Zero-Knowledge - Server never sees your writing
-- ③ Self-Hostable - Run it yourself, own your data
-- ④ FLOSS - Free, open-source, endless freedom
+### 08-settings-page.png
+Settings page displaying:
+- Security settings (E2E encryption, master key storage, zero knowledge)
+- Appearance settings (theme toggle)
+- Export & Backup options
+- Privacy settings (analytics, data collection)
+- Self-hosting instructions with Docker
 
-### 09-password-visibility-feature.png
-Password visibility toggle feature demonstration:
-- Shows the eye icon button functionality
-- Example of the UI/UX attention to detail
-- Password field with toggle in active state
+### 09-404-page.png
+Custom 404 Not Found page showing:
+- Leather-themed error page
+- Navigation options to workspace and home
+- Quick links to templates, docs, and settings
+- Easter egg hint (press SPACE for a game)
 
 ## Technical Details
 
-All screenshots were captured from a local deployment of 4diary running on:
-- Next.js development server (localhost:3000)
-- Connected to production MongoDB database
+All screenshots were captured from a production deployment of 4diary running on:
+- Next.js production server (localhost:3000)
+- Connected to MongoDB database
 - Full page screenshots showing responsive design
 - PNG format for high quality preservation
 
 ## Purpose
 
-These screenshots serve as visual documentation for the Hack This Fall 2025 submission, demonstrating:
+These screenshots serve as visual documentation demonstrating:
 - User interface design and UX
 - Core features and functionality
 - Privacy-focused architecture
