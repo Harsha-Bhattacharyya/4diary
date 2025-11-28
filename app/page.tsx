@@ -415,6 +415,26 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Learn More Section */}
+        <section className="py-12 bg-black/30">
+          <div className="max-w-4xl mx-auto text-center">
+            <Link 
+              href="/about" 
+              className="inline-flex items-center gap-2 text-leather-200 hover:text-leather-100 transition-colors text-lg group"
+            >
+              <span>Learn More About 4diary</span>
+              <svg 
+                className="w-5 h-5 group-hover:translate-x-1 transition-transform" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </Link>
+          </div>
+        </section>
+
         {/* Footer */}
         <footer className="text-center text-leather-300 text-sm py-12 bg-black/40">
           <p>Made with ❤️ in 🇮🇳</p>
