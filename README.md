@@ -42,6 +42,29 @@ A privacy-focused, end-to-end encrypted note-taking application built with Next.
 
 ## 🚀 Getting Started
 
+### ⚡ Quick Install (Recommended)
+
+The easiest way to get started is using our interactive installer:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Harsha-Bhattacharyya/4diary/main/install.sh | bash
+```
+
+Or download and run manually:
+
+```bash
+wget https://raw.githubusercontent.com/Harsha-Bhattacharyya/4diary/main/install.sh
+chmod +x install.sh
+./install.sh
+```
+
+The installer will:
+- ✅ Check system requirements
+- ✅ Guide you through configuration
+- ✅ Set up Docker or local development environment
+- ✅ Configure MongoDB, Redis, and other services
+- ✅ Generate all necessary configuration files
+
 ### Prerequisites
 
 - Node.js 20+ 
@@ -49,7 +72,7 @@ A privacy-focused, end-to-end encrypted note-taking application built with Next.
 - Redis (optional, for share tokens feature)
 - npm or yarn
 
-### Development Setup
+### Manual Development Setup
 
 1. Clone the repository:
 ```bash
