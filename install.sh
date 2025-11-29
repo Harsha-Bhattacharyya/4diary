@@ -390,6 +390,29 @@ collect_docker_config() {
     BASE_URL=$(prompt_input "Base URL (for share links)" "http://localhost:$APP_PORT")
     
     echo ""
+    
+    # JWT Secret Configuration
+    echo -e "${BOLD_WHITE}${ICON_KEY} Security Configuration${NC}"
+    echo ""
+    
+    # Generate a secure random JWT secret
+    local default_jwt_secret
+    default_jwt_secret=$(openssl rand -base64 32 2>/dev/null || head -c 32 /dev/urandom | base64 | tr -d '\n')
+    
+    JWT_SECRET_CHOICE=$(prompt_choice "JWT Secret (required for authentication)" \
+        "${ICON_GEAR} Generate secure random secret (recommended)" \
+        "${ICON_PENCIL} Enter custom secret")
+    
+    if [[ "$JWT_SECRET_CHOICE" == "1" ]]; then
+        JWT_SECRET="$default_jwt_secret"
+        print_success "Generated secure JWT secret"
+    else
+        JWT_SECRET=$(prompt_password "Enter JWT secret (min 32 characters recommended)")
+        if [[ ${#JWT_SECRET} -lt 32 ]]; then
+            print_warning "JWT secret is less than 32 characters - consider using a longer secret for better security"
+        fi
+    fi
+    echo ""
 }
 
 collect_dev_config() {
@@ -427,6 +450,29 @@ collect_dev_config() {
     BASE_URL=$(prompt_input "Base URL" "http://localhost:$APP_PORT")
     
     echo ""
+    
+    # JWT Secret Configuration
+    echo -e "${BOLD_WHITE}${ICON_KEY} Security Configuration${NC}"
+    echo ""
+    
+    # Generate a secure random JWT secret
+    local default_jwt_secret
+    default_jwt_secret=$(openssl rand -base64 32 2>/dev/null || head -c 32 /dev/urandom | base64 | tr -d '\n')
+    
+    JWT_SECRET_CHOICE=$(prompt_choice "JWT Secret (required for authentication)" \
+        "${ICON_GEAR} Generate secure random secret (recommended)" \
+        "${ICON_PENCIL} Enter custom secret")
+    
+    if [[ "$JWT_SECRET_CHOICE" == "1" ]]; then
+        JWT_SECRET="$default_jwt_secret"
+        print_success "Generated secure JWT secret"
+    else
+        JWT_SECRET=$(prompt_password "Enter JWT secret (min 32 characters recommended)")
+        if [[ ${#JWT_SECRET} -lt 32 ]]; then
+            print_warning "JWT secret is less than 32 characters - consider using a longer secret for better security"
+        fi
+    fi
+    echo ""
 }
 
 collect_sentry_config() {
@@ -461,10 +507,11 @@ escape_env_value() {
 
 generate_env_file() {
     local target_file="$1"
-    local escaped_mongodb escaped_redis escaped_base_url escaped_sentry_dsn escaped_sentry_org escaped_sentry_project escaped_sentry_token
+    local escaped_mongodb escaped_redis escaped_base_url escaped_jwt_secret escaped_sentry_dsn escaped_sentry_org escaped_sentry_project escaped_sentry_token
     
     escaped_mongodb=$(escape_env_value "$MONGODB_URI")
     escaped_base_url=$(escape_env_value "$BASE_URL")
+    escaped_jwt_secret=$(escape_env_value "$JWT_SECRET")
     
     cat > "$target_file" << EOF
 # 4Diary Configuration
@@ -488,6 +535,10 @@ EOF
 
 # Application
 NEXT_PUBLIC_BASE_URL=$escaped_base_url
+PORT=$APP_PORT
+
+# Authentication (Required)
+JWT_SECRET=$escaped_jwt_secret
 EOF
 
     if [[ -n "$SENTRY_DSN" ]]; then
@@ -523,10 +574,11 @@ EOF
 
 generate_docker_compose_override() {
     local target_file="$1"
-    local escaped_mongodb escaped_redis escaped_base_url escaped_sentry_dsn escaped_sentry_org escaped_sentry_project escaped_sentry_token
+    local escaped_mongodb escaped_redis escaped_base_url escaped_jwt_secret escaped_sentry_dsn escaped_sentry_org escaped_sentry_project escaped_sentry_token
     
     escaped_mongodb=$(escape_env_value "$MONGODB_URI")
     escaped_base_url=$(escape_env_value "$BASE_URL")
+    escaped_jwt_secret=$(escape_env_value "$JWT_SECRET")
     
     cat > "$target_file" << EOF
 # 4Diary Docker Compose Override
@@ -542,6 +594,7 @@ services:
     environment:
       - NODE_ENV=production
       - MONGODB_URI=${escaped_mongodb}
+      - JWT_SECRET=${escaped_jwt_secret}
 EOF
 
     if [[ -n "$REDIS_URL" ]]; then
@@ -828,6 +881,8 @@ main() {
         echo -e "${BOLD_WHITE}Redis:${NC} ${DIM}Not configured${NC}"
     fi
     echo -e "${BOLD_WHITE}Base URL:${NC} $BASE_URL"
+    echo -e "${BOLD_WHITE}Port:${NC} $APP_PORT"
+    echo -e "${BOLD_WHITE}JWT Secret:${NC} ${DIM}[configured]${NC}"
     if [[ -n "$SENTRY_DSN" ]]; then
         echo -e "${BOLD_WHITE}Sentry:${NC} Configured"
     else
