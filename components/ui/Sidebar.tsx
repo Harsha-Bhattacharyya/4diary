@@ -145,17 +145,17 @@ export default function Sidebar({
         collapsed ? "w-16" : "w-64"
       } ${
         collapsed ? "z-10" : "z-[1000]"
-      } bg-[#2D2416]/80 backdrop-blur-md border-r border-[#8B7355]/30 shadow-2xl`}
+      } bg-white/90 dark:bg-[#2D2416]/90 backdrop-blur-md border-r border-gray-200 dark:border-[#8B7355]/30 shadow-2xl`}
     >
       {/* Header */}
-      <div className="p-4 border-b border-[#8B7355] flex items-center justify-between">
+      <div className="p-4 border-b border-gray-200 dark:border-[#8B7355] flex items-center justify-between">
         {!collapsed && (
-          <h2 className="text-lg font-semibold text-[#E8DCC4]">Workspace</h2>
+          <h2 className="text-lg font-semibold text-black dark:text-white">Workspace</h2>
         )}
         <button
           type="button"
           onClick={() => onToggle(!collapsed)}
-          className="text-[#E8DCC4] hover:text-[#C4B8A0] transition-colors p-2"
+          className="text-black dark:text-white hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-2"
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           <svg
@@ -188,14 +188,14 @@ export default function Sidebar({
       {!collapsed && (
         <div className="overflow-y-auto h-[calc(100vh-5rem)] p-2">
           {Object.keys(groupedDocs).length === 0 ? (
-            <div className="p-4 text-center text-[#A08465]">
+            <div className="p-4 text-center text-gray-500 dark:text-gray-400">
               <p className="text-sm">No documents yet</p>
             </div>
           ) : (
             Object.entries(groupedDocs).map(([folder, docs]) => (
               <div key={folder} className="mb-4">
                 {/* Folder Header */}
-                <div className="px-2 py-1 text-xs font-semibold text-[#A08465] uppercase">
+                <div className="px-2 py-1 text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wide">
                   {folder}
                 </div>
 
@@ -210,7 +210,7 @@ export default function Sidebar({
                     onDrop={(e) => handleDrop(e, doc.id)}
                     onDragEnd={handleDragEnd}
                     className={`w-full rounded-md transition-all ${
-                      dragOverDoc === doc.id ? 'border-2 border-[#8B7355] bg-[#3D3426]/50' : ''
+                      dragOverDoc === doc.id ? 'border-2 border-gray-300 dark:border-[#8B7355] bg-gray-100 dark:bg-[#3D3426]/50' : ''
                     } ${draggedDoc === doc.id ? 'opacity-50' : ''}`}
                   >
                     <div
@@ -223,7 +223,7 @@ export default function Sidebar({
                           onDocumentClick(doc.id);
                         }
                       }}
-                      className="group w-full text-left px-3 py-2 text-[#E8DCC4] hover:bg-[#3D3426] transition-colors rounded-md cursor-pointer"
+                      className="group w-full text-left px-3 py-2 text-black dark:text-white hover:bg-gray-100 dark:hover:bg-[#3D3426] transition-colors rounded-md cursor-pointer"
                     >
                       <div className="flex items-center gap-2">
                         {/* Star icon */}
@@ -235,7 +235,7 @@ export default function Sidebar({
                             aria-label={doc.favorite ? "Unstar" : "Star"}
                             title={doc.favorite ? "Unstar" : "Star"}
                           >
-                            {doc.favorite ? "⭐" : "☆"}
+                            {doc.favorite ? "⭐" : <span className="text-gray-500 dark:text-gray-400">☆</span>}
                           </button>
                         )}
                         
@@ -244,7 +244,7 @@ export default function Sidebar({
                         
                         {/* Drag handle */}
                         {onReorder && (
-                          <span className="text-xs text-[#A08465] opacity-0 group-hover:opacity-100 transition-opacity cursor-move">
+                          <span className="text-xs text-gray-500 dark:text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity cursor-move">
                             ⋮⋮
                           </span>
                         )}
@@ -255,7 +255,7 @@ export default function Sidebar({
                           {doc.tags.map((tag) => (
                             <span
                               key={tag}
-                              className="inline-block px-1.5 py-0.5 text-[10px] bg-[#8B7355]/30 text-[#C4B8A0] rounded"
+                              className="inline-block px-1.5 py-0.5 text-[10px] bg-gray-200 dark:bg-[#8B7355]/40 text-gray-700 dark:text-gray-200 rounded"
                             >
                               {tag}
                             </span>
@@ -279,7 +279,7 @@ export default function Sidebar({
               type="button"
               key={doc.id}
               onClick={() => onDocumentClick(doc.id)}
-              className="w-10 h-10 flex items-center justify-center rounded-md text-[#E8DCC4] hover:bg-[#3D3426] transition-colors relative"
+              className="w-10 h-10 flex items-center justify-center rounded-md text-black dark:text-white hover:bg-gray-100 dark:hover:bg-[#3D3426] transition-colors relative"
               title={doc.title}
               aria-label={doc.title}
             >
