@@ -305,6 +305,15 @@ export function ImportNotes({ onImportComplete, isOpen, onClose }: ImportNotesPr
                   onDrop={handleDrop}
                   onDragOver={handleDragOver}
                   onClick={() => fileInputRef.current?.click()}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      fileInputRef.current?.click();
+                    }
+                  }}
+                  role="button"
+                  tabIndex={0}
+                  aria-label="Select files to import"
                   className="border-2 border-dashed border-leather-600 rounded-lg p-8 text-center cursor-pointer hover:border-leather-500 transition-colors"
                 >
                   <input
