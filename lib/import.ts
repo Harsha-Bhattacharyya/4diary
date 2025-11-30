@@ -1167,11 +1167,42 @@ export async function autoImportFiles(files: File[]): Promise<ImportResult> {
         allErrors.push(...result.errors);
         allWarnings.push(...result.warnings);
       } else if (hasJson) {
-        // Google Keep or Standard Notes
-        const result = await importGoogleKeep([file]);
-        allNotes.push(...result.notes);
-        allErrors.push(...result.errors);
-        allWarnings.push(...result.warnings);
+        // Google Keep or Standard Notes - detect format by sampling first JSON file
+        const jsonPaths = fileNames.filter(f => f.toLowerCase().endsWith(".json") && !f.includes("__MACOSX"));
+        let detectedFormat: "standard-notes" | "google-keep" = "google-keep";
+        
+        if (jsonPaths.length > 0) {
+          try {
+            const samplePath = jsonPaths[0];
+            const sampleContent = await zip.files[samplePath].async("string");
+            const sampleData = JSON.parse(sampleContent);
+            
+            // Detect Standard Notes format:
+            // - Has "items" array at top level with content_type fields
+            // - Or has specific Standard Notes backup structure
+            if (
+              (Array.isArray(sampleData.items) && sampleData.items.some((item: { content_type?: string }) => item.content_type === "Note")) ||
+              (Array.isArray(sampleData) && sampleData.some((item: { content_type?: string }) => item.content_type === "Note"))
+            ) {
+              detectedFormat = "standard-notes";
+            }
+          } catch {
+            // Parsing error - fall back to Google Keep
+            allWarnings.push(`Could not detect JSON format in ZIP, assuming Google Keep`);
+          }
+        }
+        
+        if (detectedFormat === "standard-notes") {
+          const result = await importStandardNotes([file]);
+          allNotes.push(...result.notes);
+          allErrors.push(...result.errors);
+          allWarnings.push(...result.warnings);
+        } else {
+          const result = await importGoogleKeep([file]);
+          allNotes.push(...result.notes);
+          allErrors.push(...result.errors);
+          allWarnings.push(...result.warnings);
+        }
       } else if (hasHtml) {
         // Apple Notes or other HTML export
         const result = await importAppleNotes([file]);
