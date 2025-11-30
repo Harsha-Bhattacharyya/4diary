@@ -12,6 +12,7 @@
  */
 
 import Link from "next/link";
+import Image from "next/image";
 import LeatherBackground from "@/components/ui/LeatherBackground";
 import TopMenu from "@/components/ui/TopMenu";
 
@@ -100,7 +101,14 @@ export default function About() {
           <div className="text-center p-8 rounded-lg bg-leather-700 bg-opacity-40 border border-leather-500/30">
             <h2 className="text-3xl font-bold text-leather-100 mb-6">💻 The Lead Dev</h2>
             <div className="flex flex-col items-center">
-              <div className="w-32 h-32 rounded-full bg-leather-500 bg-opacity-50 border-4 border-leather-400 flex items-center justify-center mb-4">
+              <div className="w-32 h-32 rounded-full bg-leather-500 bg-opacity-50 border-4 border-leather-400 flex items-center justify-center mb-4 overflow-hidden">
+                <Image
+                  src="/developer-pfp.jpg"
+                  alt="Harsha Bhattacharyya - Lead Developer"
+                  width={128}
+                  height={128}
+                  className="w-full h-full object-cover"
+                />
               </div>
               <h3 className="text-2xl font-bold text-leather-100 mb-2">Harsha Bhattacharyya</h3>
               <p className="text-leather-200 max-w-md">
