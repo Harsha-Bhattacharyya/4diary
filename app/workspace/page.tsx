@@ -749,24 +749,35 @@ function WorkspaceContent() {
       throw new Error("Workspace not initialized");
     }
 
+    const failedNotes: string[] = [];
+
     // Create documents from imported notes
     for (const note of importedNotes) {
-      await createDocument({
-        workspaceId,
-        userId: userEmail,
-        content: note.content as unknown[],
-        metadata: {
-          title: note.title,
-          tags: note.tags,
-          folder: note.folder,
-          type: "doc",
-        },
-      });
+      try {
+        await createDocument({
+          workspaceId,
+          userId: userEmail,
+          content: note.content as unknown[],
+          metadata: {
+            title: note.title,
+            tags: note.tags,
+            folder: note.folder,
+            type: "doc",
+          },
+        });
+      } catch (err) {
+        console.error(`Failed to import note "${note.title}":`, err);
+        failedNotes.push(note.title);
+      }
     }
 
     // Reload documents list
     const updatedDocs = await listDocuments(workspaceId, userEmail);
     setDocuments(updatedDocs);
+
+    if (failedNotes.length > 0) {
+      throw new Error(`Failed to import ${failedNotes.length} note(s): ${failedNotes.join(", ")}`);
+    }
   };
 
   if (loading) {
