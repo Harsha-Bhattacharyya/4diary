@@ -771,22 +771,26 @@ export async function importStandardNotes(files: File[]): Promise<ImportResult> 
         for (const item of items) {
           // Only import notes (content_type: "Note")
           if (item.content_type === "Note" && item.content) {
-            const snContent = typeof item.content === "string" 
-              ? JSON.parse(item.content) 
-              : item.content;
-            
-            const title = snContent.title || "Untitled";
-            const text = snContent.text || "";
-            
-            const blockNoteContent = markdownToBlockNote(text);
-            
-            notes.push({
-              title,
-              content: blockNoteContent,
-              createdAt: item.created_at,
-              updatedAt: item.updated_at,
-              sourceApp: "standard-notes",
-            });
+            try {
+              const snContent = typeof item.content === "string" 
+                ? JSON.parse(item.content) 
+                : item.content;
+              
+              const title = snContent.title || "Untitled";
+              const text = snContent.text || "";
+              
+              const blockNoteContent = markdownToBlockNote(text);
+              
+              notes.push({
+                title,
+                content: blockNoteContent,
+                createdAt: item.created_at,
+                updatedAt: item.updated_at,
+                sourceApp: "standard-notes",
+              });
+            } catch (noteErr) {
+              warnings.push(`Skipped note: ${noteErr instanceof Error ? noteErr.message : String(noteErr)}`);
+            }
           }
         }
       } else {
