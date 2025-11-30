@@ -95,6 +95,47 @@ export function detectImportFormat(files: File[]): ImportFormat | null {
   return null;
 }
 
+// ============ Helper Functions ============
+
+/**
+ * Check if a path is a macOS metadata file that should be skipped
+ */
+function isMacOSMetadataPath(path: string): boolean {
+  return path.startsWith("__MACOSX/") || path.includes("/__MACOSX/");
+}
+
+/**
+ * Detect if parsed JSON data is in Standard Notes format
+ * Standard Notes has an "items" array with entries having content_type fields
+ */
+function isStandardNotesFormat(data: unknown): boolean {
+  if (!data || typeof data !== "object") return false;
+  
+  const obj = data as Record<string, unknown>;
+  
+  // Check for items array with Note content_type
+  if (Array.isArray(obj.items)) {
+    return obj.items.some((item: unknown) => {
+      if (item && typeof item === "object") {
+        return (item as Record<string, unknown>).content_type === "Note";
+      }
+      return false;
+    });
+  }
+  
+  // Check for top-level array with Note content_type
+  if (Array.isArray(data)) {
+    return data.some((item: unknown) => {
+      if (item && typeof item === "object") {
+        return (item as Record<string, unknown>).content_type === "Note";
+      }
+      return false;
+    });
+  }
+  
+  return false;
+}
+
 /**
  * Main import function - routes to appropriate parser
  */
@@ -266,10 +307,10 @@ async function extractGoogleKeepFromZip(file: File): Promise<ImportResult> {
   try {
     const zip = await JSZip.loadAsync(file);
     const jsonFiles = Object.keys(zip.files).filter(
-      name => name.toLowerCase().endsWith(".json") && !name.includes("__MACOSX")
+      name => name.toLowerCase().endsWith(".json") && !isMacOSMetadataPath(name)
     );
     const htmlFiles = Object.keys(zip.files).filter(
-      name => name.toLowerCase().endsWith(".html") && !name.includes("__MACOSX")
+      name => name.toLowerCase().endsWith(".html") && !isMacOSMetadataPath(name)
     );
     
     // Process JSON files (preferred)
@@ -602,7 +643,7 @@ async function extractNotionFromZip(file: File): Promise<ImportResult> {
   try {
     const zip = await JSZip.loadAsync(file);
     const mdFiles = Object.keys(zip.files).filter(
-      name => name.toLowerCase().endsWith(".md") && !name.includes("__MACOSX")
+      name => name.toLowerCase().endsWith(".md") && !isMacOSMetadataPath(name)
     );
     
     for (const mdPath of mdFiles) {
@@ -935,10 +976,10 @@ async function extractAppleNotesFromZip(file: File): Promise<ImportResult> {
     const zip = await JSZip.loadAsync(file);
     const htmlFiles = Object.keys(zip.files).filter(
       name => (name.toLowerCase().endsWith(".html") || name.toLowerCase().endsWith(".htm")) 
-        && !name.includes("__MACOSX")
+        && !isMacOSMetadataPath(name)
     );
     const txtFiles = Object.keys(zip.files).filter(
-      name => name.toLowerCase().endsWith(".txt") && !name.includes("__MACOSX")
+      name => name.toLowerCase().endsWith(".txt") && !isMacOSMetadataPath(name)
     );
     
     for (const htmlPath of htmlFiles) {
@@ -1092,8 +1133,8 @@ export async function autoImportFiles(files: File[]): Promise<ImportResult> {
       const content = await file.text();
       const data = JSON.parse(content);
       
-      // Detect Standard Notes format
-      if (data.items || (Array.isArray(data) && data[0]?.content_type)) {
+      // Detect Standard Notes format using helper
+      if (isStandardNotesFormat(data)) {
         const result = await importStandardNotes([file]);
         allNotes.push(...result.notes);
         allErrors.push(...result.errors);
@@ -1168,7 +1209,7 @@ export async function autoImportFiles(files: File[]): Promise<ImportResult> {
         allWarnings.push(...result.warnings);
       } else if (hasJson) {
         // Google Keep or Standard Notes - detect format by sampling first JSON file
-        const jsonPaths = fileNames.filter(f => f.toLowerCase().endsWith(".json") && !f.includes("__MACOSX"));
+        const jsonPaths = fileNames.filter(f => f.toLowerCase().endsWith(".json") && !isMacOSMetadataPath(f));
         let detectedFormat: "standard-notes" | "google-keep" = "google-keep";
         
         if (jsonPaths.length > 0) {
@@ -1177,18 +1218,12 @@ export async function autoImportFiles(files: File[]): Promise<ImportResult> {
             const sampleContent = await zip.files[samplePath].async("string");
             const sampleData = JSON.parse(sampleContent);
             
-            // Detect Standard Notes format:
-            // - Has "items" array at top level with content_type fields
-            // - Or has specific Standard Notes backup structure
-            if (
-              (Array.isArray(sampleData.items) && sampleData.items.some((item: { content_type?: string }) => item.content_type === "Note")) ||
-              (Array.isArray(sampleData) && sampleData.some((item: { content_type?: string }) => item.content_type === "Note"))
-            ) {
+            if (isStandardNotesFormat(sampleData)) {
               detectedFormat = "standard-notes";
             }
           } catch {
             // Parsing error - fall back to Google Keep
-            allWarnings.push(`Could not detect JSON format in ZIP, assuming Google Keep`);
+            allWarnings.push(`Could not detect JSON format in ZIP file '${file.name}', assuming Google Keep`);
           }
         }
         
