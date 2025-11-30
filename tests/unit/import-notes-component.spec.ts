@@ -316,62 +316,62 @@ test.describe('ImportNotes Component - Preview Step', () => {
   test('should show summary statistics in preview', async ({ page }) => {
     // This would require actually importing files
     // Testing the structure exists
-    const modal = page.locator('text=Notes to import').first();
+    const _modal = page.locator('text=Notes to import').first();
     // Structure test only - actual data would come from real import
   });
 
   test('should show warning count', async ({ page }) => {
     // Testing structure
-    const modal = page.locator('text=Warnings').first();
+    const _modal = page.locator('text=Warnings').first();
   });
 
   test('should show error count', async ({ page }) => {
     // Testing structure
-    const modal = page.locator('text=Errors').first();
+    const _modal = page.locator('text=Errors').first();
   });
 
   test('should list preview notes with metadata', async ({ page }) => {
     // Testing that preview structure exists
-    const modal = page.locator('text=Notes Preview').first();
+    const _modal = page.locator('text=Notes Preview').first();
   });
 
   test('should show Back button in preview step', async ({ page }) => {
     // Testing navigation structure
-    const backButton = page.getByRole('button', { name: /Back/i });
+    const _backButton = page.getByRole('button', { name: /Back/i });
   });
 });
 
 test.describe('ImportNotes Component - Import Progress', () => {
   test('should show progress bar during import', async ({ page }) => {
     // Testing structure
-    const progressBar = page.locator('.bg-leather-800.rounded-full');
+    const _progressBar = page.locator('.bg-leather-800.rounded-full');
   });
 
   test('should show importing message', async ({ page }) => {
     // Testing structure
-    const message = page.locator('text=Importing Notes...');
+    const _message = page.locator('text=Importing Notes...');
   });
 
   test('should show percentage complete', async ({ page }) => {
     // Testing structure
-    const percentage = page.locator('text=% complete');
+    const _percentage = page.locator('text=% complete');
   });
 });
 
 test.describe('ImportNotes Component - Complete Step', () => {
   test('should show success message on completion', async ({ page }) => {
     // Testing structure
-    const success = page.locator('text=Import Complete!');
+    const _success = page.locator('text=Import Complete!');
   });
 
   test('should show Done button', async ({ page }) => {
     // Testing structure
-    const doneButton = page.getByRole('button', { name: /Done/i });
+    const _doneButton = page.getByRole('button', { name: /Done/i });
   });
 
   test('should show emoji celebration', async ({ page }) => {
     // Testing structure
-    const celebration = page.locator('text=🎉');
+    const _celebration = page.locator('text=🎉');
   });
 });
 
