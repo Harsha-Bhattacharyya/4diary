@@ -172,7 +172,7 @@ export default function About() {
 
             {/* Discord Link */}
             <Link 
-              href="https://discord.gg/4diary" 
+              href="https://discord.gg/a3VaGxD9qn"
               target="_blank" 
               rel="noopener noreferrer"
               className="flex flex-col items-center gap-2 text-leather-200 hover:text-leather-100 transition-colors group"
