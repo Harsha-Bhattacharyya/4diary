@@ -9,6 +9,7 @@
  * modification, are permitted provided that the conditions in the LICENSE file are met.
  */
 
+import 'server-only';
 import * as fs from 'fs';
 import * as path from 'path';
 
