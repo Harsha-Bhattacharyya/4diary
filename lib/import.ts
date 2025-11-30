@@ -329,7 +329,7 @@ function parseGoogleKeepJson(data: Record<string, unknown>, filename: string): I
     const listItems = (data.listContent as Array<{ text: string; isChecked?: boolean }>)
       .map(item => `- [${item.isChecked ? "x" : " "}] ${item.text}`)
       .join("\n");
-    contentText = listItems;
+    contentText = contentText ? `${contentText}\n\n${listItems}` : listItems;
   }
   
   // Convert to BlockNote format
