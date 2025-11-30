@@ -31,7 +31,8 @@ A privacy-focused, end-to-end encrypted note-taking application built with Next.
 ### Advanced Features
 - 📋 **Kanban Boards**: Drag-and-drop task management with encrypted boards
 - 🔗 **Embed Previews**: Rich URL previews with sanitized metadata
-- 📥 **Export Freedom**: Export as Markdown or ZIP files
+- 📥 **Import Notes**: Import from Google Keep, Evernote, Notion, Apple Notes, Standard Notes, or Markdown
+- 📤 **Export Freedom**: Export as Markdown or ZIP files
 - 📦 **Self-Hostable**: Docker-ready deployment
 - 📱 **PWA Support**: Install as a progressive web app with offline capabilities
 
@@ -234,6 +235,25 @@ For information about reporting security vulnerabilities, supported versions, an
 2. Browse categories (journal, work, productivity)
 3. Click "Use Template" to start with pre-built structure
 4. Customize to your needs
+
+### Importing Notes
+
+4Diary supports importing notes from popular apps:
+
+1. Go to Workspace
+2. Click "📥 Import" in Quick Actions
+3. Select format (or use Auto-detect):
+   - **Markdown** (.md files)
+   - **Google Keep** (Google Takeout export)
+   - **Evernote** (.enex files)
+   - **Notion** (exported workspace)
+   - **Standard Notes** (backup files)
+   - **Apple Notes** (HTML/text export)
+4. Drop or select your files
+5. Preview imported notes
+6. Click Import - notes are encrypted and saved
+
+For detailed instructions, see [Import Guide](docs/guides/import.md).
 
 ### Exporting Data
 

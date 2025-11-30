@@ -40,6 +40,7 @@ import { createDocumentFromTemplate } from "@/lib/templateService";
 import { exportDocumentAsMarkdown, exportEncryptedWorkspaceAsZip } from "@/lib/exportService";
 import { saveDocumentVersion } from "@/lib/versionService";
 import type { KanbanBoardData } from "@/components/kanban/Board";
+import type { ImportedNote } from "@/lib/import";
 
 // Dynamic import to avoid SSR issues with BlockNote
 const BlockEditor = dynamic(() => import("@/components/editor/BlockEditor"), {
@@ -65,6 +66,10 @@ const Backlinks = dynamic(() => import("@/components/ui/Backlinks"), {
 });
 
 const PlaywriterMode = dynamic(() => import("@/components/ui/PlaywriterMode").then(mod => ({ default: mod.PlaywriterMode })), {
+  ssr: false,
+});
+
+const ImportNotes = dynamic(() => import("@/components/ui/ImportNotes").then(mod => ({ default: mod.ImportNotes })), {
   ssr: false,
 });
 
@@ -168,6 +173,7 @@ function WorkspaceContent() {
   const [showLineNumbers, setShowLineNumbers] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showPlaywriterMode, setShowPlaywriterMode] = useState(false);
+  const [showImportNotes, setShowImportNotes] = useState(false);
   const [editorFont, setEditorFont] = useState<EditorFontType>(() => {
     // Hydrate from localStorage on initial mount (client-side only)
     if (typeof window !== 'undefined') {
@@ -736,6 +742,31 @@ function WorkspaceContent() {
       setError(err instanceof Error ? err.message : "Failed to delete document");
       setShowDeleteConfirm(false);
     }
+  };
+
+  const handleImportNotes = async (importedNotes: ImportedNote[]): Promise<void> => {
+    if (!workspaceId || !userEmail) {
+      throw new Error("Workspace not initialized");
+    }
+
+    // Create documents from imported notes
+    for (const note of importedNotes) {
+      await createDocument({
+        workspaceId,
+        userId: userEmail,
+        content: note.content as unknown[],
+        metadata: {
+          title: note.title,
+          tags: note.tags,
+          folder: note.folder,
+          type: "doc",
+        },
+      });
+    }
+
+    // Reload documents list
+    const updatedDocs = await listDocuments(workspaceId, userEmail);
+    setDocuments(updatedDocs);
   };
 
   if (loading) {
@@ -1377,6 +1408,14 @@ function WorkspaceContent() {
                 <span className="text-xs sm:text-sm text-leather-200 text-center">Kanban</span>
               </button>
               
+              <button
+                onClick={() => setShowImportNotes(true)}
+                className="flex flex-col items-center justify-center p-4 rounded-lg bg-leather-900/30 hover:bg-leather-900/50 transition-all border border-leather-700/30 hover:border-leather-600"
+              >
+                <span className="text-3xl mb-2">📥</span>
+                <span className="text-xs sm:text-sm text-leather-200 text-center">Import</span>
+              </button>
+              
               {documents.length > 0 && (
                 <button
                   onClick={handleExportWorkspace}
@@ -1608,6 +1647,13 @@ function WorkspaceContent() {
 
     {/* QuickNote Modal - Available globally with Ctrl+Q */}
     <QuickNote onSave={handleSaveQuickNote} />
+
+    {/* Import Notes Modal */}
+    <ImportNotes
+      isOpen={showImportNotes}
+      onClose={() => setShowImportNotes(false)}
+      onImportComplete={handleImportNotes}
+    />
 
     {/* PWA Components */}
     <PWAInit />

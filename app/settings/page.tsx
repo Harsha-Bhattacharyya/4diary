@@ -12,6 +12,7 @@
  */
 
 import React, { useState } from "react";
+import Link from "next/link";
 import LeatherBackground from "@/components/ui/LeatherBackground";
 import GlassCard from "@/components/ui/GlassCard";
 import LeatherButton from "@/components/ui/LeatherButton";
@@ -141,10 +142,27 @@ export default function SettingsPage() {
           {/* Export Settings */}
           <GlassCard className="mb-6 settings-card">
             <h2 className="text-2xl font-bold mb-4 text-leather-100">
-              📥 Export & Backup
+              📥 Import & Export
             </h2>
             <div className="space-y-4">
               <div>
+                <h3 className="font-bold mb-2 text-leather-100">
+                  Import Notes
+                </h3>
+                <p className="text-sm text-leather-300 mb-4">
+                  Import notes from Google Keep, Evernote, Notion, Apple Notes, Standard Notes, or Markdown files
+                </p>
+                <Link href="/workspace">
+                  <LeatherButton
+                    variant="parchment"
+                    size="md"
+                  >
+                    Go to Workspace to Import
+                  </LeatherButton>
+                </Link>
+              </div>
+
+              <div className="pt-4 border-t border-leather-700">
                 <h3 className="font-bold mb-2 text-leather-100">
                   Export All Documents
                 </h3>
@@ -163,11 +181,28 @@ export default function SettingsPage() {
 
               <div className="pt-4 border-t border-leather-700">
                 <h3 className="font-bold mb-2 text-leather-100">
-                  Export Format
+                  Supported Import Formats
                 </h3>
-                <p className="text-sm text-leather-300">
-                  Documents are exported as standard Markdown (.md) files with metadata
-                </p>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div className="flex items-center gap-2 text-leather-300">
+                    <span>📝</span> Markdown (.md)
+                  </div>
+                  <div className="flex items-center gap-2 text-leather-300">
+                    <span>📋</span> Google Keep (Takeout)
+                  </div>
+                  <div className="flex items-center gap-2 text-leather-300">
+                    <span>🐘</span> Evernote (.enex)
+                  </div>
+                  <div className="flex items-center gap-2 text-leather-300">
+                    <span>📓</span> Notion Export
+                  </div>
+                  <div className="flex items-center gap-2 text-leather-300">
+                    <span>🍎</span> Apple Notes (HTML)
+                  </div>
+                  <div className="flex items-center gap-2 text-leather-300">
+                    <span>🔒</span> Standard Notes
+                  </div>
+                </div>
               </div>
             </div>
           </GlassCard>
