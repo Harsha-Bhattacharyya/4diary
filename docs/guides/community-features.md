@@ -168,5 +168,5 @@ Potential improvements to these features:
 ## 📚 Learn More
 
 - [Main README](../README.md)
-- [Testing Guide](../TESTING_GUIDE.md)
-- [Contributing](../CONTRIBUTING.md)
+- [Testing Guide](../../tests/README.md)
+- [Contributing](../../CONTRIBUTING.md)

@@ -16,7 +16,6 @@ import { useRouter } from "next/navigation";
 import LeatherBackground from "@/components/ui/LeatherBackground";
 import GlassCard from "@/components/ui/GlassCard";
 import LeatherButton from "@/components/ui/LeatherButton";
-import Link from "next/link";
 
 /**
  * Authentication page component that displays and manages login and signup forms.
@@ -255,13 +254,14 @@ export default function AuthPage() {
                 />
                 <label htmlFor="terms" className="text-sm text-leather-200">
                   I agree to the{" "}
-                  <Link
-                    href="/CODE_OF_CONDUCT.md"
+                  <a
+                    href="https://github.com/Harsha-Bhattacharyya/4diary/blob/main/LICENSE"
                     className="text-leather-300 hover:underline"
                     target="_blank"
+                    rel="noopener noreferrer"
                   >
-                    privacy CoC (commitment)
-                  </Link>
+                    License Agreement
+                  </a>
                 </label>
               </div>
             )}

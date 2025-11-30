@@ -50,7 +50,7 @@ Resources for contributors and developers.
 - Code Style Guide - Coding standards and conventions 📝 *Planned*
 - Best Practices - Contributing guidelines 📝 *Planned*
 
-> **Note**: See [CONTRIBUTING.md](../CONTRIBUTING.md) and [TESTING_GUIDE.md](../TESTING_GUIDE.md) in the project root for current development documentation.
+> **Note**: See [CONTRIBUTING.md](../CONTRIBUTING.md) in the project root for current development documentation. For testing, refer to the [tests/README.md](../tests/README.md).
 
 ## 🔍 Quick Navigation
 
