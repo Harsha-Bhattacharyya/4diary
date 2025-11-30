@@ -170,9 +170,12 @@ function extractTitleFromMarkdown(content: string, filename: string): string {
   }
   
   // Try to extract from YAML frontmatter
-  const yamlMatch = content.match(/^---\s*\ntitle:\s*["']?(.+?)["']?\s*\n/);
-  if (yamlMatch) {
-    return yamlMatch[1].trim();
+  const frontmatterMatch = content.match(/^---\s*\n([\s\S]*?)\n---/);
+  if (frontmatterMatch) {
+    const titleMatch = frontmatterMatch[1].match(/^title:\s*["']?(.+?)["']?\s*$/m);
+    if (titleMatch) {
+      return titleMatch[1].trim();
+    }
   }
   
   // Use filename without extension
