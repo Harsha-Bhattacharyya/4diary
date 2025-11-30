@@ -1420,6 +1420,7 @@ function WorkspaceContent() {
               </button>
               
               <button
+                type="button"
                 onClick={() => setShowImportNotes(true)}
                 className="flex flex-col items-center justify-center p-4 rounded-lg bg-leather-900/30 hover:bg-leather-900/50 transition-all border border-leather-700/30 hover:border-leather-600"
               >
