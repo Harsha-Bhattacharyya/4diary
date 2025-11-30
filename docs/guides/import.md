@@ -189,16 +189,16 @@ This is the content of my note with **bold** and *italic* text.
 
 Apple Notes doesn't have a built-in export feature. Use one of these methods:
 
-**Method 1: Copy as PDF/Text**
+#### Method 1: Copy as PDF/Text
 1. Open a note
 2. Click File → Export as PDF (or copy text)
 3. Convert PDF to text or HTML
 
-**Method 2: Third-party Tools**
+#### Method 2: Third-party Tools
 - Use [Exporter for Notes](https://apps.apple.com/us/app/exporter/id1099120373) (Mac App Store)
 - Export to HTML or Markdown format
 
-**Method 3: iCloud Web**
+#### Method 3: iCloud Web
 1. Go to icloud.com/notes
 2. Select notes and copy content
 3. Paste into text files
