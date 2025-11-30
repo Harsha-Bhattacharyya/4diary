@@ -20,6 +20,7 @@ Detailed guides for using 4Diary's features effectively.
 - [Quick Note](guides/quick-note.md) - Lightning-fast note capture with Ctrl+Q
 - [Reader Mode](guides/reader-mode.md) - Distraction-free reading experience
 - [Sharing & Collaboration](guides/sharing.md) - Share documents securely
+- [Import Notes](guides/import.md) - Import from Google Keep, Evernote, Notion & more
 - [Export & Backup](guides/export-backup.md) - Export your data in multiple formats
 - [Security & Privacy](guides/security-privacy.md) - Understand your data protection
 - [Keyboard Shortcuts](guides/shortcuts.md) - Work faster with hotkeys
