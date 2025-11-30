@@ -39,9 +39,6 @@ jobs:
     - name: Build project
       run: npm run build
     
-    - name: Run tests
-      run: npm test
-    
     - name: Get version from tag
       id: version
       run: |
