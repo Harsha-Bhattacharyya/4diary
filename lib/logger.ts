@@ -307,8 +307,8 @@ function getConfigFromEnv(): LoggerConfig {
     enableConsole: process.env.LOG_CONSOLE !== 'false',
     enableFile: process.env.LOG_FILE === 'true',
     logDir: process.env.LOG_DIR || './logs',
-    maxFileSize: parseInt(process.env.LOG_MAX_SIZE || '10485760', 10), // 10MB default
-    maxFiles: parseInt(process.env.LOG_MAX_FILES || '5', 10),
+    maxFileSize: parseInt(process.env.LOG_MAX_SIZE || '10485760', 10) || 10485760,
+    maxFiles: parseInt(process.env.LOG_MAX_FILES || '5', 10) || 5,
     enableStructuredLogs: process.env.LOG_STRUCTURED === 'true',
     sanitizePII: process.env.LOG_SANITIZE_PII !== 'false',
     redactPatterns: DEFAULT_PII_PATTERNS,
