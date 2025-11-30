@@ -18,17 +18,17 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Import Library - Format Detection', () => {
   test('should detect markdown format from .md file', () => {
-    const mockFile = new File(['# Test'], 'test.md', { type: 'text/markdown' });
+    const _mockFile = new File(['# Test'], 'test.md', { type: 'text/markdown' });
     // Note: detectImportFormat is not exported, testing through importMarkdownFiles
   });
 
   test('should detect markdown format from .markdown file', () => {
-    const mockFile = new File(['# Test'], 'test.markdown', { type: 'text/markdown' });
+    const _mockFile = new File(['# Test'], 'test.markdown', { type: 'text/markdown' });
     // Testing through importMarkdownFiles
   });
 
   test('should detect evernote format from .enex file', () => {
-    const mockFile = new File(['<en-export></en-export>'], 'test.enex', { type: 'application/xml' });
+    const _mockFile = new File(['<en-export></en-export>'], 'test.enex', { type: 'application/xml' });
     // Testing through file extension
   });
 });
@@ -36,10 +36,10 @@ test.describe('Import Library - Format Detection', () => {
 test.describe('Import Library - Markdown Import', () => {
   test('should import simple markdown file with H1 title', async () => {
     const content = '# My Test Note\n\nThis is the content.';
-    const mockFile = new File([content], 'test.md', { type: 'text/markdown' });
+    const _mockFile = new File([content], 'test.md', { type: 'text/markdown' });
     
     // We'll test this through the browser context since File API is needed
-    const result = await test.step('Import markdown', async () => {
+    const _result = await test.step('Import markdown', async () => {
       // This would be tested in integration, but we document expected behavior
       expect(content).toContain('# My Test Note');
     });
@@ -47,7 +47,7 @@ test.describe('Import Library - Markdown Import', () => {
 
   test('should import markdown with YAML frontmatter title', async () => {
     const content = '---\ntitle: Frontmatter Title\ntags: [test, demo]\n---\n\n# Content\n\nBody text.';
-    const mockFile = new File([content], 'test.md', { type: 'text/markdown' });
+    const _mockFile = new File([content], 'test.md', { type: 'text/markdown' });
     
     expect(content).toContain('title: Frontmatter Title');
     expect(content).toContain('tags: [test, demo]');
@@ -65,7 +65,7 @@ test.describe('Import Library - Markdown Import', () => {
   });
 
   test('should use filename as title when no H1 or frontmatter', async () => {
-    const content = 'Just some content without a heading';
+    const _content = 'Just some content without a heading';
     const filename = 'my-note-title.md';
     
     expect(filename.replace('.md', '')).toBe('my-note-title');
@@ -73,7 +73,7 @@ test.describe('Import Library - Markdown Import', () => {
 
   test('should handle empty markdown file', async () => {
     const content = '';
-    const mockFile = new File([content], 'empty.md', { type: 'text/markdown' });
+    const _mockFile = new File([content], 'empty.md', { type: 'text/markdown' });
     
     expect(content).toBe('');
   });
@@ -211,7 +211,7 @@ test.describe('Import Library - Evernote Import', () => {
     
     expect(match).toBeTruthy();
     if (match) {
-      const [, year, month, day, hour, minute, second] = match;
+      const [, year, month, day, _hour, _minute, _second] = match;
       expect(year).toBe('2023');
       expect(month).toBe('05');
       expect(day).toBe('15');
@@ -305,7 +305,7 @@ Content here...`;
 
   test('should clean Notion UUIDs from folder paths', async () => {
     const folder = 'Projects abc123/Subfolder def456';
-    const cleaned = folder.replace(/\s+[a-f0-9]{32}$/gi, '');
+    const _cleaned = folder.replace(/\s+[a-f0-9]{32}$/gi, '');
     
     // Note: The regex needs to be applied per path segment
     expect(folder).toContain('Projects');
