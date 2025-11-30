@@ -289,7 +289,7 @@ let fileWriter: LogFileWriter | null = null;
  * Get or create file writer instance
  */
 function getFileWriter(config: LoggerConfig): LogFileWriter {
-  if (!fileWriter) {
+  if (!fileWriter || fileWriter.logDir !== config.logDir) {
     fileWriter = new LogFileWriter(config.logDir, config.maxFileSize, config.maxFiles);
   }
   return fileWriter;
