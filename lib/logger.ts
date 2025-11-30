@@ -108,15 +108,22 @@ const DEFAULT_ALLOWED_FIELDS = [
  * File writer for log files with rotation support
  */
 class LogFileWriter {
-  private logDir: string;
+  private _logDir: string;
   private maxFileSize: number;
   private maxFiles: number;
   private initialized: boolean = false;
 
   constructor(logDir: string, maxFileSize: number, maxFiles: number) {
-    this.logDir = logDir;
+    this._logDir = logDir;
     this.maxFileSize = maxFileSize;
     this.maxFiles = maxFiles;
+  }
+
+  /**
+   * Get the log directory path
+   */
+  get logDir(): string {
+    return this._logDir;
   }
 
   /**
