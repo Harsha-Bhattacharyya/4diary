@@ -22,7 +22,7 @@
     "@caldwell619/react-kanban": "^0.0.12",
     "@hello-pangea/dnd": "^18.0.1",
     "@sentry/nextjs": "^10.27.0",
-    "@tiptap/extensions": "^3.11.1",
+    "@tiptap/extensions": "^3.13.0",
     "@vercel/analytics": "^1.6.1",
     "@vercel/functions": "^3.3.4",
     "@vercel/speed-insights": "^1.2.0",
