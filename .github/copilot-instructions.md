@@ -6,14 +6,21 @@
 
 ### Core Technology Stack
 
-- **Framework**: Next.js 16 (App Router)
+- **Framework**: Next.js 16.0.10 (App Router)
 - **Language**: TypeScript 5.9.3
+- **Runtime**: Node.js 20+ (25-alpine in Docker)
+- **UI Library**: React 19.2.1
 - **Styling**: Tailwind CSS v4
-- **Database**: MongoDB
-- **Cache/Session Storage**: Redis (optional)
-- **Editor**: BlockNote
-- **Testing**: Playwright
+- **Database**: MongoDB 7.0.0
+- **Cache/Session Storage**: Redis (ioredis 5.8.2, optional)
+- **Editor**: BlockNote 0.42.3
+- **Testing**: Playwright 1.57.0
 - **Encryption**: Web Crypto API (AES-256-GCM)
+- **Animation**: Framer Motion 12.23.24
+- **Monitoring**: Sentry 10.27.0, Vercel Analytics 1.6.1, Vercel Speed Insights 1.2.0
+- **Drag & Drop**: @hello-pangea/dnd 18.0.1
+- **Kanban**: @caldwell619/react-kanban 0.0.12
+- **PWA**: Custom service worker with offline support
 
 ## Architecture Principles
 
@@ -31,21 +38,60 @@
 ```
 ├── app/                    # Next.js App Router pages & API routes
 │   ├── api/               # API endpoints (Next.js Route Handlers)
+│   │   ├── auth/         # Authentication routes (login, signup, logout, session)
+│   │   ├── documents/    # Document CRUD operations
+│   │   ├── workspaces/   # Workspace management
+│   │   ├── shares/       # Share token management
+│   │   ├── templates/    # Template operations
+│   │   ├── backlinks/    # Backlink indexing and retrieval
+│   │   ├── embed/        # URL embed preview generation
+│   │   ├── analytics/    # Privacy-respecting analytics events
+│   │   └── docs/         # Document content and metadata
 │   ├── workspace/         # Workspace pages and layouts
 │   ├── auth/              # Authentication pages
-│   └── share/             # Public share pages
+│   ├── share/             # Public share pages
+│   ├── settings/          # Settings page
+│   ├── templates/         # Templates page
+│   ├── docs/              # Documentation pages
+│   └── about/             # About page
 ├── components/            # React components
 │   ├── editor/           # Editor-related components
 │   ├── ui/               # Reusable UI components
 │   └── kanban/           # Kanban board components
 ├── lib/                   # Utility libraries and services
 │   ├── crypto/           # Encryption/decryption utilities
+│   ├── vim/              # Vim mode implementation
 │   ├── mongodb.ts        # MongoDB connection
-│   └── redis.ts          # Redis connection
+│   ├── redis.ts          # Redis connection
+│   ├── crypto-utils.ts   # Crypto helper functions
+│   ├── documentService.ts # Document operations
+│   ├── workspaceService.ts # Workspace operations
+│   ├── backlinkService.ts # Backlink indexing
+│   ├── versionService.ts  # Version history management
+│   ├── templateService.ts # Template operations
+│   ├── exportService.ts   # Export functionality
+│   ├── import.ts          # Import from various formats
+│   ├── export.ts          # Export utilities
+│   ├── pwaService.ts      # PWA and service worker
+│   ├── summarizer.ts      # Content summarization
+│   ├── logger.ts          # Structured logging
+│   ├── analytics.ts       # Analytics tracking
+│   └── inMemoryStorage.ts # In-memory caching
+├── docs/                  # Documentation
+│   ├── getting-started/  # Setup guides
+│   ├── guides/           # Feature guides (import, etc.)
+│   ├── advanced/         # Advanced topics
+│   └── architecture/     # Architecture documentation
 ├── tests/                 # Test files
 │   ├── e2e/              # End-to-end tests
 │   └── unit/             # Unit tests
-└── public/               # Static assets
+├── public/                # Static assets
+│   ├── manifest.json     # PWA manifest
+│   └── sw.js             # Service worker
+├── instrumentation.ts     # Sentry instrumentation
+├── instrumentation-client.ts # Client-side instrumentation
+├── sentry.server.config.ts # Sentry server config
+└── sentry.edge.config.ts  # Sentry edge config
 ```
 
 ## Coding Standards
@@ -57,6 +103,7 @@
   - When writing new code, follow strict typing practices even though strict mode is off
 - **Target**: ES2020
 - **Module Resolution**: bundler
+- **JSX**: react-jsx (automatic JSX runtime)
 - **Path Aliases**: Use `@/*` for root-level imports
 - **Type Annotations**: Always prefer explicit types for function parameters and return values
 - **Interfaces**: Use interfaces for component props and data structures
@@ -121,8 +168,21 @@ export default function MyComponent({
 - **HTTP Methods**: Export functions named after HTTP methods (GET, POST, PUT, DELETE)
 - **Response Format**: Return NextResponse with proper status codes
 - **Error Handling**: Always wrap in try-catch with proper error responses
-- **Authentication**: Check session for protected routes
+- **Authentication**: Check session for protected routes using jose library
 - **Rate Limiting**: Implement where appropriate (especially for shares)
+- **Available Routes**:
+  - `/api/auth/*` - Authentication (login, signup, logout, session)
+  - `/api/documents` - Document CRUD operations
+  - `/api/documents/[id]` - Single document operations
+  - `/api/workspaces` - Workspace management
+  - `/api/shares` - Share token creation and management
+  - `/api/share` - Public share access
+  - `/api/templates` - Template operations
+  - `/api/backlinks` - Backlink indexing and retrieval
+  - `/api/embed` - URL embed preview generation
+  - `/api/analytics` - Privacy-respecting analytics events
+  - `/api/docs` - Document metadata operations
+  - `/api/docs/content` - Document content operations
 
 Example API route:
 ```typescript
@@ -141,6 +201,36 @@ export async function GET(request: NextRequest) {
   }
 }
 ```
+
+## Service Layer Architecture
+
+### Core Services
+
+The application uses a service layer pattern to separate business logic from API routes:
+
+- **documentService.ts**: Document CRUD operations, encryption/decryption coordination
+- **workspaceService.ts**: Workspace management, user workspace operations
+- **backlinkService.ts**: Backlink indexing, bidirectional link tracking, wiki-link parsing
+- **versionService.ts**: Version history management, version storage and retrieval
+- **templateService.ts**: Template operations, pre-built document templates
+- **exportService.ts**: Export coordination, workspace export as ZIP
+- **pwaService.ts**: PWA functionality, service worker registration, offline sync
+- **import.ts**: Multi-format import (Markdown, Google Keep, Evernote, Notion, etc.)
+- **export.ts**: Export utilities, format conversion, decryption for export
+- **crypto-utils.ts**: Encryption helper functions, key generation, IV handling
+- **summarizer.ts**: Content summarization using node-summarizer
+- **logger.ts**: Structured logging, request tracking, error logging
+- **analytics.ts**: Privacy-respecting analytics, event tracking
+- **inMemoryStorage.ts**: In-memory caching layer for hot data
+
+### Service Patterns
+
+- **Separation of Concerns**: Services handle business logic, routes handle HTTP
+- **Reusability**: Services can be called from multiple routes or other services
+- **Error Handling**: Services throw errors, routes catch and format responses
+- **Type Safety**: All services use TypeScript interfaces for parameters and returns
+- **Async/Await**: All service methods are async for consistency
+- **Transaction Support**: MongoDB transactions where needed for data consistency
 
 ## Security Guidelines
 
@@ -163,10 +253,13 @@ export async function GET(request: NextRequest) {
 
 ### Authentication
 
-- **Session Cookies**: Use HTTP-only, secure cookies
+- **Session Management**: JWT tokens using jose library
+- **Session Cookies**: HTTP-only, secure cookies
 - **Session Validation**: Always validate session on protected routes
+- **Password Hashing**: bcrypt 6.0.0 for password storage
 - **Logout**: Clear session and redirect to /auth
 - **Never** expose passwords or encryption keys in responses
+- **PBKDF2**: Key derivation with 100,000 iterations for key strengthening
 
 ### Dependencies
 
@@ -175,12 +268,18 @@ export async function GET(request: NextRequest) {
   - Review dependency security advisories
   - Prefer well-maintained, popular packages
 - **Keep dependencies updated** with Dependabot
+- **Key Security Libraries**:
+  - `bcrypt` - Password hashing
+  - `jose` - JWT tokens
+  - `sanitize-html` - HTML sanitization for embed previews
+  - `@sentry/nextjs` - Error tracking and security monitoring
+  - Native Web Crypto API - Client-side encryption
 
 ## Testing Requirements
 
 ### Testing Stack
 
-- **Framework**: Playwright (v1.56.1)
+- **Framework**: Playwright (v1.57.0)
 - **Test Types**: Unit tests and E2E tests
 - **Test Location**: `tests/unit/` and `tests/e2e/`
 - **Commands**:
@@ -188,7 +287,9 @@ export async function GET(request: NextRequest) {
   - `npm run test:unit` - Run unit tests only
   - `npm run test:e2e` - Run E2E tests only
   - `npm run test:ui` - Run with Playwright UI
+  - `npm run test:headed` - Run with visible browser
   - `npm run test:debug` - Run in debug mode
+  - `npm run test:report` - Show test report
 
 ### Testing Best Practices
 
@@ -271,10 +372,11 @@ test.describe("Component Name", () => {
 
 ### Kanban Components
 
-- **Board**: Drag-and-drop task board
+- **Board**: Drag-and-drop task board using @caldwell619/react-kanban
   - Fully encrypted board data
   - Column-based organization
   - Card state management
+  - Drag and drop powered by @hello-pangea/dnd
 
 ## Database Patterns
 
@@ -285,6 +387,8 @@ test.describe("Component Name", () => {
   - Types: `doc` (document), `board` (kanban), `quick` (quick note)
   - Metadata stored unencrypted for search: title, tags, folder
   - Content stored encrypted as base64 string
+  - Supports version history (last 50 versions per document)
+  - Backlinks tracked for bidirectional linking
 - **templates**: Document templates
 - **analytics_events**: Privacy-respecting usage analytics
 
@@ -318,6 +422,43 @@ Use Tailwind's default breakpoints:
 - Mobile: Overlay with backdrop blur
 - Desktop: Always visible, can collapse to icon-only mode
 
+## Monitoring & Observability
+
+### Sentry Integration
+
+- **Error Tracking**: Automatic error capture and reporting
+- **Performance Monitoring**: Track slow transactions and operations
+- **Configuration Files**:
+  - `sentry.server.config.ts` - Server-side config
+  - `sentry.edge.config.ts` - Edge runtime config
+  - `instrumentation.ts` - Runtime-specific loading
+  - `instrumentation-client.ts` - Client-side instrumentation
+- **Tunnel Route**: `/monitoring` to bypass ad-blockers
+- **Source Maps**: Uploaded in CI for readable stack traces
+- **Logger Disabled**: Tree-shaken in production builds
+- **Vercel Cron Monitors**: Automatic instrumentation enabled
+
+### Vercel Analytics
+
+- **Web Analytics**: Track page views and user behavior
+- **Speed Insights**: Real user monitoring (RUM) for performance
+- **Privacy-Respecting**: GDPR compliant, no personal data collection
+- **Packages**: `@vercel/analytics` and `@vercel/speed-insights`
+
+### Custom Logging
+
+- **Structured Logging**: Implemented in `lib/logger.ts`
+- **Log Levels**: Debug, info, warn, error
+- **Context Tracking**: Request IDs, user IDs, timestamps
+- **Privacy-Safe**: Never log sensitive data or encryption keys
+
+### Custom Analytics
+
+- **Privacy-First**: Implemented in `lib/analytics.ts`
+- **Anonymous Events**: No PII tracking
+- **Usage Patterns**: Feature usage, error rates
+- **MongoDB Storage**: `analytics_events` collection
+
 ## Performance
 
 - **Auto-save**: Debounce changes, only save when content actually changes
@@ -325,6 +466,9 @@ Use Tailwind's default breakpoints:
 - **Code Splitting**: Leverage Next.js automatic code splitting
 - **Image Optimization**: Use Next.js Image component
 - **Caching**: Utilize Redis for frequently accessed data
+- **In-Memory Cache**: `lib/inMemoryStorage.ts` for hot data
+- **Service Worker**: Offline caching and background sync
+- **Standalone Output**: Optimized Docker builds with Next.js standalone mode
 
 ## Accessibility
 
@@ -349,12 +493,50 @@ Example: `feat: add ephemeral share links with TTL`
 
 ## Development Workflow
 
+### Prerequisites
+
+- **Node.js**: 20+ (25-alpine recommended for Docker)
+- **MongoDB**: 7.0.0+ (local or MongoDB Atlas)
+- **Redis**: Optional but recommended for share tokens
+- **npm**: Package manager
+
+### Setup Steps
+
 1. **Install dependencies**: `npm install`
 2. **Setup environment**: Copy `.env.example` to `.env.local`
+   - Required: `MONGODB_URI`
+   - Optional: `REDIS_URL`, `NEXT_PUBLIC_BASE_URL`
+   - Sentry: `SENTRY_DSN`, `SENTRY_ORG`, `SENTRY_PROJECT`
 3. **Start dev server**: `npm run dev`
-4. **Run linter**: `npm run lint`
-5. **Run tests**: `npm test`
+4. **Run linter**: `npm run lint` (ESLint 9 with Next.js config)
+5. **Run tests**: `npm test` (Playwright)
 6. **Build for production**: `npm run build`
+7. **Start production**: `npm start`
+
+### Docker Workflow
+
+1. **Build image**: `docker build -t 4diary .`
+2. **Run with compose**: `docker-compose up -d`
+3. **With debug UI**: `docker-compose --profile debug up -d`
+4. **Stop services**: `docker-compose down`
+
+## Next.js Configuration
+
+### next.config.ts
+
+- **Output Mode**: `standalone` for optimized Docker builds
+- **Server Actions**: Body size limit set to 5MB for file uploads
+- **Sentry Integration**: Wrapped with `withSentryConfig`
+- **Source Maps**: Uploaded to Sentry in CI
+- **Tunnel Route**: `/monitoring` for Sentry to bypass ad-blockers
+- **Automatic Instrumentation**: Vercel Cron Monitors enabled
+
+### Instrumentation
+
+- **Server Runtime**: `instrumentation.ts` loads runtime-specific Sentry config
+- **Client Runtime**: `instrumentation-client.ts` for browser-side monitoring
+- **Dynamic Loading**: Runtime detection (nodejs vs edge) for proper config
+- **Error Boundaries**: Automatic error capture and reporting
 
 ## Common Pitfalls to Avoid
 
@@ -368,6 +550,10 @@ Example: `feat: add ephemeral share links with TTL`
 8. **Don't** add dependencies without security checks
 9. **Don't** remove or modify tests without good reason
 10. **Don't** use force push - history rewriting not allowed
+11. **Don't** log sensitive data (passwords, encryption keys, tokens)
+12. **Don't** expose MongoDB/Redis credentials in error messages
+13. **Don't** skip input validation on API routes
+14. **Don't** forget copyright headers (BSD-3-Clause) on new files
 
 ## Feature-Specific Guidelines
 
@@ -377,6 +563,7 @@ Example: `feat: add ephemeral share links with TTL`
 - Local storage until saved to workspace
 - Auto-save locally before sync
 - Clear after successful save
+- Accessible from any page
 
 ### Quick Read (Reader Mode)
 
@@ -385,6 +572,43 @@ Example: `feat: add ephemeral share links with TTL`
 - Exit with ESC or close button
 - Maintains document scroll position
 
+### Vim Mode
+
+- Keyboard shortcut: Ctrl+Shift+V to toggle
+- Full Vim keybindings support in editor
+- Four modes: NORMAL, INSERT, REPLACE, COMMAND
+- Navigation with hjkl keys
+- Commands: `:wq`, `:q`, `:x` to exit
+- Implemented in `lib/vim/` directory
+- Hooks: `useVimMode` for React integration
+- Visual feedback for current mode
+
+### Backlinks (Bidirectional Linking)
+
+- Wiki-style syntax: `[[Document Title]]`
+- Automatic link detection and indexing
+- Backlinks sidebar shows documents linking to current page
+- Real-time updates via `backlinkService.ts`
+- Encrypted content remains secure
+- Navigate between linked documents
+
+### Version History
+
+- Automatic versioning on document save
+- Keeps last 50 versions per document
+- View and restore previous versions
+- Managed by `versionService.ts`
+- Version metadata includes timestamp and content hash
+- Client-side decryption of historical versions
+
+### Calendar View
+
+- Organize documents by date
+- Monthly calendar navigation
+- Visual indicators for days with documents
+- Toggle between list and calendar views
+- Date-based filtering and organization
+
 ### Share Links
 
 - Ephemeral with automatic expiry
@@ -392,6 +616,23 @@ Example: `feat: add ephemeral share links with TTL`
 - Revocable anytime
 - Content remains encrypted end-to-end
 - Rate limiting: 10 shares per 15 minutes
+- Default TTL: 24 hours
+- Stored in Redis with automatic cleanup
+
+### Import Feature
+
+- Support for multiple formats:
+  - Markdown (.md files)
+  - Google Keep (Takeout export)
+  - Evernote (.enex files)
+  - Notion (exported workspace)
+  - Standard Notes (backup files)
+  - Apple Notes (HTML/text export)
+- Auto-detection of format
+- Batch import support
+- Preview before import
+- Implemented in `lib/import.ts`
+- Content encrypted on import
 
 ### Export Feature
 
@@ -399,24 +640,106 @@ Example: `feat: add ephemeral share links with TTL`
 - ZIP file for full workspace
 - Maintains folder structure
 - Decrypts content during export (client-side)
+- Implemented in `lib/export.ts` and `lib/exportService.ts`
+- Includes metadata preservation
+
+### PWA (Progressive Web App)
+
+- Installable on desktop and mobile
+- Offline support with service worker
+- Automatic sync when back online
+- Manifest in `public/manifest.json`
+- Service worker in `public/sw.js`
+- Managed by `lib/pwaService.ts`
+- Custom icons and splash screens
+
+### Embed Previews
+
+- Rich URL previews for links
+- Sanitized metadata extraction
+- Image, title, and description display
+- Handled by `/api/embed` route
+- Uses `sanitize-html` for XSS protection
+- Cached for performance
+
+### Emoji Icons
+
+- Visual document identification
+- Emoji picker integration (`emoji-picker-react`)
+- Per-document custom icons
+- Searchable and filterable
 
 ## Documentation Standards
 
 - **README.md**: Keep updated with features and setup
 - **CONTRIBUTING.md**: Guidelines for contributors
 - **SECURITY.md**: Security policy and vulnerability reporting
-- **TESTING_GUIDE.md**: Comprehensive testing documentation
+- **RELEASE.md**: Release notes and changelog
+- **docs/**: Comprehensive documentation directory
+  - `getting-started/`: Setup and installation guides
+  - `guides/`: Feature-specific guides (import, etc.)
+  - `advanced/`: Advanced topics and customization
+  - `architecture/`: System architecture documentation
+  - `VIM_MODE.md`: Complete Vim mode documentation
 - **Code Comments**: JSDoc for complex functions
 - **Inline Comments**: Only when logic is non-obvious
+- **Copyright Headers**: BSD-3-Clause license headers on all source files
 
 ## Resources
 
 - [Next.js Documentation](https://nextjs.org/docs)
+- [React 19 Documentation](https://react.dev/)
 - [Tailwind CSS v4](https://tailwindcss.com/docs)
 - [Web Crypto API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API)
 - [Playwright Testing](https://playwright.dev/)
 - [MongoDB Node Driver](https://www.mongodb.com/docs/drivers/node/)
 - [BlockNote Editor](https://www.blocknotejs.org/)
+- [Framer Motion](https://www.framer.com/motion/)
+- [Sentry Documentation](https://docs.sentry.io/platforms/javascript/guides/nextjs/)
+- [Vercel Analytics](https://vercel.com/docs/analytics)
+- [@hello-pangea/dnd](https://github.com/hello-pangea/dnd)
+- [ioredis](https://github.com/redis/ioredis)
+
+## Additional Libraries & Tools
+
+### Utility Libraries
+
+- **jszip**: Create ZIP archives for workspace export
+- **uuid**: Generate unique identifiers for documents and shares
+- **sanitize-html**: Sanitize HTML content for embed previews
+- **fast-xml-parser**: Parse XML for Evernote imports
+- **node-summarizer**: Content summarization for quick previews
+- **react-markdown**: Render Markdown content
+- **rehype-highlight**: Syntax highlighting for code blocks
+- **rehype-raw**: Raw HTML support in Markdown
+- **remark-gfm**: GitHub Flavored Markdown support
+- **react-hotkeys-hook**: Keyboard shortcut management
+- **emoji-picker-react**: Emoji selection interface
+
+### TypeScript Types
+
+- `@types/bcrypt`: Type definitions for bcrypt
+- `@types/node`: Node.js type definitions
+- `@types/react`: React type definitions
+- `@types/react-dom`: React DOM type definitions
+- `@types/sanitize-html`: sanitize-html type definitions
+- `@types/uuid`: uuid type definitions
+
+### Build & Development Tools
+
+- **eslint**: Linting (ESLint 9)
+- **eslint-config-next**: Next.js ESLint configuration
+- **tailwindcss**: CSS framework (v4)
+- **@tailwindcss/postcss**: PostCSS plugin for Tailwind
+- **postcss**: CSS processing
+- **TypeScript**: Type checking (5.9.3)
+
+### Deployment Tools
+
+- **Docker**: Containerization with multi-stage builds
+- **docker-compose**: Multi-service orchestration
+- **Vercel**: Deployment platform (optional)
+- **Node.js 25-alpine**: Lightweight production runtime
 
 ## Support & Contribution
 
@@ -424,6 +747,8 @@ Example: `feat: add ephemeral share links with TTL`
 - Security vulnerabilities: Follow SECURITY.md process
 - Pull requests: Follow CONTRIBUTING.md guidelines
 - Questions: Use GitHub Discussions
+- Code of Conduct: See CODE_OF_CONDUCT.md
+- License: BSD-3-Clause (see LICENSE file)
 
 ---
 
