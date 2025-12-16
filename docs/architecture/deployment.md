@@ -70,7 +70,7 @@ SENTRY_DSN=https://...@sentry.io/...
 **Via Vercel CLI**:
 ```bash
 # Install Vercel CLI
-npm install -g vercel
+pnpm install -g vercel
 
 # Login
 vercel login
@@ -139,15 +139,15 @@ FROM node:20-alpine AS base
 FROM base AS deps
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci --only=production
+RUN pnpm install --frozen-lockfile --only=production
 
 # Build application
 FROM base AS builder
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci
+RUN pnpm install --frozen-lockfile
 COPY . .
-RUN npm run build
+RUN pnpm run build
 
 # Production image
 FROM base AS runner
@@ -419,7 +419,7 @@ sudo systemctl start nginx
 sudo systemctl enable nginx
 
 # Install PM2
-sudo npm install -g pm2
+sudo pnpm install -g pm2
 ```
 
 #### Step 2: Deploy Application
@@ -431,10 +431,10 @@ git clone https://github.com/Harsha-Bhattacharyya/4diary.git
 cd 4diary
 
 # Install dependencies
-npm ci --only=production
+pnpm install --frozen-lockfile --only=production
 
 # Build application
-npm run build
+pnpm run build
 
 # Configure environment
 cp .env.example .env.production
@@ -442,7 +442,7 @@ nano .env.production
 # Edit with your values
 
 # Start with PM2
-pm2 start npm --name "4diary" -- start
+pm2 start pnpm --name "4diary" -- start
 pm2 save
 pm2 startup
 ```
@@ -601,8 +601,8 @@ curl -I https://your-domain.com
 sudo apt-get update && sudo apt-get upgrade -y
 
 # Node.js updates
-npm outdated
-npm update
+pnpm outdated
+pnpm update
 
 # PM2 updates
 pm2 update
@@ -750,7 +750,7 @@ sudo netstat -tulpn | grep :3000
 pm2 monit
 
 # Increase memory limit
-pm2 start npm --name "4diary" --max-memory-restart 1G -- start
+pm2 start pnpm --name "4diary" --max-memory-restart 1G -- start
 
 # Or in Docker
 services:
@@ -791,7 +791,7 @@ docker-compose -f docker-compose.prod.yml up -d --no-deps --build app
 
 ```bash
 # Run migrations before deployment
-npm run migrate
+pnpm run migrate
 
 # Or use migration tools
 npx prisma migrate deploy

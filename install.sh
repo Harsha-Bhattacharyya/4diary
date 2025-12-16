@@ -719,7 +719,7 @@ install_dev() {
     print_step "Installing dependencies..."
     echo ""
     
-    if run_with_output "npm install"; then
+    if run_with_output "pnpm install"; then
         echo ""
         print_success "Dependencies installed successfully"
     else
@@ -736,11 +736,11 @@ install_dev() {
         echo ""
         print_info "Press Ctrl+C to stop the server"
         echo ""
-        npm run dev
+        pnpm run dev
     else
         echo ""
         print_info "To start the development server later, run:"
-        echo -e "  ${CYAN}cd $INSTALL_DIR && npm run dev${NC}"
+        echo -e "  ${CYAN}cd $INSTALL_DIR && pnpm run dev${NC}"
     fi
 }
 
@@ -778,11 +778,11 @@ print_summary() {
         echo -e "  ${DIM}Logs:${NC}    ${CYAN}docker compose logs -f app${NC}"
         echo -e "  ${DIM}Rebuild:${NC} ${CYAN}docker compose up -d --build${NC}"
     else
-        echo -e "  ${DIM}Dev:${NC}     ${CYAN}npm run dev${NC}"
-        echo -e "  ${DIM}Build:${NC}   ${CYAN}npm run build${NC}"
-        echo -e "  ${DIM}Start:${NC}   ${CYAN}npm run start${NC}"
-        echo -e "  ${DIM}Lint:${NC}    ${CYAN}npm run lint${NC}"
-        echo -e "  ${DIM}Test:${NC}    ${CYAN}npm test${NC}"
+        echo -e "  ${DIM}Dev:${NC}     ${CYAN}pnpm run dev${NC}"
+        echo -e "  ${DIM}Build:${NC}   ${CYAN}pnpm run build${NC}"
+        echo -e "  ${DIM}Start:${NC}   ${CYAN}pnpm run start${NC}"
+        echo -e "  ${DIM}Lint:${NC}    ${CYAN}pnpm run lint${NC}"
+        echo -e "  ${DIM}Test:${NC}    ${CYAN}pnpm test${NC}"
     fi
     echo ""
     

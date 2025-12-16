@@ -7,7 +7,7 @@ This guide will walk you through setting up 4Diary on your local machine.
 Before you begin, ensure you have the following installed:
 
 - **Node.js** 20 or higher
-- **npm** or **yarn** package manager
+- **pnpm** package manager (recommended)
 - **MongoDB** (local installation or MongoDB Atlas)
 - **Git** for cloning the repository
 
@@ -23,7 +23,7 @@ cd 4diary
 ### 2. Install Dependencies
 
 ```bash
-npm install
+pnpm install
 ```
 
 ### 3. Configure Environment Variables
@@ -49,7 +49,7 @@ Or use MongoDB Atlas by updating the `MONGODB_URI` with your connection string.
 ### 5. Run the Development Server
 
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
@@ -73,8 +73,8 @@ This will start:
 To create a production build:
 
 ```bash
-npm run build
-npm start
+pnpm run build
+pnpm start
 ```
 
 ## Troubleshooting
@@ -92,7 +92,7 @@ If you encounter MongoDB connection errors:
 If port 3000 is already in use:
 
 ```bash
-PORT=3001 npm run dev
+PORT=3001 pnpm run dev
 ```
 
 ## Next Steps

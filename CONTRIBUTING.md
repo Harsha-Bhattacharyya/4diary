@@ -82,14 +82,14 @@ git clone https://github.com/your-username/4diary.git
 cd 4diary
 
 # Install dependencies
-npm install
+pnpm install
 
 # Copy environment file
 cp .env.local.example .env.local
 # Edit .env.local with your MongoDB URI
 
 # Start development server
-npm run dev
+pnpm run dev
 ```
 
 ## Styleguides
