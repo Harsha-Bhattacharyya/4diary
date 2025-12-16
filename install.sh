@@ -709,6 +709,7 @@ install_docker() {
     fi
 }
 
+# install_dev sets up a local development environment by generating a .env.local, installing dependencies with pnpm, and optionally starting the development server.
 install_dev() {
     print_section "${ICON_NODE} Setting Up Development Environment"
     
@@ -746,7 +747,8 @@ install_dev() {
 
 # ============================================================================
 # SUMMARY
-# ============================================================================
+# print_summary prints a final installation summary showing install directory, application URL, generated configuration files, quick-start commands, feature list, and documentation/support links.
+# It adapts displayed config files and commands based on INSTALL_MODE and marks the share-links feature as available when REDIS_URL is set.
 
 print_summary() {
     print_section "${ICON_SPARKLE} Installation Complete!"
