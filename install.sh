@@ -858,8 +858,8 @@ main() {
         print_warning "Node.js is installed but pnpm is missing"
         print_info "To enable local development, install pnpm:"
         echo -e "  ${CYAN}npm install -g pnpm${NC}"
-        echo -e "  ${DIM}or${NC}"
-        echo -e "  ${CYAN}corepack enable${NC}"
+        echo -e "  ${DIM}or use corepack (requires Node.js 16.10+):${NC}"
+        echo -e "  ${CYAN}corepack enable && corepack prepare pnpm@latest --activate${NC}"
         echo ""
     fi
     

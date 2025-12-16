@@ -51,7 +51,7 @@ export default withSentryConfig(nextConfig, {
 
   // Webpack-specific Sentry options
   webpack: {
-    // Enables automatic instrumentation of Vercel Cron Monitors. (Does not yet work with App Router route handlers.)
+    // Enables automatic instrumentation of Vercel Cron Monitors
     // See the following for more information:
     // https://docs.sentry.io/product/crons/
     // https://vercel.com/docs/cron-jobs
