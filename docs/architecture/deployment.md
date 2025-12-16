@@ -138,13 +138,13 @@ FROM node:20-alpine AS base
 # Install dependencies
 FROM base AS deps
 WORKDIR /app
-COPY package*.json ./
-RUN pnpm install --frozen-lockfile --only=production
+COPY package.json pnpm-lock.yaml* ./
+RUN pnpm install --frozen-lockfile --prod
 
 # Build application
 FROM base AS builder
 WORKDIR /app
-COPY package*.json ./
+COPY package.json pnpm-lock.yaml* ./
 RUN pnpm install --frozen-lockfile
 COPY . .
 RUN pnpm run build
@@ -793,8 +793,8 @@ docker-compose -f docker-compose.prod.yml up -d --no-deps --build app
 # Run migrations before deployment
 pnpm run migrate
 
-# Or use migration tools
-npx prisma migrate deploy
+# Or use migration tools with pnpm
+pnpm exec prisma migrate deploy
 ```
 
 ### Health Checks

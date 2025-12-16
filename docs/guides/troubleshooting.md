@@ -128,10 +128,10 @@ Solutions to common issues and problems in 4Diary.
 
 **Solutions**:
 
-1. **Clear npm Cache**
+1. **Clear pnpm Store**
    ```bash
-   pnpm store clean --force
-   rm -rf node_modules package-lock.json
+   pnpm store prune
+   rm -rf node_modules pnpm-lock.yaml
    pnpm install
    ```
 
