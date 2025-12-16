@@ -7,7 +7,7 @@ RUN corepack enable
 
 # Install dependencies only when needed
 FROM base AS deps
-RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache libc6-compat=1.2.5-r0
 WORKDIR /app
 
 # Copy package files
