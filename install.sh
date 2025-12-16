@@ -291,6 +291,19 @@ check_node() {
     fi
 }
 
+check_pnpm() {
+    print_substep "Checking for pnpm..."
+    if command -v pnpm &> /dev/null; then
+        local pnpm_version
+        pnpm_version=$(pnpm --version)
+        print_success "pnpm v$pnpm_version is installed"
+        return 0
+    else
+        print_warning "pnpm is not installed"
+        return 1
+    fi
+}
+
 check_docker() {
     print_substep "Checking for Docker..."
     if command -v docker &> /dev/null; then
@@ -823,6 +836,7 @@ main() {
     
     # Check optional dependencies
     HAS_NODE=$(check_node && echo "yes" || echo "no")
+    HAS_PNPM=$(check_pnpm && echo "yes" || echo "no")
     HAS_DOCKER=$(check_docker && echo "yes" || echo "no")
     HAS_COMPOSE=$(check_docker_compose && echo "yes" || echo "no")
     
@@ -837,9 +851,16 @@ main() {
         option_indices+=("docker")
     fi
     
-    if [[ "$HAS_NODE" == "yes" ]]; then
-        install_options+=("${ICON_NODE} Local Development (Node.js)")
+    if [[ "$HAS_NODE" == "yes" ]] && [[ "$HAS_PNPM" == "yes" ]]; then
+        install_options+=("${ICON_NODE} Local Development (Node.js + pnpm)")
         option_indices+=("dev")
+    elif [[ "$HAS_NODE" == "yes" ]] && [[ "$HAS_PNPM" == "no" ]]; then
+        print_warning "Node.js is installed but pnpm is missing"
+        print_info "To enable local development, install pnpm:"
+        echo -e "  ${CYAN}npm install -g pnpm${NC}"
+        echo -e "  ${DIM}or${NC}"
+        echo -e "  ${CYAN}corepack enable${NC}"
+        echo ""
     fi
     
     if [[ ${#install_options[@]} -eq 0 ]]; then
