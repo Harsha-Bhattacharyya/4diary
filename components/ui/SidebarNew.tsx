@@ -231,7 +231,7 @@ export default function SidebarNew({
             </div>
           </div>
           <div className="text-xs text-neutral-600 dark:text-neutral-400">
-            <span aria-label="Calendar">📅</span> {currentDate}
+            <span role="img" aria-label="Calendar">📅</span> {currentDate}
           </div>
         </div>
       )}
