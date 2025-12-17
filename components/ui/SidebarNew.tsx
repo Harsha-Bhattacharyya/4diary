@@ -160,8 +160,12 @@ export default function SidebarNew({
 
     if (draggedIndex === -1 || targetIndex === -1) return;
 
-    // Calculate new sort order - place before or after target
-    const newSortOrder = targetIndex * 1000;
+    // Calculate new sort order - place between target and its neighbor
+    const targetDoc = sortedDocs[targetIndex];
+    const prevDoc = sortedDocs[targetIndex - 1];
+    const targetOrder = targetDoc.sortOrder ?? targetIndex * 1000;
+    const prevOrder = prevDoc?.sortOrder ?? (targetIndex - 1) * 1000;
+    const newSortOrder = Math.floor((prevOrder + targetOrder) / 2);
     onReorder(draggedDoc, newSortOrder);
 
     setDraggedDoc(null);
