@@ -430,7 +430,7 @@ export default function NoteSettings({
                     type="button"
                     variant={editorFont === "serif" ? "default" : "outline"}
                     onClick={() => onFontChange?.("serif")}
-                    style={{ fontFamily: "Arial, Helvetica, sans-serif" }}
+                    style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
                   >
                     Serif
                   </Button>
