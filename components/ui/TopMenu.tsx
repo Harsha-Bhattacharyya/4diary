@@ -14,7 +14,23 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import LeatherButton from "./LeatherButton";
+import { Button } from "./button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./dropdown-menu";
+import { 
+  Menu, 
+  Home, 
+  BookOpen, 
+  FileText, 
+  BookMarked, 
+  Info,
+  LogOut 
+} from "lucide-react";
 
 interface TopMenuProps {
   currentPage?: string;
@@ -56,137 +72,105 @@ export default function TopMenu({ currentPage = "Home" }: TopMenuProps) {
   }, []);
 
   return (
-    <>
-      <div className="relative z-[9999]">
-        {/* Top Bar */}
-        <div className="flex justify-between items-center px-6 py-4">
-          <button
-            type="button"
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="text-leather-200 hover:text-leather-100 transition-colors p-2 flex items-center gap-2"
-            aria-label="Toggle menu"
-          >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+    <div className="relative z-[9999]">
+      {/* Top Bar */}
+      <div className="flex justify-between items-center px-6 py-4">
+        <div className="flex items-center gap-2">
+          <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className="text-leather-200 hover:text-leather-100 hover:bg-leather-900/30"
+              >
+                <Menu className="w-5 h-5 mr-2" />
+                <span className="font-semibold">{currentPage}</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent 
+              align="start"
+              className="w-56 bg-leather-500 border-leather-400 border-2"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
-            <span className="font-semibold">{currentPage}</span>
-          </button>
-          
-          {isAuthenticated ? (
-            <div className="flex items-center gap-3">
-              <span className="text-leather-200 text-sm">
-                {username || 'User'}
-              </span>
-              <button
-                type="button"
-                onClick={async () => {
-                  try {
-                    const response = await fetch("/api/auth/logout", { method: "POST" });
-                    
-                    if (!response.ok) {
-                      const data = await response.json().catch(() => ({}));
-                      throw new Error(data.error || "Logout failed");
-                    }
-                    
-                    // Only clear state and redirect on successful logout
-                    setIsAuthenticated(false);
-                    setUsername(null);
-                    router.push("/auth");
-                  } catch (err) {
-                    console.error("Logout error:", err);
-                    alert(err instanceof Error ? err.message : "Failed to logout. Please try again.");
-                  }
-                }}
-                className="text-leather-300 hover:text-leather-100 text-sm transition-colors"
-              >
-                Logout
-              </button>
-            </div>
-          ) : (
-            <Link href="/auth">
-              <LeatherButton variant="parchment" size="sm">
-                Log in
-              </LeatherButton>
-            </Link>
-          )}
+              <DropdownMenuItem asChild>
+                <Link href="/" className="flex items-center gap-2 text-leather-100 cursor-pointer">
+                  <Home className="w-4 h-4" />
+                  <span>Home</span>
+                </Link>
+              </DropdownMenuItem>
+              
+              <DropdownMenuItem asChild>
+                <Link href="/workspace" className="flex items-center gap-2 text-leather-100 cursor-pointer">
+                  <BookOpen className="w-4 h-4" />
+                  <span>Workspace</span>
+                </Link>
+              </DropdownMenuItem>
+              
+              <DropdownMenuItem asChild>
+                <Link href="/templates" className="flex items-center gap-2 text-leather-100 cursor-pointer">
+                  <FileText className="w-4 h-4" />
+                  <span>Templates</span>
+                </Link>
+              </DropdownMenuItem>
+              
+              <DropdownMenuSeparator className="bg-leather-600" />
+              
+              <DropdownMenuItem asChild>
+                <Link href="/docs" className="flex items-center gap-2 text-leather-100 cursor-pointer">
+                  <BookMarked className="w-4 h-4" />
+                  <span>Docs</span>
+                </Link>
+              </DropdownMenuItem>
+              
+              <DropdownMenuItem asChild>
+                <Link href="/about" className="flex items-center gap-2 text-leather-100 cursor-pointer">
+                  <Info className="w-4 h-4" />
+                  <span>About</span>
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
-
-        {/* Dropdown Menu */}
-        {menuOpen && (
-          <div className="absolute top-full left-4 mt-2 bg-leather-500 rounded-lg shadow-lg border-2 border-leather-400 py-2 min-w-[200px] z-[9999]">
-            <Link href="/">
-              <button
-                type="button"
-                className="w-full text-left px-4 py-2 hover:bg-leather-600 transition-colors text-leather-100"
-                onClick={() => setMenuOpen(false)}
-              >
-                🏠 Home
-              </button>
-            </Link>
-            <Link href="/workspace">
-              <button
-                type="button"
-                className="w-full text-left px-4 py-2 hover:bg-leather-600 transition-colors text-leather-100"
-                onClick={() => setMenuOpen(false)}
-              >
-                📚 Workspace
-              </button>
-            </Link>
-            <Link href="/templates">
-              <button
-                type="button"
-                className="w-full text-left px-4 py-2 hover:bg-leather-600 transition-colors text-leather-100"
-                onClick={() => setMenuOpen(false)}
-              >
-                📄 Templates
-              </button>
-            </Link>
-            <Link href="/docs">
-              <button
-                type="button"
-                className="w-full text-left px-4 py-2 hover:bg-leather-600 transition-colors text-leather-100"
-                onClick={() => setMenuOpen(false)}
-              >
-                📖 Docs
-              </button>
-            </Link>
-            <Link href="/about">
-              <button
-                type="button"
-                className="w-full text-left px-4 py-2 hover:bg-leather-600 transition-colors text-leather-100"
-                onClick={() => setMenuOpen(false)}
-              >
-                ℹ️ About
-              </button>
-            </Link>
+        
+        {isAuthenticated ? (
+          <div className="flex items-center gap-3">
+            <span className="text-leather-200 text-sm">
+              {username || 'User'}
+            </span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={async () => {
+                try {
+                  const response = await fetch("/api/auth/logout", { method: "POST" });
+                  
+                  if (!response.ok) {
+                    const data = await response.json().catch(() => ({}));
+                    throw new Error(data.error || "Logout failed");
+                  }
+                  
+                  // Only clear state and redirect on successful logout
+                  setIsAuthenticated(false);
+                  setUsername(null);
+                  router.push("/auth");
+                } catch (err) {
+                  console.error("Logout error:", err);
+                  alert(err instanceof Error ? err.message : "Failed to logout. Please try again.");
+                }
+              }}
+              className="text-leather-300 hover:text-leather-100 text-sm hover:bg-leather-900/30"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Logout
+            </Button>
           </div>
+        ) : (
+          <Link href="/auth">
+            <Button variant="outline" size="sm">
+              Log in
+            </Button>
+          </Link>
         )}
       </div>
-      
-      {/* Backdrop - outside the relative container */}
-      {menuOpen && (
-        <button
-          type="button"
-          aria-label="Close menu"
-          className="fixed inset-0 cursor-default"
-          onClick={() => setMenuOpen(false)}
-          onKeyDown={(event) => {
-            if (event.key === "Escape" || event.key === "Enter" || event.key === " ") {
-              setMenuOpen(false);
-            }
-          }}
-        ></button>
-      )}
-    </>
+    </div>
   );
 }
