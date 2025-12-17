@@ -309,6 +309,7 @@ export default function SidebarNew({
                   {docs.map((doc) => (
                     <div
                       key={doc.id}
+                      role="listitem"
                       draggable={!!onReorder}
                       onDragStart={(e) => handleDragStart(e, doc.id)}
                       onDragOver={(e) => handleDragOver(e, doc.id)}
