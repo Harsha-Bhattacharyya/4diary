@@ -14,7 +14,20 @@
  * Provides multi-language support with caching to reduce API calls
  */
 
-import { logger } from "./logger";
+// Simple console logger for client-side (avoiding server-only logger)
+const log = {
+  debug: (msg: string, data?: object) => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[Translation] ${msg}`, data || '');
+    }
+  },
+  info: (msg: string, data?: object) => {
+    console.log(`[Translation] ${msg}`, data || '');
+  },
+  error: (msg: string, data?: object) => {
+    console.error(`[Translation] ${msg}`, data || '');
+  },
+};
 
 // Supported languages (implementing first 3 as per requirement)
 export const SUPPORTED_LANGUAGES = {
@@ -111,7 +124,7 @@ export async function translateText(
   const cachedTranslation = translationCache.get(cacheKey);
   
   if (cachedTranslation) {
-    logger.debug("Translation cache hit", { sourceLang, targetLang });
+    log.debug("Translation cache hit", { sourceLang, targetLang });
     return {
       translatedText: cachedTranslation,
       sourceLang,
@@ -129,7 +142,7 @@ export async function translateText(
   }
 
   try {
-    logger.info("Translating text via lingo.dev", {
+    log.info("Translating text via lingo.dev", {
       sourceLang,
       targetLang,
       textLength: text.length,
@@ -170,7 +183,7 @@ export async function translateText(
     }
     translationCache.set(cacheKey, translatedText);
 
-    logger.info("Translation successful", { sourceLang, targetLang });
+    log.info("Translation successful", { sourceLang, targetLang });
 
     return {
       translatedText,
@@ -179,7 +192,7 @@ export async function translateText(
       cached: false,
     };
   } catch (error) {
-    logger.error("Translation failed", {
+    log.error("Translation failed", {
       error: error instanceof Error ? error.message : "Unknown error",
       sourceLang,
       targetLang,
@@ -209,7 +222,7 @@ export async function translateBatch(
       const result = await translateText({ text, sourceLang, targetLang });
       results.push(result);
     } catch (error) {
-      logger.error("Batch translation item failed", {
+      log.error("Batch translation item failed", {
         error: error instanceof Error ? error.message : "Unknown error",
         text: text.substring(0, 50), // Log first 50 chars
       });
@@ -232,7 +245,7 @@ export async function translateBatch(
  */
 export function clearTranslationCache(): void {
   translationCache.clear();
-  logger.info("Translation cache cleared");
+  log.info("Translation cache cleared");
 }
 
 /**

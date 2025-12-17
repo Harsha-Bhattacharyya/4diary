@@ -35,9 +35,10 @@ export async function GET(request: NextRequest) {
         : "Translation service is not configured. Set LINGO_API_KEY environment variable.",
     });
   } catch (error) {
-    logger.error("Failed to get translation service status", {
-      error: error instanceof Error ? error.message : "Unknown error",
-    });
+    logger.error(
+      "Failed to get translation service status",
+      error instanceof Error ? error : undefined
+    );
     return NextResponse.json(
       { error: "Failed to get translation service status" },
       { status: 500 }
@@ -128,9 +129,10 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
-    logger.error("Translation request failed", {
-      error: error instanceof Error ? error.message : "Unknown error",
-    });
+    logger.error(
+      "Translation request failed",
+      error instanceof Error ? error : undefined
+    );
 
     // Return appropriate error message
     const errorMessage =
