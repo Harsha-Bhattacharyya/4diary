@@ -242,7 +242,7 @@ export default function NoteSettings({
           <DrawerHeader className="text-left">
             <div className="flex items-center justify-between">
               <DrawerTitle className="text-2xl font-bold">
-                <span aria-label="Settings">⚙️</span> Note Settings
+                <span role="img" aria-label="Settings">⚙️</span> Note Settings
               </DrawerTitle>
               <DrawerClose asChild>
                 <Button variant="ghost" size="icon" className="h-8 w-8">
