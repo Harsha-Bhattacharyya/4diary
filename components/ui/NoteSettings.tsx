@@ -11,7 +11,7 @@
 
 "use client";
 
-import React, { useEffect, useMemo, useState, useCallback } from "react";
+import React, { useMemo, useState, useCallback } from "react";
 import { generateAllHashes } from "@/lib/crypto/hash";
 import {
   Drawer,

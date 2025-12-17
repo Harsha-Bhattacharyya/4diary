@@ -26,7 +26,6 @@ import React, { useState, useMemo } from "react";
 import Link from "next/link";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { 
   ChevronLeft, 
   ChevronRight,

@@ -15,8 +15,9 @@ import React, { useState, useEffect, Suspense, useCallback } from "react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import LeatherBackground from "@/components/ui/LeatherBackground";
-import Sidebar from "@/components/ui/Sidebar";
+import SidebarNew from "@/components/ui/SidebarNew";
 import GlassCard from "@/components/ui/GlassCard";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import LeatherButton from "@/components/ui/LeatherButton";
 import EditableTitle from "@/components/ui/EditableTitle";
 import { EmojiPickerComponent } from "@/components/ui/EmojiPicker";
@@ -1232,34 +1233,27 @@ function WorkspaceContent() {
       {/* QuickNote Modal - Available globally with Ctrl+Q */}
       <QuickNote onSave={handleSaveQuickNote} />
 
-      {/* Delete Confirmation Modal */}
-      {showDeleteConfirm && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50">
-          <GlassCard className="max-w-md w-full mx-4 p-6">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">Delete Note?</h3>
-            <p className="text-gray-600 mb-6">
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Note?</AlertDialogTitle>
+            <AlertDialogDescription>
               Are you sure you want to delete &quot;{currentDocument?.metadata.title || "this note"}&quot;? 
-              This action cannot be undone.
-            </p>
-            <div className="flex gap-3 justify-end">
-              <button
-                type="button"
-                onClick={() => setShowDeleteConfirm(false)}
-                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleDeleteDocument}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
-              >
-                Delete
-              </button>
-            </div>
-          </GlassCard>
-        </div>
-      )}
+              This action cannot be undone and the note will be permanently deleted.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleDeleteDocument}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* PWA Components */}
       <PWAInit />
@@ -1276,7 +1270,7 @@ function WorkspaceContent() {
 
       {/* Sidebar - Overlay */}
       <div className="fade-in">
-        <Sidebar
+        <SidebarNew
           workspaceId={workspaceId || "demo"}
           documents={documents.map((doc) => ({
             id: doc.id,
@@ -1291,12 +1285,13 @@ function WorkspaceContent() {
           onToggle={setSidebarCollapsed}
           onToggleFavorite={handleToggleFavorite}
           onReorder={handleReorder}
+          userEmail={userEmail || undefined}
         />
       </div>
 
       {/* Main Content - Dynamic left margin based on sidebar state */}
       <main className={`relative z-0 flex-1 overflow-y-auto transition-all duration-300 ${
-        sidebarCollapsed ? 'ml-16' : 'ml-64'
+        sidebarCollapsed ? 'ml-16' : 'ml-80'
       }`}>
         <div className="max-w-7xl mx-auto p-6 sm:p-8">
           {/* Header Section */}
