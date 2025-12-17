@@ -18,8 +18,8 @@ import { cn } from "@/lib/utils"
 
 const Avatar = React.forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Root>
->(({ className, ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Root> & { 'aria-label'?: string }
+>(({ className, 'aria-label': ariaLabel, ...props }, ref) => (
   <AvatarPrimitive.Root
     ref={ref}
     className={cn(
@@ -27,6 +27,7 @@ const Avatar = React.forwardRef<
       className
     )}
     role="img"
+    aria-label={ariaLabel}
     {...props}
   />
 ))
