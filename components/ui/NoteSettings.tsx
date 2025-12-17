@@ -241,7 +241,9 @@ export default function NoteSettings({
         <div className="mx-auto w-full max-w-2xl">
           <DrawerHeader className="text-left">
             <div className="flex items-center justify-between">
-              <DrawerTitle className="text-2xl font-bold">⚙️ Note Settings</DrawerTitle>
+              <DrawerTitle className="text-2xl font-bold">
+                <span aria-label="Settings">⚙️</span> Note Settings
+              </DrawerTitle>
               <DrawerClose asChild>
                 <Button variant="ghost" size="icon" className="h-8 w-8">
                   <X className="h-4 w-4" />

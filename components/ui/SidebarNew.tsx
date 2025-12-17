@@ -227,7 +227,7 @@ export default function SidebarNew({
             </div>
           </div>
           <div className="text-xs text-neutral-600 dark:text-neutral-400">
-            📅 {currentDate}
+            <span aria-label="Calendar">📅</span> {currentDate}
           </div>
         </div>
       )}
@@ -297,7 +297,7 @@ export default function SidebarNew({
               <div key={folder} className="mb-4">
                 {/* Folder Header */}
                 <div className="px-2 py-1 text-xs font-semibold text-neutral-600 dark:text-neutral-300 uppercase tracking-wide">
-                  📁 {folder}
+                  <span aria-label="Folder">📁</span> {folder}
                 </div>
 
                 {/* Documents in Folder */}
@@ -376,7 +376,7 @@ export default function SidebarNew({
       {!collapsed && (
         <div className="p-4 border-t border-neutral-200 dark:border-neutral-800 flex-shrink-0">
           <p className="text-xs text-neutral-500 dark:text-neutral-400 text-center">
-            🔐 End-to-end encrypted
+            <span aria-label="Secure">🔐</span> End-to-end encrypted
           </p>
         </div>
       )}
