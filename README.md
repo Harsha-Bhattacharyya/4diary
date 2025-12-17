@@ -35,6 +35,7 @@ A privacy-focused, end-to-end encrypted note-taking application built with Next.
 - 📤 **Export Freedom**: Export as Markdown or ZIP files
 - 📦 **Self-Hostable**: Docker-ready deployment
 - 📱 **PWA Support**: Install as a progressive web app with offline capabilities
+- 🌍 **Multi-Language**: Support for English, Bengali, Hindi (more languages coming soon)
 
 ### UI/UX
 - 🎨 **Leather Theme**: Rich, warm color palette inspired by leather journals
@@ -97,6 +98,9 @@ MONGODB_URI=mongodb://localhost:27017/4diary
 
 # Optional (for share tokens feature):
 REDIS_URL=redis://localhost:6379
+
+# Optional (for multi-language support):
+LINGO_API_KEY=your_lingo_api_key_here
 
 # Optional:
 NEXT_PUBLIC_BASE_URL=http://localhost:3000

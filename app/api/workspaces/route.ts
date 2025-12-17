@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
-    const { id, userId, name } = body;
+    const { id, userId, name, language } = body;
 
     if (!id || !userId) {
       return NextResponse.json(
@@ -135,6 +135,7 @@ export async function PUT(request: NextRequest) {
     };
 
     if (name) updateFields.name = name;
+    if (language) updateFields.language = language;
 
     const result = await db.collection(collections.workspaces).updateOne(
       { _id: new ObjectId(id), userId },

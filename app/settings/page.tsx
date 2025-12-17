@@ -11,13 +11,14 @@
  * modification, are permitted provided that the conditions in the LICENSE file are met.
  */
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import LeatherBackground from "@/components/ui/LeatherBackground";
 import GlassCard from "@/components/ui/GlassCard";
 import LeatherButton from "@/components/ui/LeatherButton";
 import TopMenu from "@/components/ui/TopMenu";
 import { useTheme } from "@/components/ui/ThemeProvider";
+import { SUPPORTED_LANGUAGES, LanguageCode } from "@/lib/translationService";
 
 /**
  * Render the application Settings page with security, export, privacy, appearance, and self-hosting sections.
@@ -29,6 +30,10 @@ import { useTheme } from "@/components/ui/ThemeProvider";
 export default function SettingsPage() {
   const [exportInProgress, setExportInProgress] = useState(false);
   const { theme, toggleTheme } = useTheme();
+  const [selectedLanguage, setSelectedLanguage] = useState<LanguageCode>("en");
+  const [languageSaving, setLanguageSaving] = useState(false);
+  const [languageSaved, setLanguageSaved] = useState(false);
+  const [translationAvailable, setTranslationAvailable] = useState(false);
 
   const handleExportWorkspace = async () => {
     setExportInProgress(true);
@@ -37,6 +42,95 @@ export default function SettingsPage() {
       alert("Export functionality will be implemented with workspace data");
       setExportInProgress(false);
     }, 1000);
+  };
+
+  // Load current language preference and check translation service availability
+  useEffect(() => {
+    const loadLanguageSettings = async () => {
+      try {
+        // Check if translation service is available
+        const statusResponse = await fetch("/api/translate");
+        if (statusResponse.ok) {
+          const statusData = await statusResponse.json();
+          setTranslationAvailable(statusData.available);
+        }
+
+        // Load user's workspace to get language preference
+        const userId = localStorage.getItem("userId");
+        if (userId) {
+          const workspaceResponse = await fetch(
+            `/api/workspaces?userId=${encodeURIComponent(userId)}`
+          );
+          if (workspaceResponse.ok) {
+            const data = await workspaceResponse.json();
+            if (data.workspaces && data.workspaces.length > 0) {
+              const workspace = data.workspaces[0];
+              if (workspace.language) {
+                setSelectedLanguage(workspace.language as LanguageCode);
+              }
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Failed to load language settings:", error);
+      }
+    };
+
+    loadLanguageSettings();
+  }, []);
+
+  const handleLanguageChange = async (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const newLanguage = event.target.value as LanguageCode;
+    setSelectedLanguage(newLanguage);
+    setLanguageSaving(true);
+    setLanguageSaved(false);
+
+    try {
+      // Get user's workspace
+      const userId = localStorage.getItem("userId");
+      if (!userId) {
+        throw new Error("User not authenticated");
+      }
+
+      const workspaceResponse = await fetch(
+        `/api/workspaces?userId=${encodeURIComponent(userId)}`
+      );
+      if (!workspaceResponse.ok) {
+        throw new Error("Failed to fetch workspace");
+      }
+
+      const data = await workspaceResponse.json();
+      if (!data.workspaces || data.workspaces.length === 0) {
+        throw new Error("No workspace found");
+      }
+
+      const workspace = data.workspaces[0];
+
+      // Update workspace with new language
+      const updateResponse = await fetch("/api/workspaces", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: workspace._id,
+          userId,
+          language: newLanguage,
+        }),
+      });
+
+      if (!updateResponse.ok) {
+        throw new Error("Failed to update language preference");
+      }
+
+      setLanguageSaved(true);
+      setTimeout(() => setLanguageSaved(false), 3000);
+    } catch (error) {
+      console.error("Failed to save language preference:", error);
+      alert("Failed to save language preference. Please try again.");
+    } finally {
+      setLanguageSaving(false);
+    }
   };
 
   return (
@@ -116,7 +210,7 @@ export default function SettingsPage() {
               🎨 Appearance
             </h2>
             <div className="space-y-4">
-              <div className="flex items-center justify-between py-3">
+              <div className="flex items-center justify-between py-3 border-b border-leather-700">
                 <div>
                   <h3 className="font-bold text-leather-100">
                     Theme
@@ -135,6 +229,43 @@ export default function SettingsPage() {
                 >
                   {theme === "light" ? "☀️ Light" : "🌙 Dark"}
                 </button>
+              </div>
+
+              <div className="flex items-center justify-between py-3">
+                <div className="flex-1">
+                  <h3 className="font-bold text-leather-100">
+                    Language
+                  </h3>
+                  <p className="text-sm text-leather-300">
+                    Choose your preferred language for the interface
+                  </p>
+                  {!translationAvailable && (
+                    <p className="text-xs text-amber-400 mt-1">
+                      ⚠️ Translation service not configured. Set LINGO_API_KEY to enable.
+                    </p>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <select
+                    value={selectedLanguage}
+                    onChange={handleLanguageChange}
+                    disabled={languageSaving}
+                    className="px-4 py-2 bg-leather-600 hover:bg-leather-700 text-leather-100 rounded-lg transition-colors font-medium border-2 border-leather-500 focus:border-leather-400 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                    aria-label="Select language"
+                  >
+                    {Object.entries(SUPPORTED_LANGUAGES).map(([code, lang]) => (
+                      <option key={code} value={code}>
+                        {lang.nativeName}
+                      </option>
+                    ))}
+                  </select>
+                  {languageSaved && (
+                    <span className="text-green-400 text-sm">✓ Saved</span>
+                  )}
+                  {languageSaving && (
+                    <span className="text-leather-300 text-sm">Saving...</span>
+                  )}
+                </div>
               </div>
             </div>
           </GlassCard>

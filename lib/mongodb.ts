@@ -142,6 +142,7 @@ export interface Workspace {
   name: string;
   encryptedMasterKey: string; // Master key encrypted with user password
   salt: string; // Salt for key derivation
+  language?: string; // Preferred language code (e.g., 'en', 'bn', 'hi')
   createdAt: Date;
   updatedAt: Date;
 }
