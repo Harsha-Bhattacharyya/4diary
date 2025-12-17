@@ -11,8 +11,19 @@
 
 "use client";
 
-import React, { useEffect, useMemo, useState, useCallback } from "react";
+import React, { useMemo, useState, useCallback } from "react";
 import { generateAllHashes } from "@/lib/crypto/hash";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { X } from "lucide-react";
 
 export type EditorFontType = "normal" | "serif" | "condensed";
 
@@ -224,366 +235,317 @@ export default function NoteSettings({
     }
   };
 
-  // Close on Escape key
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        onClose();
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, onClose]);
-
-  if (!isOpen) return null;
-
   return (
-    <div
-      className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="note-settings-title"
-    >
-      <div
-        className="bg-white rounded-lg shadow-2xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h2
-            id="note-settings-title"
-            className="text-2xl font-bold text-gray-900"
-          >
-            ⚙️ Note Settings
-          </h2>
-          <button
-            type="button"
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            aria-label="Close settings"
-          >
-            <svg
-              className="w-5 h-5 text-gray-700"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-              focusable="false"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        </div>
-
-        {/* Statistics */}
-        <div className="space-y-4 mb-6">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="p-4 bg-gray-50 rounded-lg">
-              <div className="text-sm text-gray-600 mb-1">Word Count</div>
-              <div className="text-2xl font-bold text-gray-900">
-                {stats.wordCount.toLocaleString()}
-              </div>
+    <Drawer open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DrawerContent className="max-h-[90vh]">
+        <div className="mx-auto w-full max-w-2xl">
+          <DrawerHeader className="text-left">
+            <div className="flex items-center justify-between">
+              <DrawerTitle className="text-2xl font-bold">
+                <span role="img" aria-label="Settings">⚙️</span> Note Settings
+              </DrawerTitle>
+              <DrawerClose asChild>
+                <Button variant="ghost" size="icon" className="h-8 w-8">
+                  <X className="h-4 w-4" />
+                  <span className="sr-only">Close</span>
+                </Button>
+              </DrawerClose>
             </div>
-
-            <div className="p-4 bg-gray-50 rounded-lg">
-              <div className="text-sm text-gray-600 mb-1">Line Count</div>
-              <div className="text-2xl font-bold text-gray-900">
-                {stats.lineCount.toLocaleString()}
-              </div>
-            </div>
-
-            <div className="p-4 bg-gray-50 rounded-lg">
-              <div className="text-sm text-gray-600 mb-1">Characters</div>
-              <div className="text-2xl font-bold text-gray-900">
-                {stats.characterCount.toLocaleString()}
-              </div>
-            </div>
-
-            <div className="p-4 bg-gray-50 rounded-lg">
-              <div className="text-sm text-gray-600 mb-1">File Size</div>
-              <div className="text-2xl font-bold text-gray-900">
-                {stats.fileSizeKB} KB
-              </div>
-            </div>
-          </div>
-
-          <div className="p-4 bg-gray-50 rounded-lg">
-            <div className="text-sm text-gray-600 mb-1">Last Modified</div>
-            <div className="text-base font-medium text-gray-900">
-              {formattedDate}
-            </div>
-          </div>
-        </div>
-
-        {/* Organization */}
-        <div className="border-t border-gray-200 pt-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Organization
-          </h3>
-
-          {/* Folder */}
-          <div className="mb-4">
-            <label
-              htmlFor="note-folder"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              📁 Folder
-            </label>
-            <input
-              id="note-folder"
-              type="text"
-              value={folder}
-              onChange={(e) => handleFolderChange(e.target.value)}
-              placeholder="Enter folder name (e.g., Work, Personal)"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-leather-500 focus:border-leather-500 text-gray-900 placeholder-gray-400"
-            />
-            <p className="mt-1 text-xs text-gray-500">
-              Leave empty to keep note in &quot;Unfiled&quot;
-            </p>
-          </div>
-
-          {/* Tags */}
-          <div>
-            <label
-              htmlFor="note-tags"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              🏷️ Tags
-            </label>
-            <div className="flex gap-2 mb-2">
-              <input
-                id="note-tags"
-                type="text"
-                value={tagInput}
-                onChange={(e) => setTagInput(e.target.value)}
-                onKeyDown={handleTagKeyDown}
-                placeholder="Add a tag and press Enter"
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-leather-500 focus:border-leather-500 text-gray-900 placeholder-gray-400"
-              />
-              <button
-                type="button"
-                onClick={handleAddTag}
-                disabled={!tagInput.trim()}
-                className="px-4 py-2 bg-leather-600 text-white rounded-lg hover:bg-leather-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Add
-              </button>
-            </div>
-            {/* Tags list */}
-            {tags.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-2">
-                {tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="inline-flex items-center gap-1 px-2 py-1 bg-leather-100 text-leather-800 rounded-full text-sm"
-                  >
-                    {tag}
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveTag(tag)}
-                      className="w-4 h-4 flex items-center justify-center rounded-full hover:bg-leather-200 transition-colors"
-                      aria-label={`Remove tag ${tag}`}
-                    >
-                      ×
-                    </button>
-                  </span>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Settings */}
-        <div className="border-t border-gray-200 pt-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Display Settings
-          </h3>
-
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-            <div>
-              <div className="font-medium text-gray-900">Line Numbers</div>
-              <div className="text-sm text-gray-600">
-                Show line numbers in editor
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => onToggleLineNumbers(!showLineNumbers)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                showLineNumbers ? "bg-leather-600" : "bg-gray-300"
-              }`}
-              role="switch"
-              aria-checked={showLineNumbers}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  showLineNumbers ? "translate-x-6" : "translate-x-1"
-                }`}
-              />
-            </button>
-          </div>
-
-          {/* Font Selection */}
-          <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-            <div className="mb-3">
-              <div className="font-medium text-gray-900">Editor Font</div>
-              <div className="text-sm text-gray-600">
-                Choose your preferred font style
-              </div>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={() => onFontChange?.("normal")}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  editorFont === "normal"
-                    ? "bg-leather-600 text-white"
-                    : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-100"
-                }`}
-                style={{ fontFamily: "'JetBrains Mono', monospace" }}
-              >
-                Normal
-              </button>
-              <button
-                type="button"
-                onClick={() => onFontChange?.("serif")}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  editorFont === "serif"
-                    ? "bg-leather-600 text-white"
-                    : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-100"
-                }`}
-                style={{ fontFamily: "Arial, Helvetica, sans-serif" }}
-              >
-                Serif
-              </button>
-              <button
-                type="button"
-                onClick={() => onFontChange?.("condensed")}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  editorFont === "condensed"
-                    ? "bg-leather-600 text-white"
-                    : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-100"
-                }`}
-                style={{ fontFamily: "'Roboto Condensed', 'Arial Narrow', sans-serif" }}
-              >
-                Condensed
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Hash Generation */}
-        <div className="border-t border-gray-200 pt-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            🔐 Hash Generation
-          </h3>
+            <DrawerDescription>
+              View statistics and manage note settings
+            </DrawerDescription>
+          </DrawerHeader>
           
-          <p className="text-sm text-gray-600 mb-4">
-            Generate cryptographic hashes of your note content for verification or integrity checking.
-          </p>
+          <div className="p-4 pb-6 overflow-y-auto max-h-[70vh]">
 
-          <button
-            type="button"
-            onClick={handleGenerateHashes}
-            disabled={generatingHashes}
-            className="w-full px-4 py-2 bg-leather-600 text-white rounded-lg hover:bg-leather-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mb-4"
-          >
-            {generatingHashes ? "Generating..." : "Generate Hashes"}
-          </button>
-
-          {hashes && (
-            <div className="space-y-3">
-              {/* MD5 */}
-              <div className="p-3 bg-gray-50 rounded-lg">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm font-medium text-gray-700">MD5</span>
-                  <button
-                    type="button"
-                    onClick={() => copyHashToClipboard(hashes.md5, "md5")}
-                    className="text-xs text-leather-600 hover:text-leather-800"
-                  >
-                    {copiedHash === "md5" ? "✓ Copied!" : "Copy"}
-                  </button>
+            {/* Statistics */}
+            <div className="space-y-4 mb-6">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-4 bg-neutral-50 dark:bg-neutral-900 rounded-lg">
+                  <div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">Word Count</div>
+                  <div className="text-2xl font-bold text-neutral-900 dark:text-neutral-50">
+                    {stats.wordCount.toLocaleString()}
+                  </div>
                 </div>
-                <code className="text-xs text-gray-600 break-all font-mono">
-                  {hashes.md5}
-                </code>
+
+                <div className="p-4 bg-neutral-50 dark:bg-neutral-900 rounded-lg">
+                  <div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">Line Count</div>
+                  <div className="text-2xl font-bold text-neutral-900 dark:text-neutral-50">
+                    {stats.lineCount.toLocaleString()}
+                  </div>
+                </div>
+
+                <div className="p-4 bg-neutral-50 dark:bg-neutral-900 rounded-lg">
+                  <div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">Characters</div>
+                  <div className="text-2xl font-bold text-neutral-900 dark:text-neutral-50">
+                    {stats.characterCount.toLocaleString()}
+                  </div>
+                </div>
+
+                <div className="p-4 bg-neutral-50 dark:bg-neutral-900 rounded-lg">
+                  <div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">File Size</div>
+                  <div className="text-2xl font-bold text-neutral-900 dark:text-neutral-50">
+                    {stats.fileSizeKB} KB
+                  </div>
+                </div>
               </div>
 
-              {/* SHA-1 */}
-              <div className="p-3 bg-gray-50 rounded-lg">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm font-medium text-gray-700">SHA-1</span>
-                  <button
-                    type="button"
-                    onClick={() => copyHashToClipboard(hashes.sha1, "sha1")}
-                    className="text-xs text-leather-600 hover:text-leather-800"
-                  >
-                    {copiedHash === "sha1" ? "✓ Copied!" : "Copy"}
-                  </button>
+              <div className="p-4 bg-neutral-50 dark:bg-neutral-900 rounded-lg">
+                <div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">Last Modified</div>
+                <div className="text-base font-medium text-neutral-900 dark:text-neutral-50">
+                  {formattedDate}
                 </div>
-                <code className="text-xs text-gray-600 break-all font-mono">
-                  {hashes.sha1}
-                </code>
-              </div>
-
-              {/* SHA-256 */}
-              <div className="p-3 bg-gray-50 rounded-lg">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm font-medium text-gray-700">SHA-256</span>
-                  <button
-                    type="button"
-                    onClick={() => copyHashToClipboard(hashes.sha256, "sha256")}
-                    className="text-xs text-leather-600 hover:text-leather-800"
-                  >
-                    {copiedHash === "sha256" ? "✓ Copied!" : "Copy"}
-                  </button>
-                </div>
-                <code className="text-xs text-gray-600 break-all font-mono">
-                  {hashes.sha256}
-                </code>
-              </div>
-
-              {/* SHA-512 */}
-              <div className="p-3 bg-gray-50 rounded-lg">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm font-medium text-gray-700">SHA-512</span>
-                  <button
-                    type="button"
-                    onClick={() => copyHashToClipboard(hashes.sha512, "sha512")}
-                    className="text-xs text-leather-600 hover:text-leather-800"
-                  >
-                    {copiedHash === "sha512" ? "✓ Copied!" : "Copy"}
-                  </button>
-                </div>
-                <code className="text-xs text-gray-600 break-all font-mono">
-                  {hashes.sha512}
-                </code>
               </div>
             </div>
-          )}
-        </div>
 
-        {/* Close Button */}
-        <div className="mt-6">
-          <button
-            type="button"
-            onClick={onClose}
-            className="w-full px-4 py-2 bg-leather-600 text-white rounded-lg hover:bg-leather-700 transition-colors"
-          >
-            Close
-          </button>
+            <Separator className="my-6" />
+
+            {/* Organization */}
+            <div>
+              <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-50 mb-4">
+                Organization
+              </h3>
+
+              {/* Folder */}
+              <div className="mb-4">
+                <label
+                  htmlFor="note-folder"
+                  className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2"
+                >
+                  📁 Folder
+                </label>
+                <input
+                  id="note-folder"
+                  type="text"
+                  value={folder}
+                  onChange={(e) => handleFolderChange(e.target.value)}
+                  placeholder="Enter folder name (e.g., Work, Personal)"
+                  className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-neutral-950 dark:focus:ring-neutral-300 focus:border-neutral-950 dark:focus:border-neutral-300 bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-50 placeholder-neutral-400"
+                />
+                <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
+                  Leave empty to keep note in &quot;Unfiled&quot;
+                </p>
+              </div>
+
+              {/* Tags */}
+              <div>
+                <label
+                  htmlFor="note-tags"
+                  className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2"
+                >
+                  🏷️ Tags
+                </label>
+                <div className="flex gap-2 mb-2">
+                  <input
+                    id="note-tags"
+                    type="text"
+                    value={tagInput}
+                    onChange={(e) => setTagInput(e.target.value)}
+                    onKeyDown={handleTagKeyDown}
+                    placeholder="Add a tag and press Enter"
+                    className="flex-1 px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-neutral-950 dark:focus:ring-neutral-300 bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-50 placeholder-neutral-400"
+                  />
+                  <Button
+                    type="button"
+                    onClick={handleAddTag}
+                    disabled={!tagInput.trim()}
+                  >
+                    Add
+                  </Button>
+                </div>
+                {/* Tags list */}
+                {tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="inline-flex items-center gap-1 px-2 py-1 bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 rounded-full text-sm"
+                      >
+                        {tag}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveTag(tag)}
+                          className="w-4 h-4 flex items-center justify-center rounded-full hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+                          aria-label={`Remove tag ${tag}`}
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <Separator className="my-6" />
+
+            {/* Settings */}
+            <div>
+              <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-50 mb-4">
+                Display Settings
+              </h3>
+
+              <div className="flex items-center justify-between p-4 bg-neutral-50 dark:bg-neutral-900 rounded-lg">
+                <div>
+                  <div className="font-medium text-neutral-900 dark:text-neutral-50">Line Numbers</div>
+                  <div className="text-sm text-neutral-600 dark:text-neutral-400">
+                    Show line numbers in editor
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => onToggleLineNumbers(!showLineNumbers)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    showLineNumbers ? "bg-neutral-900 dark:bg-neutral-50" : "bg-neutral-300 dark:bg-neutral-700"
+                  }`}
+                  role="switch"
+                  aria-checked={showLineNumbers}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white dark:bg-neutral-900 transition-transform ${
+                      showLineNumbers ? "translate-x-6" : "translate-x-1"
+                    }`}
+                  />
+                </button>
+              </div>
+
+              {/* Font Selection */}
+              <div className="mt-4 p-4 bg-neutral-50 dark:bg-neutral-900 rounded-lg">
+                <div className="mb-3">
+                  <div className="font-medium text-neutral-900 dark:text-neutral-50">Editor Font</div>
+                  <div className="text-sm text-neutral-600 dark:text-neutral-400">
+                    Choose your preferred font style
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    type="button"
+                    variant={editorFont === "normal" ? "default" : "outline"}
+                    onClick={() => onFontChange?.("normal")}
+                    style={{ fontFamily: "'JetBrains Mono', monospace" }}
+                  >
+                    Normal
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={editorFont === "serif" ? "default" : "outline"}
+                    onClick={() => onFontChange?.("serif")}
+                    style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
+                  >
+                    Serif
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={editorFont === "condensed" ? "default" : "outline"}
+                    onClick={() => onFontChange?.("condensed")}
+                    style={{ fontFamily: "'Roboto Condensed', 'Arial Narrow', sans-serif" }}
+                  >
+                    Condensed
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            <Separator className="my-6" />
+
+            {/* Hash Generation */}
+            <div>
+              <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-50 mb-4">
+                🔐 Hash Generation
+              </h3>
+              
+              <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4">
+                Generate cryptographic hashes of your note content for verification or integrity checking.
+              </p>
+
+              <Button
+                type="button"
+                onClick={handleGenerateHashes}
+                disabled={generatingHashes}
+                className="w-full mb-4"
+              >
+                {generatingHashes ? "Generating..." : "Generate Hashes"}
+              </Button>
+
+              {hashes && (
+                <div className="space-y-3">
+                  {/* MD5 */}
+                  <div className="p-3 bg-neutral-50 dark:bg-neutral-900 rounded-lg">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300">MD5</span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => copyHashToClipboard(hashes.md5, "md5")}
+                      >
+                        {copiedHash === "md5" ? "✓ Copied!" : "Copy"}
+                      </Button>
+                    </div>
+                    <code className="text-xs text-neutral-600 dark:text-neutral-400 break-all font-mono">
+                      {hashes.md5}
+                    </code>
+                  </div>
+
+                  {/* SHA-1 */}
+                  <div className="p-3 bg-neutral-50 dark:bg-neutral-900 rounded-lg">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300">SHA-1</span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => copyHashToClipboard(hashes.sha1, "sha1")}
+                      >
+                        {copiedHash === "sha1" ? "✓ Copied!" : "Copy"}
+                      </Button>
+                    </div>
+                    <code className="text-xs text-neutral-600 dark:text-neutral-400 break-all font-mono">
+                      {hashes.sha1}
+                    </code>
+                  </div>
+
+                  {/* SHA-256 */}
+                  <div className="p-3 bg-neutral-50 dark:bg-neutral-900 rounded-lg">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300">SHA-256</span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => copyHashToClipboard(hashes.sha256, "sha256")}
+                      >
+                        {copiedHash === "sha256" ? "✓ Copied!" : "Copy"}
+                      </Button>
+                    </div>
+                    <code className="text-xs text-neutral-600 dark:text-neutral-400 break-all font-mono">
+                      {hashes.sha256}
+                    </code>
+                  </div>
+
+                  {/* SHA-512 */}
+                  <div className="p-3 bg-neutral-50 dark:bg-neutral-900 rounded-lg">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300">SHA-512</span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => copyHashToClipboard(hashes.sha512, "sha512")}
+                      >
+                        {copiedHash === "sha512" ? "✓ Copied!" : "Copy"}
+                      </Button>
+                    </div>
+                    <code className="text-xs text-neutral-600 dark:text-neutral-400 break-all font-mono">
+                      {hashes.sha512}
+                    </code>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
+      </DrawerContent>
+    </Drawer>
   );
 }
