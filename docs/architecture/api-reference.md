@@ -832,7 +832,7 @@ curl -X GET "https://api.4diary.app/api/documents?folder=Work" \
 
 ```bash
 # Start dev server
-npm run dev
+pnpm run dev
 
 # API available at http://localhost:3000/api
 ```

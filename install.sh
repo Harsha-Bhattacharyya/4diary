@@ -291,6 +291,19 @@ check_node() {
     fi
 }
 
+check_pnpm() {
+    print_substep "Checking for pnpm..."
+    if command -v pnpm &> /dev/null; then
+        local pnpm_version
+        pnpm_version=$(pnpm --version)
+        print_success "pnpm v$pnpm_version is installed"
+        return 0
+    else
+        print_warning "pnpm is not installed"
+        return 1
+    fi
+}
+
 check_docker() {
     print_substep "Checking for Docker..."
     if command -v docker &> /dev/null; then
@@ -709,6 +722,7 @@ install_docker() {
     fi
 }
 
+# install_dev sets up a local development environment by generating a .env.local, installing dependencies with pnpm, and optionally starting the development server.
 install_dev() {
     print_section "${ICON_NODE} Setting Up Development Environment"
     
@@ -719,7 +733,7 @@ install_dev() {
     print_step "Installing dependencies..."
     echo ""
     
-    if run_with_output "npm install"; then
+    if run_with_output "pnpm install"; then
         echo ""
         print_success "Dependencies installed successfully"
     else
@@ -736,17 +750,18 @@ install_dev() {
         echo ""
         print_info "Press Ctrl+C to stop the server"
         echo ""
-        npm run dev
+        pnpm run dev
     else
         echo ""
         print_info "To start the development server later, run:"
-        echo -e "  ${CYAN}cd $INSTALL_DIR && npm run dev${NC}"
+        echo -e "  ${CYAN}cd $INSTALL_DIR && pnpm run dev${NC}"
     fi
 }
 
 # ============================================================================
 # SUMMARY
-# ============================================================================
+# print_summary prints a final installation summary showing install directory, application URL, generated configuration files, quick-start commands, feature list, and documentation/support links.
+# It adapts displayed config files and commands based on INSTALL_MODE and marks the share-links feature as available when REDIS_URL is set.
 
 print_summary() {
     print_section "${ICON_SPARKLE} Installation Complete!"
@@ -778,11 +793,11 @@ print_summary() {
         echo -e "  ${DIM}Logs:${NC}    ${CYAN}docker compose logs -f app${NC}"
         echo -e "  ${DIM}Rebuild:${NC} ${CYAN}docker compose up -d --build${NC}"
     else
-        echo -e "  ${DIM}Dev:${NC}     ${CYAN}npm run dev${NC}"
-        echo -e "  ${DIM}Build:${NC}   ${CYAN}npm run build${NC}"
-        echo -e "  ${DIM}Start:${NC}   ${CYAN}npm run start${NC}"
-        echo -e "  ${DIM}Lint:${NC}    ${CYAN}npm run lint${NC}"
-        echo -e "  ${DIM}Test:${NC}    ${CYAN}npm test${NC}"
+        echo -e "  ${DIM}Dev:${NC}     ${CYAN}pnpm run dev${NC}"
+        echo -e "  ${DIM}Build:${NC}   ${CYAN}pnpm run build${NC}"
+        echo -e "  ${DIM}Start:${NC}   ${CYAN}pnpm run start${NC}"
+        echo -e "  ${DIM}Lint:${NC}    ${CYAN}pnpm run lint${NC}"
+        echo -e "  ${DIM}Test:${NC}    ${CYAN}pnpm test${NC}"
     fi
     echo ""
     
@@ -823,6 +838,7 @@ main() {
     
     # Check optional dependencies
     HAS_NODE=$(check_node && echo "yes" || echo "no")
+    HAS_PNPM=$(check_pnpm && echo "yes" || echo "no")
     HAS_DOCKER=$(check_docker && echo "yes" || echo "no")
     HAS_COMPOSE=$(check_docker_compose && echo "yes" || echo "no")
     
@@ -837,9 +853,16 @@ main() {
         option_indices+=("docker")
     fi
     
-    if [[ "$HAS_NODE" == "yes" ]]; then
-        install_options+=("${ICON_NODE} Local Development (Node.js)")
+    if [[ "$HAS_NODE" == "yes" ]] && [[ "$HAS_PNPM" == "yes" ]]; then
+        install_options+=("${ICON_NODE} Local Development (Node.js + pnpm)")
         option_indices+=("dev")
+    elif [[ "$HAS_NODE" == "yes" ]] && [[ "$HAS_PNPM" == "no" ]]; then
+        print_warning "Node.js is installed but pnpm is missing"
+        print_info "To enable local development, install pnpm:"
+        echo -e "  ${CYAN}npm install -g pnpm${NC}"
+        echo -e "  ${DIM}or use corepack (requires Node.js 16.10+):${NC}"
+        echo -e "  ${CYAN}corepack enable && corepack prepare pnpm@latest --activate${NC}"
+        echo ""
     fi
     
     if [[ ${#install_options[@]} -eq 0 ]]; then

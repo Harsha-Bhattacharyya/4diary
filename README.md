@@ -71,7 +71,7 @@ The installer will:
 - Node.js 20+ 
 - MongoDB (local or MongoDB Atlas)
 - Redis (optional, for share tokens feature)
-- npm or yarn
+- pnpm (recommended package manager)
 
 ### Manual Development Setup
 
@@ -83,7 +83,7 @@ cd 4diary
 
 2. Install dependencies:
 ```bash
-npm install
+pnpm install
 ```
 
 3. Configure environment variables:
@@ -104,7 +104,7 @@ NEXT_PUBLIC_BASE_URL=http://localhost:3000
 
 4. Run the development server:
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 5. Open [http://localhost:3000](http://localhost:3000) in your browser

@@ -101,7 +101,7 @@ Solutions to common issues and problems in 4Diary.
 
 1. **Use Different Port**
    ```bash
-   PORT=3001 npm run dev
+   PORT=3001 pnpm run dev
    ```
 
 2. **Find Process Using Port**
@@ -124,15 +124,15 @@ Solutions to common issues and problems in 4Diary.
 
 ### Dependencies Install Failed
 
-**Symptoms**: `npm install` errors
+**Symptoms**: `pnpm install` errors
 
 **Solutions**:
 
-1. **Clear npm Cache**
+1. **Clear pnpm Store**
    ```bash
-   npm cache clean --force
-   rm -rf node_modules package-lock.json
-   npm install
+   pnpm store prune
+   rm -rf node_modules pnpm-lock.yaml
+   pnpm install
    ```
 
 2. **Use Correct Node Version**
@@ -822,7 +822,7 @@ Solutions to common issues and problems in 4Diary.
 
 ### Build Fails
 
-**Symptoms**: `npm run build` errors
+**Symptoms**: `pnpm run build` errors
 
 **Solutions**:
 
@@ -834,8 +834,8 @@ Solutions to common issues and problems in 4Diary.
 2. **Clean Install**
    ```bash
    rm -rf node_modules .next
-   npm install
-   npm run build
+   pnpm install
+   pnpm run build
    ```
 
 3. **Check Environment**
@@ -894,7 +894,7 @@ Solutions to common issues and problems in 4Diary.
    ```bash
    # Clear Next.js cache
    rm -rf .next
-   npm run build
+   pnpm run build
    ```
 
 ## Getting More Help

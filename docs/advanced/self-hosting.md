@@ -71,8 +71,8 @@ mongodump --uri="mongodb://localhost:27017/4diary" --out=/backups/4diary-$(date 
 
 ```bash
 git pull origin main
-npm ci --only=production
-npm run build
+pnpm install --frozen-lockfile --prod
+pnpm run build
 pm2 restart 4diary
 ```
 
