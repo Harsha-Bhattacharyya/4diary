@@ -78,8 +78,8 @@ export default function SidebarNew({
   const userInitials = useMemo(() => {
     if (!userEmail) return "U";
     const name = userEmail.split('@')[0];
-    const parts = name.split(/[._-]/);
-    if (parts.length >= 2) {
+    const parts = name.split(/[._-]/).filter(p => p.length > 0);
+    if (parts.length >= 2 && parts[0].length > 0 && parts[1].length > 0) {
       return (parts[0][0] + parts[1][0]).toUpperCase();
     }
     return name.substring(0, 2).toUpperCase();
