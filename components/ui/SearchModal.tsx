@@ -275,8 +275,13 @@ export default function SearchModal({
   return (
     <div 
       className="fixed inset-0 z-50 flex items-start justify-center pt-20 bg-black/50 backdrop-blur-sm"
+      role="dialog"
+      aria-modal="true"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
+      }}
+      onKeyDown={(e) => {
+        if (e.key === 'Escape') onClose();
       }}
     >
       <GlassCard className="w-full max-w-3xl max-h-[70vh] overflow-hidden flex flex-col">
