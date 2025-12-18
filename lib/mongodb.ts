@@ -16,6 +16,7 @@
 
 import { MongoClient, MongoClientOptions, Db, ObjectId } from "mongodb";
 import { attachDatabasePool } from '@vercel/functions';
+import type { LanguageCode } from './translationTypes';
 
 const uri = process.env.MONGODB_URI;
 
@@ -142,6 +143,7 @@ export interface Workspace {
   name: string;
   encryptedMasterKey: string; // Master key encrypted with user password
   salt: string; // Salt for key derivation
+  language?: LanguageCode; // Preferred language code (e.g., 'en', 'bn', 'hi')
   createdAt: Date;
   updatedAt: Date;
 }

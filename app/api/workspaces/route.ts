@@ -119,13 +119,28 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
-    const { id, userId, name } = body;
+    const { id, userId, name, language } = body;
 
     if (!id || !userId) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
       );
+    }
+
+    // Validate language code if provided
+    if (language !== undefined) {
+      const validLanguages = ['en', 'bn', 'hi'];
+      if (!validLanguages.includes(language)) {
+        return NextResponse.json(
+          { 
+            error: "Invalid language code",
+            validLanguages: validLanguages,
+            received: language
+          },
+          { status: 400 }
+        );
+      }
     }
 
     const db = await getDatabase();
@@ -135,6 +150,7 @@ export async function PUT(request: NextRequest) {
     };
 
     if (name) updateFields.name = name;
+    if (language) updateFields.language = language;
 
     const result = await db.collection(collections.workspaces).updateOne(
       { _id: new ObjectId(id), userId },
