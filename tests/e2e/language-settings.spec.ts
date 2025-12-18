@@ -124,8 +124,8 @@ test.describe('Language Settings UI', () => {
     // Change to Bengali
     await languageSelect.selectOption('bn');
     
-    // Wait for save to complete
-    await page.waitForTimeout(2000);
+    // Wait for "Saved" indicator to appear
+    await expect(page.getByText('Saved')).toBeVisible({ timeout: 5000 });
     
     // Reload page
     await page.reload();
