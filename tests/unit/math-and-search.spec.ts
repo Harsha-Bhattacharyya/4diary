@@ -254,8 +254,8 @@ test.describe('Syntax Highlighting', () => {
         });
       });
       
-      // At minimum, the CSS should be present or the page should load
-      expect(hasHighlightStyles !== undefined).toBe(true);
+      // Verify that highlight.js styles are loaded
+      expect(hasHighlightStyles).toBe(true);
     }
   });
 });
