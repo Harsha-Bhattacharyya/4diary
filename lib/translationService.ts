@@ -87,14 +87,14 @@ class LRUCache<K, V> {
   }
 }
 
+// Maximum cache size to prevent memory issues
+const MAX_CACHE_SIZE = 1000;
+
 /**
  * In-memory LRU translation cache to reduce API calls
  * Key format: `${sourceLang}:${targetLang}:${text}`
  */
-const translationCache = new LRUCache<string, string>(1000);
-
-// Maximum cache size to prevent memory issues
-const MAX_CACHE_SIZE = 1000;
+const translationCache = new LRUCache<string, string>(MAX_CACHE_SIZE);
 
 /**
  * Generate cache key for a translation request

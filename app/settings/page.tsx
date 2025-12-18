@@ -103,8 +103,6 @@ export default function SettingsPage() {
     setLanguageSaving(true);
     setLanguageSaved(false);
 
-    let timeoutId: NodeJS.Timeout | null = null;
-
     try {
       // Get user's workspace
       const userId = localStorage.getItem("userId");
@@ -143,7 +141,8 @@ export default function SettingsPage() {
       }
 
       setLanguageSaved(true);
-      timeoutId = setTimeout(() => setLanguageSaved(false), 3000);
+      // Auto-hide success message after 3 seconds
+      setTimeout(() => setLanguageSaved(false), 3000);
     } catch (error) {
       console.error("Failed to save language preference:", error);
       
@@ -157,13 +156,6 @@ export default function SettingsPage() {
     } finally {
       setLanguageSaving(false);
     }
-
-    // Cleanup timeout on unmount
-    return () => {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-    };
   };
 
   return (
