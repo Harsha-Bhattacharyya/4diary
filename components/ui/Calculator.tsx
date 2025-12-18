@@ -139,10 +139,11 @@ export default function Calculator({ onClose, onInsert }: CalculatorProps) {
 
           {/* Input */}
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="calculator-input" className="block text-sm font-medium text-gray-700 mb-2">
               Expression
             </label>
             <input
+              id="calculator-input"
               ref={inputRef}
               type="text"
               value={input}
