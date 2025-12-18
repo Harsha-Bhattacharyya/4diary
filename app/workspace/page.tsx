@@ -208,8 +208,8 @@ function WorkspaceContent() {
   // Keyboard shortcuts for new features
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Ctrl/Cmd + K for search
-      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+      // Ctrl/Cmd + Shift + F for search (avoid conflict with Ctrl+K for links)
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'F') {
         e.preventDefault();
         setShowSearch(true);
       }
@@ -1037,7 +1037,7 @@ function WorkspaceContent() {
                   setDropdownOpen(false);
                 }}
                 className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
-                title="Search (Ctrl+K)"
+                title="Search (Ctrl+Shift+F)"
               >
                 🔍 Search Notes
               </button>

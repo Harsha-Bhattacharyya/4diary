@@ -117,7 +117,7 @@ Search across all your documents quickly and efficiently.
 
 ### Opening Search
 
-- **Keyboard shortcut**: Press `Ctrl+K` (Windows/Linux) or `Cmd+K` (Mac)
+- **Keyboard shortcut**: Press `Ctrl+Shift+F` (Windows/Linux) or `Cmd+Shift+F` (Mac)
 - **Menu**: Click the menu button → Search Notes
 
 ### Search Features
@@ -168,19 +168,19 @@ Results display:
 ### Examples
 
 **Find a document by title:**
-1. Press `Ctrl+K`
+1. Press `Ctrl+Shift+F`
 2. Click "Title" filter
 3. Type part of the title
 4. Press Enter to open
 
 **Search for tagged documents:**
-1. Press `Ctrl+K`
+1. Press `Ctrl+Shift+F`
 2. Click "Tags" filter
 3. Type the tag name
 4. Browse results and select with arrow keys
 
 **Find content across all documents:**
-1. Press `Ctrl+K`
+1. Press `Ctrl+Shift+F`
 2. Keep "All" filter selected
 3. Type keywords from the content
 4. Review highlighted matches in results
@@ -224,7 +224,7 @@ Quick reference for new keyboard shortcuts:
 | Shortcut | Action |
 |----------|--------|
 | `Ctrl+Shift+C` (or `Cmd+Shift+C`) | Open Calculator |
-| `Ctrl+K` (or `Cmd+K`) | Open Search |
+| `Ctrl+Shift+F` (or `Cmd+Shift+F`) | Open Search |
 | `Enter` (in Calculator) | Calculate expression |
 | `Enter` (in Search) | Open selected document |
 | `Esc` | Close modal (Calculator or Search) |

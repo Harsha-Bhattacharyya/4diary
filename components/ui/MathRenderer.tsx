@@ -33,7 +33,7 @@ export default function MathRenderer({
   displayMode = false,
   className = ""
 }: MathRendererProps) {
-  const containerRef = useRef<HTMLSpanElement>(null);
+  const containerRef = useRef<HTMLDivElement | HTMLSpanElement | null>(null);
 
   useEffect(() => {
     if (containerRef.current && math) {
@@ -53,11 +53,9 @@ export default function MathRenderer({
     }
   }, [math, displayMode]);
 
-  const Element = displayMode ? 'div' : 'span';
-  
   return (
-    <Element 
-      ref={containerRef as React.RefObject<HTMLDivElement | HTMLSpanElement>}
+    <span 
+      ref={containerRef as React.RefObject<HTMLSpanElement>}
       className={`math-renderer ${displayMode ? 'block' : 'inline'} ${className}`}
       style={{ 
         display: displayMode ? 'block' : 'inline-block',
@@ -70,21 +68,32 @@ export default function MathRenderer({
 /**
  * Parses text content and renders LaTeX math notation.
  * Supports inline math ($...$) and display math ($$...$$).
+ * Uses stricter regex to avoid false positives with currency symbols.
  * 
  * @param content - Text content potentially containing LaTeX
  */
 export function parseAndRenderMath(content: string): React.ReactNode[] {
   const nodes: React.ReactNode[] = [];
   let lastIndex = 0;
+  let mathCounter = 0;
+  
+  // First, handle escaped dollars by temporarily replacing them
+  const escapedDollarToken = '\u0000ESCAPED_DOLLAR\u0000';
+  const processedContent = content.replace(/\\\$/g, escapedDollarToken);
   
   // Match both display math ($$...$$) and inline math ($...$)
-  const mathRegex = /(\$\$[\s\S]*?\$\$|\$[^\n]*?\$)/g;
+  // Stricter regex: $ not followed/preceded by digit to avoid currency
+  // Display math: $$...$$
+  // Inline math: $ followed by non-whitespace, non-digit, then content, then $ not preceded by digit
+  const mathRegex = /(\$\$[\s\S]*?\$\$|\$(?!\s)(?!\d)[^\n$]*?(?<!\d)\$)/g;
   
   let match;
-  while ((match = mathRegex.exec(content)) !== null) {
+  while ((match = mathRegex.exec(processedContent)) !== null) {
     // Add text before math
     if (match.index > lastIndex) {
-      nodes.push(content.substring(lastIndex, match.index));
+      const textBefore = processedContent.substring(lastIndex, match.index);
+      // Restore escaped dollars in text
+      nodes.push(textBefore.replace(new RegExp(escapedDollarToken, 'g'), '$'));
     }
     
     const fullMatch = match[0];
@@ -93,9 +102,14 @@ export function parseAndRenderMath(content: string): React.ReactNode[] {
       ? fullMatch.slice(2, -2).trim()
       : fullMatch.slice(1, -1).trim();
     
+    // Use content-based stable key with counter for uniqueness
+    const contentHash = mathContent.split('').reduce((acc, char) => {
+      return ((acc << 5) - acc) + char.charCodeAt(0);
+    }, 0);
+    
     nodes.push(
       <MathRenderer 
-        key={`math-${match.index}`}
+        key={`math-${contentHash}-${mathCounter++}`}
         math={mathContent}
         displayMode={isDisplayMode}
       />
@@ -105,8 +119,10 @@ export function parseAndRenderMath(content: string): React.ReactNode[] {
   }
   
   // Add remaining text
-  if (lastIndex < content.length) {
-    nodes.push(content.substring(lastIndex));
+  if (lastIndex < processedContent.length) {
+    const textAfter = processedContent.substring(lastIndex);
+    // Restore escaped dollars in remaining text
+    nodes.push(textAfter.replace(new RegExp(escapedDollarToken, 'g'), '$'));
   }
   
   return nodes.length > 0 ? nodes : [content];

@@ -9,7 +9,7 @@ Master 4Diary with these keyboard shortcuts for maximum productivity.
 | Shortcut | Action |
 |----------|--------|
 | `Ctrl+Q` / `Cmd+Q` | Open/Close Quick Note |
-| `Ctrl+K` / `Cmd+K` | Open Search |
+| `Ctrl+Shift+F` / `Cmd+Shift+F` | Open Search |
 | `Ctrl+Shift+C` / `Cmd+Shift+C` | Open Calculator |
 | `Ctrl+S` / `Cmd+S` | Save current document |
 | `Escape` | Close modal or exit mode |
@@ -115,7 +115,7 @@ These work anywhere in 4Diary:
 ### Search Notes
 
 #### Open Search
-**`Ctrl+K` (Windows/Linux) | `Cmd+K` (Mac)**
+**`Ctrl+Shift+F` (Windows/Linux) | `Cmd+Shift+F` (Mac)**
 
 - Opens powerful search modal
 - Search across all documents
@@ -124,7 +124,7 @@ These work anywhere in 4Diary:
 
 **Search Workflow**:
 ```
-1. Press Ctrl+K
+1. Press Ctrl+Shift+F
 2. Type search query
 3. Use ↑↓ to navigate results
 4. Press Enter to open document
@@ -467,7 +467,7 @@ Future versions will allow customization:
 
 **Quick Access**:
 - `Ctrl+Q` - Quick Note
-- `Ctrl+K` - Search
+- `Ctrl+Shift+F` - Search
 - `Ctrl+Shift+C` - Calculator
 - `Ctrl+S` - Save
 - `Escape` - Close/Cancel

@@ -231,10 +231,14 @@ export default function SearchModal({
     }
   };
 
-  // Reset selected index when results change
+  // Reset selected index when query or filter changes
+  // Using setTimeout to avoid synchronous setState in effect
   useEffect(() => {
-    setSelectedIndex(0);
-  }, [searchResults]);
+    const timer = setTimeout(() => {
+      setSelectedIndex(0);
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [query, filter]);
 
   // Highlight text based on match positions
   const highlightText = (text: string, highlights: number[] = []): React.ReactNode => {

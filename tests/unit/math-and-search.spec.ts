@@ -16,6 +16,21 @@ import { test, expect } from '@playwright/test';
  * These tests verify LaTeX math rendering, calculator functionality, and search capabilities
  */
 
+// Mock authentication for all tests
+test.beforeEach(async ({ page }) => {
+  // Mock the session endpoint to return authenticated state
+  await page.route('**/api/auth/session', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        authenticated: true,
+        username: 'test@example.com'
+      })
+    });
+  });
+});
+
 test.describe('Calculator Feature', () => {
   test('should open calculator with keyboard shortcut', async ({ page }) => {
     await page.goto('/workspace');
@@ -119,8 +134,8 @@ test.describe('Search Feature', () => {
     await page.goto('/workspace');
     await page.waitForLoadState('networkidle');
     
-    // Press Ctrl+K to open search
-    await page.keyboard.press('Control+K');
+    // Press Ctrl+Shift+F to open search
+    await page.keyboard.press('Control+Shift+F');
     await page.waitForTimeout(500);
     
     // Check if search modal is visible
@@ -133,7 +148,7 @@ test.describe('Search Feature', () => {
     await page.waitForLoadState('networkidle');
     
     // Open search
-    await page.keyboard.press('Control+K');
+    await page.keyboard.press('Control+Shift+F');
     await page.waitForTimeout(500);
     
     const searchInput = page.locator('input[placeholder*="Search documents"]');
@@ -153,7 +168,7 @@ test.describe('Search Feature', () => {
     await page.waitForLoadState('networkidle');
     
     // Open search
-    await page.keyboard.press('Control+K');
+    await page.keyboard.press('Control+Shift+F');
     await page.waitForTimeout(500);
     
     // Check that filter buttons exist
@@ -168,7 +183,7 @@ test.describe('Search Feature', () => {
     await page.waitForLoadState('networkidle');
     
     // Open search
-    await page.keyboard.press('Control+K');
+    await page.keyboard.press('Control+Shift+F');
     await page.waitForTimeout(500);
     
     const searchInput = page.locator('input[placeholder*="Search documents"]');
@@ -191,7 +206,7 @@ test.describe('Search Feature', () => {
     await page.waitForLoadState('networkidle');
     
     // Open search
-    await page.keyboard.press('Control+K');
+    await page.keyboard.press('Control+Shift+F');
     await page.waitForTimeout(500);
     
     const searchInput = page.locator('input[placeholder*="Search documents"]');
