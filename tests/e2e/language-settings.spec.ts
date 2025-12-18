@@ -154,7 +154,7 @@ test.describe('Language Settings - Mobile View', () => {
     
     if (boundingBox) {
       // Should meet minimum touch target size
-      expect(boundingBox.height).toBeGreaterThanOrEqual(40);
+      expect(boundingBox.height).toBeGreaterThanOrEqual(44);
     }
   });
 });
