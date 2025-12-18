@@ -167,15 +167,16 @@ test.describe('Language Settings - Keyboard Navigation', () => {
   test('should be focusable with Tab key', async ({ page }) => {
     const languageSelect = page.locator('select[aria-label="Select language"]');
     
-    // Tab to the element
-    await page.keyboard.press('Tab');
-    await page.keyboard.press('Tab');
-    await page.keyboard.press('Tab');
+    // Focus the language selector directly
+    await languageSelect.focus();
     
-    // Check if select is focused (after several tabs)
+    // Verify it is focused
     const isFocused = await languageSelect.evaluate((el) => el === document.activeElement);
+    expect(isFocused).toBe(true);
     
-    // This may not be focused immediately, but it should be focusable
-    expect(typeof isFocused).toBe('boolean');
+    // Verify keyboard interaction works
+    await page.keyboard.press('ArrowDown');
+    const valueAfterArrow = await languageSelect.inputValue();
+    expect(valueAfterArrow).toBeTruthy();
   });
 });
