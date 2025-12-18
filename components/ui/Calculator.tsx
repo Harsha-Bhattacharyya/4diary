@@ -228,9 +228,9 @@ export default function Calculator({ onClose, onInsert }: CalculatorProps) {
             <div className="border-t pt-4">
               <h3 className="text-sm font-medium text-gray-700 mb-2">History</h3>
               <div className="space-y-2 max-h-40 overflow-y-auto">
-                {history.slice().reverse().map((item, idx) => (
+                {history.slice().reverse().map((item) => (
                   <button
-                    key={idx}
+                    key={`${item.expr}-${item.result}`}
                     onClick={() => insertFromHistory(item)}
                     className="w-full text-left p-2 bg-leather-50 hover:bg-leather-100 rounded text-sm font-mono transition-colors"
                   >
