@@ -18,7 +18,7 @@ import GlassCard from "@/components/ui/GlassCard";
 import LeatherButton from "@/components/ui/LeatherButton";
 import TopMenu from "@/components/ui/TopMenu";
 import { useTheme } from "@/components/ui/ThemeProvider";
-import { SUPPORTED_LANGUAGES, LanguageCode } from "@/lib/translationService";
+import { SUPPORTED_LANGUAGES, type LanguageCode } from "@/lib/translationTypes";
 
 /**
  * Render the application Settings page with security, export, privacy, appearance, and self-hosting sections.
@@ -46,10 +46,14 @@ export default function SettingsPage() {
 
   // Load current language preference and check translation service availability
   useEffect(() => {
+    const abortController = new AbortController();
+    
     const loadLanguageSettings = async () => {
       try {
         // Check if translation service is available
-        const statusResponse = await fetch("/api/translate");
+        const statusResponse = await fetch("/api/translate", {
+          signal: abortController.signal,
+        });
         if (statusResponse.ok) {
           const statusData = await statusResponse.json();
           setTranslationAvailable(statusData.available);
@@ -59,7 +63,8 @@ export default function SettingsPage() {
         const userId = localStorage.getItem("userId");
         if (userId) {
           const workspaceResponse = await fetch(
-            `/api/workspaces?userId=${encodeURIComponent(userId)}`
+            `/api/workspaces?userId=${encodeURIComponent(userId)}`,
+            { signal: abortController.signal }
           );
           if (workspaceResponse.ok) {
             const data = await workspaceResponse.json();
@@ -72,20 +77,33 @@ export default function SettingsPage() {
           }
         }
       } catch (error) {
+        // Ignore abort errors
+        if (error instanceof Error && error.name === 'AbortError') {
+          return;
+        }
         console.error("Failed to load language settings:", error);
       }
     };
 
     loadLanguageSettings();
+
+    // Cleanup function to abort fetch on unmount
+    return () => {
+      abortController.abort();
+    };
   }, []);
 
   const handleLanguageChange = async (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
     const newLanguage = event.target.value as LanguageCode;
+    const previousLanguage = selectedLanguage;
+    
     setSelectedLanguage(newLanguage);
     setLanguageSaving(true);
     setLanguageSaved(false);
+
+    let timeoutId: NodeJS.Timeout | null = null;
 
     try {
       // Get user's workspace
@@ -120,17 +138,32 @@ export default function SettingsPage() {
       });
 
       if (!updateResponse.ok) {
-        throw new Error("Failed to update language preference");
+        const errorData = await updateResponse.json();
+        throw new Error(errorData.error || "Failed to update language preference");
       }
 
       setLanguageSaved(true);
-      setTimeout(() => setLanguageSaved(false), 3000);
+      timeoutId = setTimeout(() => setLanguageSaved(false), 3000);
     } catch (error) {
       console.error("Failed to save language preference:", error);
-      alert("Failed to save language preference. Please try again.");
+      
+      // Rollback to previous language on failure
+      setSelectedLanguage(previousLanguage);
+      
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : "Failed to save language preference. Please try again.";
+      alert(errorMessage);
     } finally {
       setLanguageSaving(false);
     }
+
+    // Cleanup timeout on unmount
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
   };
 
   return (

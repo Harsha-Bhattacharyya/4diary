@@ -10,11 +10,25 @@
  */
 
 /**
- * Translation service using lingo.dev API
+ * Translation service using lingo.dev SDK (server-side only)
  * Provides multi-language support with caching to reduce API calls
+ * 
+ * NOTE: This module uses @lingo.dev/_sdk which has Node.js dependencies (jsdom).
+ * It should only be imported in server-side code (API routes).
+ * For client-side usage, import types from './translationTypes' instead.
  */
 
-// Simple console logger for client-side (avoiding server-only logger)
+// Re-export types from translationTypes for convenience
+export type { LanguageCode, TranslationRequest, TranslationResponse } from './translationTypes';
+export { SUPPORTED_LANGUAGES } from './translationTypes';
+
+// Import for internal use
+import { SUPPORTED_LANGUAGES, type LanguageCode, type TranslationRequest, type TranslationResponse } from './translationTypes';
+
+// Import SDK - this will only work server-side
+import type { LingoDotDevEngine as LingoDotDevEngineType } from '@lingo.dev/_sdk';
+
+// Simple console logger for server-side
 const log = {
   debug: (msg: string, data?: object) => {
     if (process.env.NODE_ENV === 'development') {
@@ -29,39 +43,55 @@ const log = {
   },
 };
 
-// Supported languages (implementing first 3 as per requirement)
-export const SUPPORTED_LANGUAGES = {
-  en: { code: "en", name: "English", nativeName: "English" },
-  bn: { code: "bn", name: "Bengali", nativeName: "বাংলা" },
-  hi: { code: "hi", name: "Hindi", nativeName: "हिन्दी" },
-  // Future languages (not yet implemented):
-  // ta: { code: "ta", name: "Tamil", nativeName: "தமிழ்" },
-  // zh: { code: "zh", name: "Mandarin", nativeName: "中文" },
-  // ru: { code: "ru", name: "Russian", nativeName: "Русский" },
-  // fr: { code: "fr", name: "French", nativeName: "Français" },
-  // de: { code: "de", name: "German", nativeName: "Deutsch" },
-} as const;
+/**
+ * LRU (Least Recently Used) cache for translations
+ * When cache is full, removes the least recently accessed item
+ */
+class LRUCache<K, V> {
+  private cache: Map<K, V>;
+  private maxSize: number;
 
-export type LanguageCode = keyof typeof SUPPORTED_LANGUAGES;
+  constructor(maxSize: number) {
+    this.cache = new Map();
+    this.maxSize = maxSize;
+  }
 
-export interface TranslationRequest {
-  text: string;
-  sourceLang: LanguageCode;
-  targetLang: LanguageCode;
-}
+  get(key: K): V | undefined {
+    const value = this.cache.get(key);
+    if (value !== undefined) {
+      // Move to end (most recently used)
+      this.cache.delete(key);
+      this.cache.set(key, value);
+    }
+    return value;
+  }
 
-export interface TranslationResponse {
-  translatedText: string;
-  sourceLang: LanguageCode;
-  targetLang: LanguageCode;
-  cached: boolean;
+  set(key: K, value: V): void {
+    // Remove if exists to reinsert at end
+    if (this.cache.has(key)) {
+      this.cache.delete(key);
+    } else if (this.cache.size >= this.maxSize) {
+      // Remove least recently used (first item)
+      const firstKey = this.cache.keys().next().value;
+      this.cache.delete(firstKey);
+    }
+    this.cache.set(key, value);
+  }
+
+  get size(): number {
+    return this.cache.size;
+  }
+
+  clear(): void {
+    this.cache.clear();
+  }
 }
 
 /**
- * In-memory translation cache to reduce API calls
+ * In-memory LRU translation cache to reduce API calls
  * Key format: `${sourceLang}:${targetLang}:${text}`
  */
-const translationCache = new Map<string, string>();
+const translationCache = new LRUCache<string, string>(1000);
 
 // Maximum cache size to prevent memory issues
 const MAX_CACHE_SIZE = 1000;
@@ -142,45 +172,27 @@ export async function translateText(
   }
 
   try {
-    log.info("Translating text via lingo.dev", {
+    log.info("Translating text via lingo.dev SDK", {
       sourceLang,
       targetLang,
       textLength: text.length,
     });
 
-    // Call lingo.dev API
-    // Note: This is a generic implementation. Adjust based on actual lingo.dev API
-    const response = await fetch("https://api.lingo.dev/v1/translate", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        text,
-        source_language: sourceLang,
-        target_language: targetLang,
-      }),
+    // Dynamically import SDK to avoid client-side bundling issues
+    const { LingoDotDevEngine } = await import('@lingo.dev/_sdk');
+    
+    // Initialize SDK engine
+    const engine = new LingoDotDevEngine({
+      apiKey: apiKey,
     });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(
-        `lingo.dev API error: ${response.status} ${response.statusText} - ${
-          errorData.message || "Unknown error"
-        }`
-      );
-    }
+    // Call lingo.dev SDK
+    const translatedText = await engine.localizeText(text, {
+      sourceLocale: sourceLang,
+      targetLocale: targetLang,
+    });
 
-    const data = await response.json();
-    const translatedText = data.translated_text || data.text || text;
-
-    // Cache the translation (with size limit)
-    if (translationCache.size >= MAX_CACHE_SIZE) {
-      // Remove oldest entry (first entry in the Map)
-      const firstKey = translationCache.keys().next().value;
-      translationCache.delete(firstKey);
-    }
+    // Cache the translation (LRU cache handles size limit automatically)
     translationCache.set(cacheKey, translatedText);
 
     log.info("Translation successful", { sourceLang, targetLang });
@@ -192,12 +204,15 @@ export async function translateText(
       cached: false,
     };
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     log.error("Translation failed", {
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: errorMessage,
       sourceLang,
       targetLang,
     });
-    throw error;
+    
+    // Re-throw with clear error message
+    throw new Error(`Translation failed: ${errorMessage}`);
   }
 }
 
@@ -215,9 +230,27 @@ export async function translateBatch(
   sourceLang: LanguageCode,
   targetLang: LanguageCode
 ): Promise<TranslationResponse[]> {
+  // Validate inputs
+  if (!texts || texts.length === 0) {
+    throw new Error("Texts array cannot be empty");
+  }
+
+  // Filter out empty strings and validate
+  const validTexts = texts.filter((text) => {
+    if (typeof text !== "string") {
+      log.error("Invalid text type in batch", { type: typeof text });
+      return false;
+    }
+    return text.trim().length > 0;
+  });
+
+  if (validTexts.length === 0) {
+    throw new Error("No valid texts to translate in batch");
+  }
+
   const results: TranslationResponse[] = [];
 
-  for (const text of texts) {
+  for (const text of validTexts) {
     try {
       const result = await translateText({ text, sourceLang, targetLang });
       results.push(result);

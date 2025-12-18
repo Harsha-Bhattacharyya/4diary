@@ -100,8 +100,9 @@ test.describe('Language Settings UI', () => {
     const appearanceSection = page.locator('h2:has-text("🎨 Appearance")');
     await expect(appearanceSection).toBeVisible();
     
-    // Language option should be in the same card
-    const appearanceCard = appearanceSection.locator('..');
+    // Language option should be within the Appearance card
+    // Find the GlassCard containing the Appearance heading
+    const appearanceCard = page.locator('.settings-card:has(h2:has-text("🎨 Appearance"))');
     const languageOption = appearanceCard.getByText('Language');
     await expect(languageOption).toBeVisible();
   });

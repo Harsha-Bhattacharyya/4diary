@@ -128,6 +128,21 @@ export async function PUT(request: NextRequest) {
       );
     }
 
+    // Validate language code if provided
+    if (language !== undefined) {
+      const validLanguages = ['en', 'bn', 'hi'];
+      if (!validLanguages.includes(language)) {
+        return NextResponse.json(
+          { 
+            error: "Invalid language code",
+            validLanguages: validLanguages,
+            received: language
+          },
+          { status: 400 }
+        );
+      }
+    }
+
     const db = await getDatabase();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const updateFields: Record<string, any> = {
