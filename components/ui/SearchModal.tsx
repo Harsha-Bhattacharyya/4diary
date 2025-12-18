@@ -201,8 +201,8 @@ export default function SearchModal({
           }
         }
 
-        // If no matches found in any field
-        if (totalScore === 0 && filter !== "all") {
+        // If no matches found in any field, exclude the document
+        if (totalScore === 0) {
           return null;
         }
 
