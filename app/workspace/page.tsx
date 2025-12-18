@@ -74,6 +74,15 @@ const ImportNotes = dynamic(() => import("@/components/ui/ImportNotes").then(mod
   ssr: false,
 });
 
+// Dynamic imports for new math and search features
+const Calculator = dynamic(() => import("@/components/ui/Calculator"), {
+  ssr: false,
+});
+
+const SearchModal = dynamic(() => import("@/components/ui/SearchModal"), {
+  ssr: false,
+});
+
 /**
  * Extracts plain text from BlockNote content structure.
  * Uses forward-order iteration to preserve original block order and empty lines.
@@ -175,6 +184,8 @@ function WorkspaceContent() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showPlaywriterMode, setShowPlaywriterMode] = useState(false);
   const [showImportNotes, setShowImportNotes] = useState(false);
+  const [showCalculator, setShowCalculator] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
   const [editorFont, setEditorFont] = useState<EditorFontType>(() => {
     // Hydrate from localStorage on initial mount (client-side only)
     if (typeof window !== 'undefined') {
@@ -192,6 +203,26 @@ function WorkspaceContent() {
     if (typeof window !== 'undefined') {
       localStorage.setItem('4diary-editor-font', font);
     }
+  }, []);
+
+  // Keyboard shortcuts for new features
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl/Cmd + K for search
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        setShowSearch(true);
+      }
+      
+      // Ctrl/Cmd + Shift + C for calculator
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'C') {
+        e.preventDefault();
+        setShowCalculator(true);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   // Check authentication
@@ -988,6 +1019,28 @@ function WorkspaceContent() {
                   🎭 Playwriter Mode
                 </button>
               )}
+              <button
+                type="button"
+                onClick={() => {
+                  setShowCalculator(true);
+                  setDropdownOpen(false);
+                }}
+                className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+                title="Calculator (Ctrl+Shift+C)"
+              >
+                🔢 Calculator
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowSearch(true);
+                  setDropdownOpen(false);
+                }}
+                className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+                title="Search (Ctrl+K)"
+              >
+                🔍 Search Notes
+              </button>
               <div className="border-t border-gray-200 my-2"></div>
               <button
                 type="button"
@@ -1661,6 +1714,34 @@ function WorkspaceContent() {
       onClose={() => setShowImportNotes(false)}
       onImportComplete={handleImportNotes}
     />
+
+    {/* Calculator Modal */}
+    {showCalculator && (
+      <Calculator
+        onClose={() => setShowCalculator(false)}
+        onInsert={(result) => {
+          // Insert result into editor if document is open
+          if (currentDocument) {
+            // Note: This is a simple implementation. For full integration,
+            // we'd need to expose an insertText method from BlockEditor
+            console.log("Insert into editor:", result);
+          }
+          setShowCalculator(false);
+        }}
+      />
+    )}
+
+    {/* Search Modal */}
+    {showSearch && (
+      <SearchModal
+        documents={documents}
+        onClose={() => setShowSearch(false)}
+        onSelectDocument={(doc) => {
+          handleOpenDocument(doc.id);
+          setShowSearch(false);
+        }}
+      />
+    )}
 
     {/* PWA Components */}
     <PWAInit />
