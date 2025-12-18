@@ -53,9 +53,11 @@ export default function MathRenderer({
     }
   }, [math, displayMode]);
 
+  const Element = displayMode ? 'div' : 'span';
+  
   return (
-    <span 
-      ref={containerRef}
+    <Element 
+      ref={containerRef as React.RefObject<HTMLDivElement | HTMLSpanElement>}
       className={`math-renderer ${displayMode ? 'block' : 'inline'} ${className}`}
       style={{ 
         display: displayMode ? 'block' : 'inline-block',
