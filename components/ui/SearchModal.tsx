@@ -59,6 +59,12 @@ export default function SearchModal({
   }, []);
 
   // Fuzzy match function
+  // Fuzzy match scoring constants
+  const SCORE_EXACT_MATCH = 1000;
+  const SCORE_CONSECUTIVE_BONUS = 5;
+  const SCORE_WORD_START_BONUS = 3;
+  const SCORE_BASE = 1;
+
   const fuzzyMatch = (text: string, search: string): { matches: boolean; score: number; highlights: number[] } => {
     if (!search) return { matches: true, score: 0, highlights: [] };
     
@@ -69,7 +75,7 @@ export default function SearchModal({
     if (textLower.includes(searchLower)) {
       const index = textLower.indexOf(searchLower);
       const highlights = Array.from({ length: search.length }, (_, i) => index + i);
-      return { matches: true, score: 1000, highlights };
+      return { matches: true, score: SCORE_EXACT_MATCH, highlights };
     }
     
     // Fuzzy match
@@ -85,15 +91,15 @@ export default function SearchModal({
         
         // Bonus for consecutive matches
         if (lastMatchIndex === textIndex - 1) {
-          score += 5;
+          score += SCORE_CONSECUTIVE_BONUS;
         }
         
         // Bonus for start of word
         if (textIndex === 0 || textLower[textIndex - 1] === ' ') {
-          score += 3;
+          score += SCORE_WORD_START_BONUS;
         }
         
-        score += 1;
+        score += SCORE_BASE;
         lastMatchIndex = textIndex;
         searchIndex++;
       }
