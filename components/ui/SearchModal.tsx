@@ -233,11 +233,7 @@ export default function SearchModal({
 
   // Reset selected index when results change
   useEffect(() => {
-    // Reset selection when search results change
-    const resetSelection = () => {
-      setSelectedIndex(0);
-    };
-    resetSelection();
+    setSelectedIndex(0);
   }, [searchResults]);
 
   // Highlight text based on match positions
