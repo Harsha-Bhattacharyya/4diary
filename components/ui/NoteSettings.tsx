@@ -40,6 +40,12 @@ interface NoteSettingsProps {
   onUpdateTags?: (tags: string[]) => void;
   editorFont?: EditorFontType;
   onFontChange?: (font: EditorFontType) => void;
+  backgroundColor?: string;
+  onBackgroundColorChange?: (color: string) => void;
+  readOnly?: boolean;
+  onToggleReadOnly?: (readOnly: boolean) => void;
+  archived?: boolean;
+  onToggleArchived?: (archived: boolean) => void;
 }
 
 /**
@@ -74,6 +80,12 @@ export default function NoteSettings({
   onUpdateTags,
   editorFont = "normal",
   onFontChange,
+  backgroundColor = "",
+  onBackgroundColorChange,
+  readOnly = false,
+  onToggleReadOnly,
+  archived = false,
+  onToggleArchived,
 }: NoteSettingsProps) {
   // For folder and tags, we work directly with props
   // The parent component manages the state and passes callbacks
@@ -443,6 +455,108 @@ export default function NoteSettings({
                     Condensed
                   </Button>
                 </div>
+              </div>
+
+              {/* Background Color */}
+              <div className="mt-4 p-4 bg-neutral-50 dark:bg-neutral-900 rounded-lg">
+                <div className="mb-3">
+                  <div className="font-medium text-neutral-900 dark:text-neutral-50">Background Color</div>
+                  <div className="text-sm text-neutral-600 dark:text-neutral-400">
+                    Choose a background color for this note
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {/* Color presets inspired by Google Keep */}
+                  {[
+                    { name: "Default", color: "" },
+                    { name: "Coral", color: "#f28b82" },
+                    { name: "Peach", color: "#fbbc04" },
+                    { name: "Sand", color: "#fff475" },
+                    { name: "Mint", color: "#ccff90" },
+                    { name: "Sage", color: "#a7ffeb" },
+                    { name: "Fog", color: "#cbf0f8" },
+                    { name: "Storm", color: "#aecbfa" },
+                    { name: "Dusk", color: "#d7aefb" },
+                    { name: "Blossom", color: "#fdcfe8" },
+                    { name: "Clay", color: "#e6c9a8" },
+                    { name: "Chalk", color: "#e8eaed" },
+                  ].map(({ name, color }) => (
+                    <button
+                      key={name}
+                      type="button"
+                      onClick={() => onBackgroundColorChange?.(color)}
+                      className={`w-12 h-12 rounded-lg border-2 transition-all hover:scale-110 ${
+                        backgroundColor === color
+                          ? "border-neutral-900 dark:border-neutral-50 ring-2 ring-offset-2 ring-neutral-900 dark:ring-neutral-50"
+                          : "border-neutral-300 dark:border-neutral-600"
+                      }`}
+                      style={{ backgroundColor: color || "#ffffff" }}
+                      title={name}
+                      aria-label={`Set background color to ${name}`}
+                    >
+                      {!color && <span className="text-xl">🚫</span>}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <Separator className="my-6" />
+
+            {/* Note State Settings */}
+            <div>
+              <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-50 mb-4">
+                Note State
+              </h3>
+
+              {/* Read-Only Toggle */}
+              <div className="flex items-center justify-between p-4 bg-neutral-50 dark:bg-neutral-900 rounded-lg mb-4">
+                <div>
+                  <div className="font-medium text-neutral-900 dark:text-neutral-50">Read-Only Mode</div>
+                  <div className="text-sm text-neutral-600 dark:text-neutral-400">
+                    Prevent editing this note
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => onToggleReadOnly?.(!readOnly)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    readOnly ? "bg-neutral-900 dark:bg-neutral-50" : "bg-neutral-300 dark:bg-neutral-700"
+                  }`}
+                  role="switch"
+                  aria-checked={readOnly}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white dark:bg-neutral-900 transition-transform ${
+                      readOnly ? "translate-x-6" : "translate-x-1"
+                    }`}
+                  />
+                </button>
+              </div>
+
+              {/* Archived Toggle */}
+              <div className="flex items-center justify-between p-4 bg-neutral-50 dark:bg-neutral-900 rounded-lg">
+                <div>
+                  <div className="font-medium text-neutral-900 dark:text-neutral-50">Archive Note</div>
+                  <div className="text-sm text-neutral-600 dark:text-neutral-400">
+                    Hide this note from your main workspace
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => onToggleArchived?.(!archived)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    archived ? "bg-neutral-900 dark:bg-neutral-50" : "bg-neutral-300 dark:bg-neutral-700"
+                  }`}
+                  role="switch"
+                  aria-checked={archived}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white dark:bg-neutral-900 transition-transform ${
+                      archived ? "translate-x-6" : "translate-x-1"
+                    }`}
+                  />
+                </button>
               </div>
             </div>
 

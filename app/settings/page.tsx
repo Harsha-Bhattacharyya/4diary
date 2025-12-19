@@ -34,6 +34,15 @@ export default function SettingsPage() {
   const [languageSaving, setLanguageSaving] = useState(false);
   const [languageSaved, setLanguageSaved] = useState(false);
   const [translationAvailable, setTranslationAvailable] = useState(false);
+  
+  // Security settings state
+  const [encryptionEnabled, setEncryptionEnabled] = useState(true);
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+  const [show2FASetup, setShow2FASetup] = useState(false);
+  const [qrCode, setQrCode] = useState("");
+  const [backupCodes, setBackupCodes] = useState<string[]>([]);
+  const [verificationCode, setVerificationCode] = useState("");
+  const [settingsSaving, setSettingsSaving] = useState(false);
 
   const handleExportWorkspace = async () => {
     setExportInProgress(true);
@@ -43,6 +52,152 @@ export default function SettingsPage() {
       setExportInProgress(false);
     }, 1000);
   };
+
+  const handleEncryptionToggle = async () => {
+    const newValue = !encryptionEnabled;
+    
+    // Show warning when disabling encryption
+    if (!newValue) {
+      const confirmed = confirm(
+        "Warning: Disabling encryption will make new documents unencrypted. " +
+        "Existing encrypted documents will remain encrypted. " +
+        "Are you sure you want to continue?"
+      );
+      if (!confirmed) return;
+    }
+
+    setSettingsSaving(true);
+    try {
+      const response = await fetch("/api/settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ encryptionEnabled: newValue }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update encryption setting");
+      }
+
+      setEncryptionEnabled(newValue);
+      alert(`Encryption ${newValue ? "enabled" : "disabled"} successfully`);
+    } catch (error) {
+      console.error("Failed to toggle encryption:", error);
+      alert("Failed to update encryption setting. Please try again.");
+    } finally {
+      setSettingsSaving(false);
+    }
+  };
+
+  const handleSetup2FA = async () => {
+    try {
+      const response = await fetch("/api/auth/2fa/setup", {
+        method: "POST",
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to setup 2FA");
+      }
+
+      const data = await response.json();
+      setQrCode(data.qrCode);
+      setBackupCodes(data.backupCodes);
+      setShow2FASetup(true);
+    } catch (error) {
+      console.error("Failed to setup 2FA:", error);
+      alert(error instanceof Error ? error.message : "Failed to setup 2FA");
+    }
+  };
+
+  const handleEnable2FA = async () => {
+    if (!verificationCode) {
+      alert("Please enter the verification code from your authenticator app");
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/auth/2fa/enable", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: verificationCode }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to enable 2FA");
+      }
+
+      setTwoFactorEnabled(true);
+      setShow2FASetup(false);
+      setVerificationCode("");
+      alert("2FA enabled successfully! Please save your backup codes in a safe place.");
+    } catch (error) {
+      console.error("Failed to enable 2FA:", error);
+      alert(error instanceof Error ? error.message : "Failed to enable 2FA");
+    }
+  };
+
+  const handleDisable2FA = async () => {
+    const password = prompt("Enter your password to disable 2FA:");
+    if (!password) return;
+
+    try {
+      const response = await fetch("/api/auth/2fa/disable", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to disable 2FA");
+      }
+
+      setTwoFactorEnabled(false);
+      alert("2FA disabled successfully");
+    } catch (error) {
+      console.error("Failed to disable 2FA:", error);
+      alert(error instanceof Error ? error.message : "Failed to disable 2FA");
+    }
+  };
+
+  // Load settings and 2FA status
+  useEffect(() => {
+    const abortController = new AbortController();
+    
+    const loadAllSettings = async () => {
+      try {
+        // Load encryption settings
+        const settingsResponse = await fetch("/api/settings", {
+          signal: abortController.signal,
+        });
+        if (settingsResponse.ok) {
+          const settingsData = await settingsResponse.json();
+          setEncryptionEnabled(settingsData.encryptionEnabled !== false);
+        }
+
+        // Load 2FA status
+        const twoFactorResponse = await fetch("/api/auth/2fa/status", {
+          signal: abortController.signal,
+        });
+        if (twoFactorResponse.ok) {
+          const twoFactorData = await twoFactorResponse.json();
+          setTwoFactorEnabled(twoFactorData.enabled || false);
+        }
+      } catch (error) {
+        if (error instanceof Error && error.name === 'AbortError') {
+          return;
+        }
+        console.error("Failed to load security settings:", error);
+      }
+    };
+    
+    loadAllSettings();
+    
+    return () => {
+      abortController.abort();
+    };
+  }, []);
 
   // Load current language preference and check translation service availability
   useEffect(() => {
@@ -185,19 +340,130 @@ export default function SettingsPage() {
               🔒 Security
             </h2>
             <div className="space-y-4">
+              {/* Encryption Toggle */}
               <div className="flex items-center justify-between py-3 border-b border-leather-700">
                 <div>
                   <h3 className="font-bold text-leather-100">
                     End-to-End Encryption
                   </h3>
                   <p className="text-sm text-leather-300">
-                    All documents are encrypted with AES-256-GCM
+                    Encrypt all documents with AES-256-GCM
                   </p>
                 </div>
-                <div className="px-4 py-2 bg-green-700/40 text-green-200 text-sm font-bold border-2 border-green-600">
-                  Enabled
-                </div>
+                <button
+                  type="button"
+                  onClick={handleEncryptionToggle}
+                  disabled={settingsSaving}
+                  className={`px-4 py-2 text-sm font-bold border-2 rounded transition-colors ${
+                    encryptionEnabled
+                      ? "bg-green-700/40 text-green-200 border-green-600"
+                      : "bg-red-700/40 text-red-200 border-red-600"
+                  } ${settingsSaving ? "opacity-50 cursor-not-allowed" : "hover:opacity-80"}`}
+                >
+                  {settingsSaving ? "Saving..." : encryptionEnabled ? "Enabled" : "Disabled"}
+                </button>
               </div>
+
+              {/* 2FA Section */}
+              <div className="py-3 border-b border-leather-700">
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <h3 className="font-bold text-leather-100">
+                      Two-Factor Authentication (2FA)
+                    </h3>
+                    <p className="text-sm text-leather-300">
+                      Add an extra layer of security with TOTP
+                    </p>
+                  </div>
+                  <div className={`px-4 py-2 text-sm font-bold border-2 ${
+                    twoFactorEnabled
+                      ? "bg-green-700/40 text-green-200 border-green-600"
+                      : "bg-neutral-700/40 text-neutral-200 border-neutral-600"
+                  }`}>
+                    {twoFactorEnabled ? "Enabled" : "Disabled"}
+                  </div>
+                </div>
+                
+                {!twoFactorEnabled ? (
+                  <LeatherButton
+                    variant="parchment"
+                    size="md"
+                    onClick={handleSetup2FA}
+                  >
+                    Setup 2FA
+                  </LeatherButton>
+                ) : (
+                  <LeatherButton
+                    variant="leather"
+                    size="md"
+                    onClick={handleDisable2FA}
+                  >
+                    Disable 2FA
+                  </LeatherButton>
+                )}
+              </div>
+
+              {/* 2FA Setup Modal */}
+              {show2FASetup && (
+                <div className="p-4 bg-leather-900 border-2 border-leather-700 rounded-lg">
+                  <h4 className="font-bold text-leather-100 mb-3">Setup Two-Factor Authentication</h4>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-sm text-leather-300 mb-2">
+                        1. Scan this QR code with your authenticator app (Google Authenticator, Authy, etc.)
+                      </p>
+                      {qrCode && (
+                        <div className="bg-white p-4 rounded inline-block">
+                          <img src={qrCode} alt="2FA QR Code" className="w-48 h-48" />
+                        </div>
+                      )}
+                    </div>
+
+                    <div>
+                      <p className="text-sm text-leather-300 mb-2">
+                        2. Save these backup codes in a safe place:
+                      </p>
+                      <div className="bg-leather-950 p-3 rounded text-sm font-mono text-leather-200 max-h-32 overflow-y-auto">
+                        {backupCodes.map((code, idx) => (
+                          <div key={idx}>{code}</div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <p className="text-sm text-leather-300 mb-2">
+                        3. Enter the 6-digit code from your app to verify:
+                      </p>
+                      <input
+                        type="text"
+                        value={verificationCode}
+                        onChange={(e) => setVerificationCode(e.target.value)}
+                        placeholder="000000"
+                        maxLength={6}
+                        className="w-full px-4 py-2 bg-leather-800 text-leather-100 border-2 border-leather-600 rounded focus:border-leather-400 focus:outline-none"
+                      />
+                    </div>
+
+                    <div className="flex gap-2">
+                      <LeatherButton
+                        variant="gradient"
+                        size="md"
+                        onClick={handleEnable2FA}
+                      >
+                        Verify & Enable
+                      </LeatherButton>
+                      <LeatherButton
+                        variant="leather"
+                        size="md"
+                        onClick={() => setShow2FASetup(false)}
+                      >
+                        Cancel
+                      </LeatherButton>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <div className="flex items-center justify-between py-3 border-b border-leather-700">
                 <div>
