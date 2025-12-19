@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation";
 import LeatherBackground from "@/components/ui/LeatherBackground";
 import GlassCard from "@/components/ui/GlassCard";
 import LeatherButton from "@/components/ui/LeatherButton";
+import { Turnstile } from "@marsidev/react-turnstile";
 
 /**
  * Authentication page component that displays and manages login and signup forms.
@@ -35,6 +36,10 @@ export default function AuthPage() {
   const [agreeToTerms, setAgreeToTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  
+  // Get Turnstile site key from environment (optional)
+  const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
   const generateSecurePassword = () => {
     const length = 16;
@@ -93,12 +98,18 @@ export default function AuthPage() {
       return;
     }
     
+    // Check Turnstile token if feature is enabled and we're logging in
+    if (isLogin && turnstileSiteKey && !turnstileToken) {
+      setError("Please complete the bot verification");
+      return;
+    }
+    
     setLoading(true);
 
     try {
       const endpoint = isLogin ? "/api/auth/login" : "/api/auth/signup";
       const body = isLogin
-        ? { username, password }
+        ? { username, password, turnstileToken }
         : { username, password, name: name || username };
 
       const response = await fetch(endpoint, {
@@ -263,6 +274,19 @@ export default function AuthPage() {
                     License Agreement
                   </a>
                 </label>
+              </div>
+            )}
+
+            {/* Cloudflare Turnstile Bot Verification (Login only, optional) */}
+            {isLogin && turnstileSiteKey && (
+              <div className="flex justify-center">
+                <Turnstile
+                  siteKey={turnstileSiteKey}
+                  onSuccess={(token) => setTurnstileToken(token)}
+                  onError={() => setTurnstileToken(null)}
+                  onExpire={() => setTurnstileToken(null)}
+                  theme="dark"
+                />
               </div>
             )}
 

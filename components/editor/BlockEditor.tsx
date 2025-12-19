@@ -22,6 +22,8 @@ import VimModeIndicator from "./VimModeIndicator";
 import { useVimMode } from "@/lib/vim/useVimMode";
 import { VimMode, RecordedKey } from "@/lib/vim/VimMode";
 import { VimNavigationHandler } from "@/lib/vim/VimNavigationHandler";
+import AIAssistant from "@/components/ui/AIAssistant";
+import { Sparkles } from "lucide-react";
 
 import type { EditorFontType } from "@/components/ui/NoteSettings";
 
@@ -74,6 +76,7 @@ export default function BlockEditor({
   const [lastContentHash, setLastContentHash] = useState<number>(0);
   const [isInitialized, setIsInitialized] = useState(false);
   const [vimEnabled, setVimEnabled] = useState(false);
+  const [showAI, setShowAI] = useState(false);
   const editorContainerRef = useRef<HTMLDivElement>(null);
   const vimNavigationHandlerRef = useRef<VimNavigationHandler | null>(null);
 
@@ -169,12 +172,19 @@ export default function BlockEditor({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Listen for Ctrl+Shift+V to toggle vim mode
+  // Listen for Ctrl+Shift+V to toggle vim mode and Ctrl+Shift+A for AI assistant
   useEffect(() => {
     const handleGlobalKeyDown = (event: KeyboardEvent) => {
       if (event.ctrlKey && event.shiftKey && event.key === 'V') {
         event.preventDefault();
         setVimEnabled((prev) => !prev);
+        return;
+      }
+      
+      // Ctrl+Shift+A to toggle AI assistant
+      if (event.ctrlKey && event.shiftKey && event.key === 'A' && editable) {
+        event.preventDefault();
+        setShowAI((prev) => !prev);
         return;
       }
 
@@ -353,6 +363,13 @@ export default function BlockEditor({
     }
   };
 
+  // Get document context for AI
+  const getDocumentContext = useCallback(() => {
+    if (!editor) return "";
+    const blocks = editor.document;
+    return JSON.stringify(blocks).slice(0, 1000); // First 1000 chars as context
+  }, [editor]);
+
   return (
     <div className="relative w-full h-full touch-auto" ref={editorContainerRef}>
       {/* Vim Mode Indicator */}
@@ -360,6 +377,24 @@ export default function BlockEditor({
 
       {/* Formatting Toolbar - Top position */}
       {showToolbar && !vimEnabled && toolbarPosition === 'top' && <FormattingToolbar editor={editor} position="top" />}
+
+      {/* AI Assistant Button */}
+      {editable && (
+        <button
+          onClick={() => setShowAI(true)}
+          className="fixed bottom-8 right-8 z-50 p-4 bg-leather-600 text-leather-50 rounded-full shadow-deep hover:bg-leather-700 transition-all hover:scale-110"
+          title="AI Assistant (Ctrl+Shift+A)"
+        >
+          <Sparkles className="w-6 h-6" />
+        </button>
+      )}
+
+      {/* AI Assistant Modal */}
+      <AIAssistant
+        isOpen={showAI}
+        onClose={() => setShowAI(false)}
+        documentContext={getDocumentContext()}
+      />
 
       {/* Save status */}
       {autoSave && (
