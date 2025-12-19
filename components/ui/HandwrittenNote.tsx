@@ -124,33 +124,15 @@ export default function HandwrittenNote({
 
   const toggleEraser = () => {
     setIsEraser(!isEraser);
-    if (!isEraser) {
-      // Eraser mode: white color
-      if (canvasRef.current) {
-        canvasRef.current.penColor = "#FFFFFF";
-      }
-    } else {
-      // Pen mode: restore color
-      if (canvasRef.current) {
-        canvasRef.current.penColor = penColor;
-      }
-    }
   };
 
   const selectColor = (color: string) => {
     setPenColor(color);
-    if (canvasRef.current && !isEraser) {
-      canvasRef.current.penColor = color;
-    }
     setShowColorPicker(false);
   };
 
   const selectPenWidth = (width: number) => {
     setPenWidth(width);
-    if (canvasRef.current) {
-      canvasRef.current.minWidth = width;
-      canvasRef.current.maxWidth = width + 1;
-    }
   };
 
   const handleBegin = () => {

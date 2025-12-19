@@ -20,7 +20,7 @@ test.describe('Bot Verification - Cloudflare Turnstile', () => {
   test('should render Turnstile widget when configured', async ({ page }) => {
     // Mock environment variable for Turnstile
     await page.addInitScript(() => {
-      // @ts-ignore
+      // @ts-expect-error - Setting test environment variable
       window.ENV_TURNSTILE_ENABLED = true;
     });
 

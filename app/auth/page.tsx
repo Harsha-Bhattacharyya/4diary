@@ -285,7 +285,9 @@ export default function AuthPage() {
                   onSuccess={(token) => setTurnstileToken(token)}
                   onError={() => setTurnstileToken(null)}
                   onExpire={() => setTurnstileToken(null)}
-                  theme="dark"
+                  options={{
+                    theme: "dark",
+                  }}
                 />
               </div>
             )}

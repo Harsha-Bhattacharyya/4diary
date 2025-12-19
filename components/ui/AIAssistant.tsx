@@ -12,7 +12,7 @@
  */
 
 import React, { useState, useRef, useEffect } from "react";
-import { DDGChat } from "@mumulhl/duckduckgo-ai-chat";
+import { initChat } from "@mumulhl/duckduckgo-ai-chat";
 import { X, Send, Sparkles, Loader2 } from "lucide-react";
 import GlassCard from "./GlassCard";
 
@@ -47,7 +47,7 @@ export default function AIAssistant({
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [aiEnabled, setAiEnabled] = useState(true);
+  const [aiEnabled] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -84,8 +84,8 @@ export default function AIAssistant({
     setIsLoading(true);
 
     try {
-      // Initialize DDG Chat
-      const chat = new DDGChat();
+      // Initialize DDG Chat (using gpt-4o-mini model)
+      const chat = await initChat("gpt-4o-mini");
       
       // Build context-aware prompt
       let prompt = input;
@@ -93,8 +93,8 @@ export default function AIAssistant({
         prompt = `Context: ${documentContext.slice(0, 500)}...\n\nQuestion: ${input}`;
       }
 
-      // Get AI response
-      const response = await chat.chat(prompt);
+      // Get AI response using fetchFull for complete response
+      const response = await chat.fetchFull(prompt);
       
       const assistantMessage: Message = {
         role: "assistant",
@@ -172,7 +172,7 @@ export default function AIAssistant({
               </h3>
               <p className="text-sm text-leather-400 max-w-md">
                 Ask questions, get writing suggestions, or request help with your notes.
-                All queries are processed through DuckDuckGo's privacy-focused AI.
+                All queries are processed through DuckDuckGo&apos;s privacy-focused AI.
               </p>
             </div>
           ) : (
@@ -247,7 +247,7 @@ export default function AIAssistant({
         {/* Privacy Notice */}
         <div className="px-4 pb-4 text-center">
           <p className="text-xs text-leather-500">
-            🔒 Privacy-first: All queries are sent through DuckDuckGo's AI. No data is stored or used for training.
+            🔒 Privacy-first: All queries are sent through DuckDuckGo&apos;s AI. No data is stored or used for training.
           </p>
         </div>
       </GlassCard>

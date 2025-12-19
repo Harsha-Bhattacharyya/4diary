@@ -415,7 +415,7 @@ export default function BlockEditor({
         style={{ WebkitTapHighlightColor: 'transparent' }}
       >
         <BlockNoteView
-          editor={editor}
+          editor={editor as any}
           onChange={handleChange}
           editable={editable}
           theme="light"

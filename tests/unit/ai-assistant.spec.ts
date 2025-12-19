@@ -17,7 +17,7 @@ import { test, expect } from '@playwright/test';
  */
 
 test.describe('AI Assistant Component', () => {
-  test('should not render AI assistant initially', async ({ page }) => {
+  test('should not render AI assistant initially', async ({ page: _page }) => {
     await page.goto('/workspace');
     
     // AI assistant should not be visible initially
@@ -25,7 +25,7 @@ test.describe('AI Assistant Component', () => {
     await expect(aiAssistant).not.toBeVisible();
   });
 
-  test('AI assistant should have privacy notice', async ({ page }) => {
+  test('AI assistant should have privacy notice', async ({ page: _page }) => {
     // This is a component test - in a real scenario, the AI assistant would be rendered
     // when the floating button is clicked in an editor
     
@@ -34,7 +34,7 @@ test.describe('AI Assistant Component', () => {
     expect(true).toBeTruthy();
   });
 
-  test('should show AI button in editor when document is editable', async ({ page }) => {
+  test('should show AI button in editor when document is editable', async ({ page: _page }) => {
     // Navigate to workspace
     await page.goto('/workspace');
     
@@ -48,7 +48,7 @@ test.describe('AI Assistant Component', () => {
 });
 
 test.describe('AI Assistant - Keyboard Shortcuts', () => {
-  test('should support Ctrl+Shift+A keyboard shortcut', async ({ page }) => {
+  test('should support Ctrl+Shift+A keyboard shortcut', async ({ page: _page }) => {
     // This test validates that the keyboard shortcut is defined
     // Full integration requires document editor to be active
     
@@ -61,7 +61,7 @@ test.describe('AI Assistant - Keyboard Shortcuts', () => {
 });
 
 test.describe('AI Assistant - Privacy Features', () => {
-  test('should use DuckDuckGo AI for privacy', async ({ page }) => {
+  test('should use DuckDuckGo AI for privacy', async ({ page: _page }) => {
     // Verify that AI assistant uses privacy-first DuckDuckGo
     // This is validated in the component implementation
     
@@ -74,7 +74,7 @@ test.describe('AI Assistant - Privacy Features', () => {
     expect(true).toBeTruthy();
   });
 
-  test('should not require API keys or external configuration', async ({ page }) => {
+  test('should not require API keys or external configuration', async ({ page: _page }) => {
     // AI should work without additional configuration
     // This supports self-hostability
     

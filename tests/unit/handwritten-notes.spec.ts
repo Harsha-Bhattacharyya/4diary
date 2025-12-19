@@ -17,21 +17,21 @@ import { test, expect } from '@playwright/test';
  */
 
 test.describe('Handwritten Notes Component', () => {
-  test('should show handwritten note button in Quick Actions', async ({ page }) => {
-    await page.goto('/workspace');
+  test('should show handwritten note button in Quick Actions', async ({ page: _page }) => {
+    await _page.goto('/workspace');
     
     // Wait for workspace to load
-    await page.waitForTimeout(2000);
+    await _page.waitForTimeout(2000);
     
     // Look for handwritten note button in Quick Actions
-    const handwrittenButton = page.locator('text=/Handwritten/i');
+    const _handwrittenButton = _page.locator('text=/Handwritten/i');
     
     // Button should exist (may not be visible if not authenticated)
     // Full test requires authentication
     expect(true).toBeTruthy();
   });
 
-  test('handwritten note component should have drawing tools', async ({ page }) => {
+  test('handwritten note component should have drawing tools', async ({ page: _page }) => {
     // This validates the component structure
     // The HandwrittenNote component should include:
     // - Canvas for drawing
@@ -47,7 +47,7 @@ test.describe('Handwritten Notes Component', () => {
     expect(true).toBeTruthy();
   });
 
-  test('should support both mouse and touch input', async ({ page }) => {
+  test('should support both mouse and touch input', async ({ page: _page }) => {
     // HandwrittenNote uses react-signature-canvas which supports:
     // - Mouse events
     // - Touch events
@@ -58,7 +58,7 @@ test.describe('Handwritten Notes Component', () => {
 });
 
 test.describe('Handwritten Notes - Document Type', () => {
-  test('should support handwritten document type', async ({ page }) => {
+  test('should support handwritten document type', async ({ page: _page }) => {
     // Document types should include "handwritten"
     // This is validated in:
     // - lib/documentService.ts (DocumentMetadata interface)
@@ -67,7 +67,7 @@ test.describe('Handwritten Notes - Document Type', () => {
     expect(true).toBeTruthy();
   });
 
-  test('should store handwritten notes as encrypted data', async ({ page }) => {
+  test('should store handwritten notes as encrypted data', async ({ page: _page }) => {
     // Handwritten notes should be stored as:
     // - Base64 encoded PNG images
     // - Encrypted like other document content
@@ -76,11 +76,11 @@ test.describe('Handwritten Notes - Document Type', () => {
     expect(true).toBeTruthy();
   });
 
-  test('should show handwritten badge in document list', async ({ page }) => {
-    await page.goto('/workspace');
+  test('should show handwritten badge in document list', async ({ page: _page }) => {
+    await _page.goto('/workspace');
     
     // Wait for workspace to load
-    await page.waitForTimeout(2000);
+    await _page.waitForTimeout(2000);
     
     // Handwritten documents should show a purple "Handwritten" badge
     // Similar to "Kanban" and "Quick Note" badges
@@ -90,7 +90,7 @@ test.describe('Handwritten Notes - Document Type', () => {
 });
 
 test.describe('Handwritten Notes - Canvas Features', () => {
-  test('should provide multiple pen colors', async ({ page }) => {
+  test('should provide multiple pen colors', async ({ page: _page }) => {
     // HandwrittenNote component provides colors:
     // - Leather (#4A3728)
     // - Black
@@ -103,7 +103,7 @@ test.describe('Handwritten Notes - Canvas Features', () => {
     expect(true).toBeTruthy();
   });
 
-  test('should provide multiple pen widths', async ({ page }) => {
+  test('should provide multiple pen widths', async ({ page: _page }) => {
     // HandwrittenNote component provides widths:
     // - Thin (1px)
     // - Medium (2px)
@@ -113,20 +113,20 @@ test.describe('Handwritten Notes - Canvas Features', () => {
     expect(true).toBeTruthy();
   });
 
-  test('should support download as PNG image', async ({ page }) => {
+  test('should support download as PNG image', async ({ page: _page }) => {
     // HandwrittenNote should allow downloading the canvas
     // as a PNG file for export/backup
     
     expect(true).toBeTruthy();
   });
 
-  test('should support undo functionality', async ({ page }) => {
+  test('should support undo functionality', async ({ page: _page }) => {
     // HandwrittenNote should support undo to remove last stroke
     
     expect(true).toBeTruthy();
   });
 
-  test('should support clear canvas functionality', async ({ page }) => {
+  test('should support clear canvas functionality', async ({ page: _page }) => {
     // HandwrittenNote should support clearing entire canvas
     
     expect(true).toBeTruthy();
@@ -134,7 +134,7 @@ test.describe('Handwritten Notes - Canvas Features', () => {
 });
 
 test.describe('Handwritten Notes - Integration', () => {
-  test('should integrate with workspace document system', async ({ page }) => {
+  test('should integrate with workspace document system', async ({ page: _page }) => {
     // Handwritten notes should:
     // - Be created with new=handwritten URL parameter
     // - Show in document list with other documents
@@ -145,14 +145,14 @@ test.describe('Handwritten Notes - Integration', () => {
     expect(true).toBeTruthy();
   });
 
-  test('should not show backlinks for handwritten notes', async ({ page }) => {
+  test('should not show backlinks for handwritten notes', async ({ page: _page }) => {
     // Handwritten notes are image-based and shouldn't show
     // wiki-style backlinks (which are text-based)
     
     expect(true).toBeTruthy();
   });
 
-  test('should not show reader mode for handwritten notes', async ({ page }) => {
+  test('should not show reader mode for handwritten notes', async ({ page: _page }) => {
     // Reader mode is for text documents
     // Handwritten notes use their own view/edit toggle
     
