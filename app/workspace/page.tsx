@@ -611,6 +611,98 @@ function WorkspaceContent() {
     }
   };
 
+  const handleBackgroundColorChange = async (newColor: string) => {
+    if (!currentDocument || !userEmail) return;
+
+    try {
+      const updatedMetadata = {
+        ...currentDocument.metadata,
+        backgroundColor: newColor || undefined,
+      };
+
+      await updateDocument({
+        id: currentDocument.id,
+        userId: userEmail,
+        content: currentDocument.content,
+        metadata: updatedMetadata,
+      });
+
+      // Update local state
+      setCurrentDocument({
+        ...currentDocument,
+        metadata: updatedMetadata,
+      });
+
+      // Reload documents list
+      if (workspaceId) {
+        const updatedDocs = await listDocuments(workspaceId, userEmail);
+        setDocuments(updatedDocs);
+      }
+    } catch (err) {
+      console.error("Background color update error:", err);
+      setError(err instanceof Error ? err.message : "Failed to update background color");
+    }
+  };
+
+  const handleToggleReadOnly = async (newReadOnly: boolean) => {
+    if (!currentDocument || !userEmail) return;
+
+    try {
+      await updateDocument({
+        id: currentDocument.id,
+        userId: userEmail,
+        readOnly: newReadOnly,
+      });
+
+      // Update local state
+      setCurrentDocument({
+        ...currentDocument,
+        readOnly: newReadOnly,
+      });
+
+      // Reload documents list
+      if (workspaceId) {
+        const updatedDocs = await listDocuments(workspaceId, userEmail);
+        setDocuments(updatedDocs);
+      }
+    } catch (err) {
+      console.error("Read-only toggle error:", err);
+      setError(err instanceof Error ? err.message : "Failed to toggle read-only mode");
+    }
+  };
+
+  const handleToggleArchived = async (newArchived: boolean) => {
+    if (!currentDocument || !userEmail) return;
+
+    try {
+      await updateDocument({
+        id: currentDocument.id,
+        userId: userEmail,
+        archived: newArchived,
+      });
+
+      // Update local state
+      setCurrentDocument({
+        ...currentDocument,
+        archived: newArchived,
+      });
+
+      // Reload documents list and close the document if archived
+      if (workspaceId) {
+        const updatedDocs = await listDocuments(workspaceId, userEmail);
+        setDocuments(updatedDocs);
+        
+        if (newArchived) {
+          // Close the document when archiving
+          setCurrentDocument(null);
+        }
+      }
+    } catch (err) {
+      console.error("Archive toggle error:", err);
+      setError(err instanceof Error ? err.message : "Failed to toggle archive");
+    }
+  };
+
   const handleExportDocument = async () => {
     if (!currentDocument || !userEmail) return;
 
@@ -1096,8 +1188,13 @@ function WorkspaceContent() {
         </div>
 
         {/* Editor Content */}
-        <div className="pt-20 pb-24 px-6 mx-auto min-h-screen flex gap-6">
-          <div className="flex-1 max-w-4xl">
+        <div 
+          className="pt-20 pb-24 px-6 mx-auto min-h-screen flex gap-6"
+          style={currentDocument.metadata.backgroundColor ? {
+            backgroundColor: currentDocument.metadata.backgroundColor,
+          } : undefined}
+        >
+          <div className="flex-1 max-w-4xl relative">
             {currentDocument.metadata.type === 'board' ? (
               // Render Kanban board for board-type documents
               <KanbanEditor
@@ -1128,12 +1225,20 @@ function WorkspaceContent() {
                 initialContent={currentDocument.content}
                 onSave={handleSave}
                 autoSave={true}
-                showToolbar={isEditMode}
-                editable={isEditMode}
+                showToolbar={isEditMode && !currentDocument.readOnly}
+                editable={isEditMode && !currentDocument.readOnly}
                 showLineNumbers={showLineNumbers}
                 toolbarPosition="bottom"
                 editorFont={editorFont}
               />
+            )}
+            
+            {/* Read-Only Indicator */}
+            {currentDocument.readOnly && (
+              <div className="absolute top-4 right-4 px-3 py-1 bg-amber-500/90 text-white text-sm font-medium rounded-full shadow-lg flex items-center gap-2 z-50">
+                <span>🔒</span>
+                <span>Read-Only</span>
+              </div>
             )}
           </div>
 
@@ -1255,6 +1360,12 @@ function WorkspaceContent() {
         onUpdateTags={handleTagsChange}
         editorFont={editorFont}
         onFontChange={handleFontChange}
+        backgroundColor={currentDocument.metadata.backgroundColor}
+        onBackgroundColorChange={handleBackgroundColorChange}
+        readOnly={currentDocument.readOnly}
+        onToggleReadOnly={handleToggleReadOnly}
+        archived={currentDocument.archived}
+        onToggleArchived={handleToggleArchived}
       />
 
       {/* Version History Modal */}
