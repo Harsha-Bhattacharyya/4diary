@@ -48,6 +48,11 @@ const BlockEditor = dynamic(() => import("@/components/editor/BlockEditor"), {
   ssr: false,
 });
 
+// Dynamic import for handwritten notes
+const HandwrittenNote = dynamic(() => import("@/components/ui/HandwrittenNote"), {
+  ssr: false,
+});
+
 // Dynamic import for KanbanEditor
 const KanbanEditor = dynamic(() => import("@/components/kanban/KanbanEditor").then(mod => ({ default: mod.KanbanEditor })), {
   ssr: false,
@@ -354,6 +359,25 @@ function WorkspaceContent() {
 
           // Navigate to the board page
           router.push(`/workspace/${workspace.id}/board/${doc.id}`);
+          return;
+        }
+
+        // If new=handwritten, create a handwritten note
+        if (newType === 'handwritten') {
+          const doc = await createDocument({
+            workspaceId: workspace.id,
+            userId: userEmail,
+            content: [{ handwritten: "" }], // Empty canvas initially
+            metadata: {
+              title: "New Handwritten Note",
+              type: "handwritten",
+            },
+          });
+
+          // Open the handwritten note for editing
+          setCurrentDocument(doc);
+          setIsEditMode(true);
+          router.push(`/workspace?id=${doc.id}`);
           return;
         }
 
@@ -1122,6 +1146,31 @@ function WorkspaceContent() {
                   });
                 }}
               />
+            ) : currentDocument.metadata.type === 'handwritten' ? (
+              // Render HandwrittenNote for handwritten documents
+              <HandwrittenNote
+                initialData={
+                  Array.isArray(currentDocument.content) && 
+                  currentDocument.content.length > 0 && 
+                  (currentDocument.content[0] as { handwritten?: string })?.handwritten
+                    ? (currentDocument.content[0] as { handwritten: string }).handwritten
+                    : undefined
+                }
+                onSave={async (data) => {
+                  if (!userEmail) return;
+                  await updateDocument({
+                    id: currentDocument.id,
+                    userId: userEmail,
+                    content: [{ handwritten: data }],
+                    metadata: currentDocument.metadata,
+                  });
+                  setCurrentDocument({
+                    ...currentDocument,
+                    content: [{ handwritten: data }],
+                  });
+                }}
+                editable={isEditMode}
+              />
             ) : (
               // Render regular BlockEditor for other documents
               <BlockEditor
@@ -1138,7 +1187,7 @@ function WorkspaceContent() {
           </div>
 
           {/* Backlinks Sidebar */}
-          {showBacklinks && currentDocument.metadata.type !== 'board' && workspaceId && userEmail && (
+          {showBacklinks && currentDocument.metadata.type !== 'board' && currentDocument.metadata.type !== 'handwritten' && workspaceId && userEmail && (
             <div className="w-80 flex-shrink-0">
               <Backlinks
                 documentTitle={currentDocument.metadata.title}
@@ -1150,8 +1199,8 @@ function WorkspaceContent() {
           )}
         </div>
 
-        {/* Floating Edit Button - Only show in read mode for non-board documents */}
-        {!isEditMode && currentDocument.metadata.type !== 'board' && (
+        {/* Floating Edit Button - Only show in read mode for non-board and non-handwritten documents */}
+        {!isEditMode && currentDocument.metadata.type !== 'board' && currentDocument.metadata.type !== 'handwritten' && (
           <button
             type="button"
             onClick={() => setIsEditMode(true)}
@@ -1177,8 +1226,8 @@ function WorkspaceContent() {
           </button>
         )}
 
-        {/* Edit Mode Bar - Only show for non-board documents in edit mode */}
-        {isEditMode && currentDocument.metadata.type !== 'board' && (
+        {/* Edit Mode Bar - Only show for non-board and non-handwritten documents in edit mode */}
+        {isEditMode && currentDocument.metadata.type !== 'board' && currentDocument.metadata.type !== 'handwritten' && (
           <div className="fixed bottom-14 left-0 right-0 z-40 pointer-events-none">
             <div className="max-w-4xl mx-auto px-6 flex justify-between items-center">
               {/* Edit Mode Indicator */}
@@ -1468,6 +1517,14 @@ function WorkspaceContent() {
               </button>
               
               <button
+                onClick={() => router.push('/workspace?new=handwritten')}
+                className="flex flex-col items-center justify-center p-4 rounded-lg bg-leather-900/30 hover:bg-leather-900/50 transition-all border border-leather-700/30 hover:border-leather-600"
+              >
+                <span className="text-3xl mb-2">✍️</span>
+                <span className="text-xs sm:text-sm text-leather-200 text-center">Handwritten</span>
+              </button>
+              
+              <button
                 type="button"
                 onClick={() => setShowImportNotes(true)}
                 className="flex flex-col items-center justify-center p-4 rounded-lg bg-leather-900/30 hover:bg-leather-900/50 transition-all border border-leather-700/30 hover:border-leather-600"
@@ -1613,6 +1670,11 @@ function WorkspaceContent() {
                                 {doc.metadata.type === 'quick' && (
                                   <span className="text-xs bg-yellow-500/20 text-yellow-300 px-2 py-0.5 rounded-full">
                                     Quick Note
+                                  </span>
+                                )}
+                                {doc.metadata.type === 'handwritten' && (
+                                  <span className="text-xs bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-full">
+                                    Handwritten
                                   </span>
                                 )}
                               </div>
