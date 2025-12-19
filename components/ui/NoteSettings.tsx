@@ -100,6 +100,12 @@ export default function NoteSettings({
   } | null>(null);
   const [generatingHashes, setGeneratingHashes] = useState(false);
   const [copiedHash, setCopiedHash] = useState<string | null>(null);
+  
+  // Password protection state
+  const [passwordProtected, setPasswordProtected] = useState(false);
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   // Calculate statistics
   const stats = useMemo(() => {
@@ -558,6 +564,112 @@ export default function NoteSettings({
                   />
                 </button>
               </div>
+            </div>
+
+            <Separator className="my-6" />
+
+            {/* Password Protection */}
+            <div>
+              <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-50 mb-4">
+                Password Protection
+              </h3>
+
+              {!passwordProtected ? (
+                <div className="p-4 bg-neutral-50 dark:bg-neutral-900 rounded-lg">
+                  <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4">
+                    Lock this note with a password for extra security.
+                  </p>
+                  <Button
+                    type="button"
+                    onClick={() => setShowPasswordDialog(true)}
+                  >
+                    Set Password
+                  </Button>
+                </div>
+              ) : (
+                <div className="p-4 bg-neutral-50 dark:bg-neutral-900 rounded-lg">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="text-2xl">🔒</span>
+                    <span className="text-sm font-medium text-neutral-900 dark:text-neutral-50">
+                      This note is password protected
+                    </span>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    onClick={() => setPasswordProtected(false)}
+                  >
+                    Remove Password
+                  </Button>
+                </div>
+              )}
+
+              {/* Password Dialog */}
+              {showPasswordDialog && (
+                <div className="mt-4 p-4 bg-neutral-100 dark:bg-neutral-800 rounded-lg border-2 border-neutral-300 dark:border-neutral-600">
+                  <h4 className="font-medium text-neutral-900 dark:text-neutral-50 mb-3">
+                    Set Note Password
+                  </h4>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-sm text-neutral-700 dark:text-neutral-300 mb-1">
+                        Password
+                      </label>
+                      <input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Enter password"
+                        className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-neutral-950 dark:focus:ring-neutral-300 bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-50"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-neutral-700 dark:text-neutral-300 mb-1">
+                        Confirm Password
+                      </label>
+                      <input
+                        type="password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        placeholder="Confirm password"
+                        className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-neutral-950 dark:focus:ring-neutral-300 bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-50"
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        onClick={() => {
+                          if (password !== confirmPassword) {
+                            alert("Passwords do not match");
+                            return;
+                          }
+                          if (password.length < 4) {
+                            alert("Password must be at least 4 characters");
+                            return;
+                          }
+                          setPasswordProtected(true);
+                          setShowPasswordDialog(false);
+                          setPassword("");
+                          setConfirmPassword("");
+                        }}
+                      >
+                        Set Password
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => {
+                          setShowPasswordDialog(false);
+                          setPassword("");
+                          setConfirmPassword("");
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             <Separator className="my-6" />
