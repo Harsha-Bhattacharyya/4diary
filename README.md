@@ -36,11 +36,15 @@ A privacy-focused, end-to-end encrypted note-taking application built with Next.
 - 📦 **Self-Hostable**: Docker-ready deployment
 - 📱 **PWA Support**: Install as a progressive web app with offline capabilities
 - 🌍 **Multi-Language**: Support for English, Bengali, Hindi (more languages coming soon)
+- 🔢 **Built-in Calculator**: Quick math calculations with LaTeX support (Ctrl+Shift+C)
+- 🔍 **Powerful Search**: Fuzzy search across all documents with filters (Ctrl/Cmd + Shift + F)
+- 📐 **LaTeX Math Notation**: Render mathematical expressions inline (`$...$`) and display mode (`$$...$$`)
+- 💻 **Syntax Highlighting**: Enhanced code block highlighting for multiple languages
 
 ### UI/UX
 - 🎨 **Leather Theme**: Rich, warm color palette inspired by leather journals
 - 🖥️ **Full-screen Editor**: Distraction-free editing experience
-- 🎯 **Keyboard Shortcuts**: Quick note (Ctrl/Cmd + Q), Vim mode (Ctrl+Shift+V), and more
+- 🎯 **Keyboard Shortcuts**: Quick note (Ctrl/Cmd + Q), Vim mode (Ctrl+Shift+V), Calculator (Ctrl+Shift+C), Search (Ctrl/Cmd + Shift + F)
 
 ## 🚀 Getting Started
 

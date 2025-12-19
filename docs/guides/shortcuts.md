@@ -9,6 +9,8 @@ Master 4Diary with these keyboard shortcuts for maximum productivity.
 | Shortcut | Action |
 |----------|--------|
 | `Ctrl+Q` / `Cmd+Q` | Open/Close Quick Note |
+| `Ctrl+Shift+F` / `Cmd+Shift+F` | Open Search |
+| `Ctrl+Shift+C` / `Cmd+Shift+C` | Open Calculator |
 | `Ctrl+S` / `Cmd+S` | Save current document |
 | `Escape` | Close modal or exit mode |
 
@@ -110,23 +112,57 @@ These work anywhere in 4Diary:
 - Adds ~~strikethrough~~ to text
 - Currently use markdown: `~~text~~`
 
+### Search Notes
+
+#### Open Search
+**`Ctrl+Shift+F` (Windows/Linux) | `Cmd+Shift+F` (Mac)**
+
+- Opens powerful search modal
+- Search across all documents
+- Use filters for precise results
+- Navigate with arrow keys
+
+**Search Workflow**:
+```
+1. Press Ctrl+Shift+F
+2. Type search query
+3. Use ↑↓ to navigate results
+4. Press Enter to open document
+5. Press Escape to close
+```
+
+**Search Filters**:
+- All - Search everywhere
+- Title - Search only titles
+- Content - Search document content
+- Tags - Search tags
+- Folder - Search folders
+
+### Calculator
+
+#### Open Calculator
+**`Ctrl+Shift+C` (Windows/Linux) | `Cmd+Shift+C` (Mac)**
+
+- Opens built-in calculator
+- Supports LaTeX math expressions
+- View calculation history
+- Insert results into editor
+
+**Calculator Workflow**:
+```
+1. Press Ctrl+Shift+C
+2. Enter expression (e.g., sqrt(16))
+3. Press Enter to calculate
+4. Click "Insert to Editor" (optional)
+5. Press Escape to close
+```
+
+**Supported Operations**:
+- Basic: +, -, *, /, ^
+- Functions: sqrt(), sin(), cos(), tan(), log()
+- Constants: pi, e
+
 ### Links
-
-#### Insert/Edit Link
-**`Ctrl+K` (Windows/Linux) | `Cmd+K` (Mac)**
-
-- Opens link dialog
-- Enter URL and press Enter
-- Works on selected text
-
-**Workflow**:
-```
-1. Select text to link
-2. Press Ctrl+K
-3. Enter URL
-4. Press Enter
-5. Link is created
-```
 
 #### Remove Link
 **`Ctrl+Shift+K` (Windows/Linux) | `Cmd+Shift+K` (Mac)** *(Planned)*
@@ -431,6 +467,8 @@ Future versions will allow customization:
 
 **Quick Access**:
 - `Ctrl+Q` - Quick Note
+- `Ctrl+Shift+F` - Search
+- `Ctrl+Shift+C` - Calculator
 - `Ctrl+S` - Save
 - `Escape` - Close/Cancel
 
@@ -438,7 +476,6 @@ Future versions will allow customization:
 - `Ctrl+B` - Bold
 - `Ctrl+I` - Italic
 - `Ctrl+U` - Underline
-- `Ctrl+K` - Link
 
 **Editing**:
 - `Ctrl+Z` - Undo
