@@ -17,6 +17,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { Icon } from "@iconify/react";
 
 interface Document {
   id: string;
@@ -239,7 +240,9 @@ export default function Sidebar({
                           </button>
                         )}
                         
-                        <span className="text-sm">📄</span>
+                        <span className="text-sm">
+                          <Icon icon="flat-color-icons:document" width={20} height={20} />
+                        </span>
                         <span className="text-sm truncate flex-1">{doc.title}</span>
                         
                         {/* Drag handle */}
@@ -283,7 +286,7 @@ export default function Sidebar({
               title={doc.title}
               aria-label={doc.title}
             >
-              📄
+              <Icon icon="flat-color-icons:document" width={24} height={24} />
               {doc.favorite && (
                 <span className="absolute top-0 right-0 text-xs">⭐</span>
               )}

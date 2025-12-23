@@ -15,6 +15,7 @@ import Link from "next/link";
 import Image from "next/image";
 import LeatherBackground from "@/components/ui/LeatherBackground";
 import TopMenu from "@/components/ui/TopMenu";
+import { Icon } from "@iconify/react";
 
 /**
  * Renders the About page for the application.
@@ -52,7 +53,9 @@ export default function About() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Privacy & Security */}
             <div className="p-6 rounded-lg bg-leather-600 bg-opacity-30 border border-leather-500/30">
-              <h3 className="text-2xl font-bold text-leather-100 mb-4">🔒 Privacy & Security</h3>
+              <h3 className="text-2xl font-bold text-leather-100 mb-4 flex items-center gap-2">
+                <Icon icon="flat-color-icons:key" width={32} height={32} /> Privacy & Security
+              </h3>
               <ul className="text-leather-200 space-y-2 text-left">
                 <li>• End-to-End Encryption with AES-256-GCM</li>
                 <li>• Zero-Knowledge Architecture</li>
@@ -63,7 +66,9 @@ export default function About() {
 
             {/* Features */}
             <div className="p-6 rounded-lg bg-leather-600 bg-opacity-30 border border-leather-500/30">
-              <h3 className="text-2xl font-bold text-leather-100 mb-4">✨ Features</h3>
+              <h3 className="text-2xl font-bold text-leather-100 mb-4 flex items-center gap-2">
+                <Icon icon="flat-color-icons:settings" width={32} height={32} /> Features
+              </h3>
               <ul className="text-leather-200 space-y-2 text-left">
                 <li>• Notion-like Rich Text Editor</li>
                 <li>• Kanban Boards for Task Management</li>
@@ -74,7 +79,9 @@ export default function About() {
 
             {/* Self-Hostable */}
             <div className="p-6 rounded-lg bg-leather-600 bg-opacity-30 border border-leather-500/30">
-              <h3 className="text-2xl font-bold text-leather-100 mb-4">🐳 Self-Hostable</h3>
+              <h3 className="text-2xl font-bold text-leather-100 mb-4 flex items-center gap-2">
+                <Icon icon="flat-color-icons:multiple-devices" width={32} height={32} /> Self-Hostable
+              </h3>
               <ul className="text-leather-200 space-y-2 text-left">
                 <li>• Docker-ready deployment</li>
                 <li>• Complete data ownership</li>
@@ -85,7 +92,9 @@ export default function About() {
 
             {/* Tech Stack */}
             <div className="p-6 rounded-lg bg-leather-600 bg-opacity-30 border border-leather-500/30">
-              <h3 className="text-2xl font-bold text-leather-100 mb-4">🛠️ Tech Stack</h3>
+              <h3 className="text-2xl font-bold text-leather-100 mb-4 flex items-center gap-2">
+                <Icon icon="flat-color-icons:settings" width={32} height={32} /> Tech Stack
+              </h3>
               <ul className="text-leather-200 space-y-2 text-left">
                 <li>• Next.js 16 (App Router)</li>
                 <li>• MongoDB & Redis</li>
@@ -99,7 +108,9 @@ export default function About() {
         {/* Lead Developer Section */}
         <section className="max-w-4xl mx-auto py-12 fade-in-delay-2">
           <div className="text-center p-8 rounded-lg bg-leather-700 bg-opacity-40 border border-leather-500/30">
-            <h2 className="text-3xl font-bold text-leather-100 mb-6">💻 The Lead Dev</h2>
+            <h2 className="text-3xl font-bold text-leather-100 mb-6 flex items-center justify-center gap-2">
+              <Icon icon="flat-color-icons:multiple-devices" width={32} height={32} /> The Lead Dev
+            </h2>
             <div className="flex flex-col items-center">
               <div className="w-32 h-32 rounded-full bg-leather-500 bg-opacity-50 border-4 border-leather-400 flex items-center justify-center mb-4 overflow-hidden">
                 <Image
@@ -200,7 +211,9 @@ export default function About() {
 
         {/* Footer */}
         <footer className="text-center text-leather-300 text-sm py-12">
-          <p>Made with ❤️ in 🇮🇳</p>
+          <p className="flex items-center justify-center gap-2">
+            Made with <Icon icon="flat-color-icons:like" width={20} height={20} /> in 🇮🇳
+          </p>
         </footer>
       </main>
     </div>
