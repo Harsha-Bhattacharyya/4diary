@@ -47,6 +47,7 @@ interface Document {
   favorite?: boolean;
   sortOrder?: number;
   tags?: string[];
+  emojiIcon?: string;
 }
 
 interface SidebarNewProps {
@@ -281,7 +282,11 @@ export default function SidebarNew({
               className="relative"
               title={doc.title}
             >
-              <File className="h-5 w-5" />
+              <Icon 
+                icon={`flat-color-icons:${doc.emojiIcon || "document"}`} 
+                width={20} 
+                height={20} 
+              />
               {doc.favorite && (
                 <Star className="absolute top-0 right-0 h-3 w-3 fill-yellow-500 text-yellow-500" />
               )}
@@ -351,7 +356,13 @@ export default function SidebarNew({
                             </button>
                           )}
                           
-                          <File className="h-4 w-4 text-neutral-600 dark:text-neutral-400 flex-shrink-0" />
+                          {/* Document icon - use selected icon or default */}
+                          <Icon 
+                            icon={`flat-color-icons:${doc.emojiIcon || "document"}`} 
+                            width={16} 
+                            height={16} 
+                            className="flex-shrink-0"
+                          />
                           <span className="text-sm truncate flex-1 text-left">{doc.title}</span>
                         </div>
                       </Button>
