@@ -12,6 +12,7 @@
  */
 
 import React, { useState, useEffect, useRef, useMemo } from "react";
+import { Icon } from "@iconify/react";
 import GlassCard from "./GlassCard";
 import { X, Search, FileText, Tag, Folder, Calendar } from "lucide-react";
 import type { Document } from "@/lib/documentService";
@@ -349,7 +350,13 @@ export default function SearchModal({
                   }`}
                 >
                   <div className="flex items-start gap-3">
-                    <div className="text-2xl">{result.doc.metadata?.emojiIcon || "📄"}</div>
+                    <div className="text-2xl flex items-center">
+                      <Icon 
+                        icon={`flat-color-icons:${result.doc.metadata?.emojiIcon || "document"}`} 
+                        width={32} 
+                        height={32} 
+                      />
+                    </div>
                     <div className="flex-1 min-w-0">
                       <div className="font-medium text-leather-900 truncate">
                         {highlightText(
