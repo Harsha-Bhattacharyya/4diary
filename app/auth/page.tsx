@@ -98,8 +98,8 @@ export default function AuthPage() {
       return;
     }
     
-    // Check Turnstile token if feature is enabled and we're logging in
-    if (isLogin && turnstileSiteKey && !turnstileToken) {
+    // Check Turnstile token if feature is enabled
+    if (turnstileSiteKey && !turnstileToken) {
       setError("Please complete the bot verification");
       return;
     }
@@ -110,7 +110,7 @@ export default function AuthPage() {
       const endpoint = isLogin ? "/api/auth/login" : "/api/auth/signup";
       const body = isLogin
         ? { username, password, turnstileToken }
-        : { username, password, name: name || username };
+        : { username, password, name: name || username, turnstileToken };
 
       const response = await fetch(endpoint, {
         method: "POST",
@@ -277,8 +277,8 @@ export default function AuthPage() {
               </div>
             )}
 
-            {/* Cloudflare Turnstile Bot Verification (Login only, optional) */}
-            {isLogin && turnstileSiteKey && (
+            {/* Cloudflare Turnstile Bot Verification (optional) */}
+            {turnstileSiteKey && (
               <div className="flex justify-center">
                 <Turnstile
                   siteKey={turnstileSiteKey}

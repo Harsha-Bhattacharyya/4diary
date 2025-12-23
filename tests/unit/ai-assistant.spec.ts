@@ -17,7 +17,7 @@ import { test, expect } from '@playwright/test';
  */
 
 test.describe('AI Assistant Component', () => {
-  test('should not render AI assistant initially', async ({ page: _page }) => {
+  test('should not render AI assistant initially', async ({ page }) => {
     await page.goto('/workspace');
     
     // AI assistant should not be visible initially
@@ -25,59 +25,28 @@ test.describe('AI Assistant Component', () => {
     await expect(aiAssistant).not.toBeVisible();
   });
 
-  test('AI assistant should have privacy notice', async ({ page: _page }) => {
-    // This is a component test - in a real scenario, the AI assistant would be rendered
-    // when the floating button is clicked in an editor
-    
-    // Note: This test validates the structure would work when integrated
-    // Full integration test would require authentication and document editing
-    expect(true).toBeTruthy();
+  test.skip('AI assistant should have privacy notice', async ({ page: _page }) => {
+    // TODO: Implement full integration test with authentication
+    // This would require setting up authenticated session and opening a document
   });
 
-  test('should show AI button in editor when document is editable', async ({ page: _page }) => {
-    // Navigate to workspace
-    await page.goto('/workspace');
-    
-    // Wait for workspace to load
-    await page.waitForTimeout(2000);
-    
-    // Check if AI button would appear in editor context
-    // Note: Full test requires authentication setup
-    expect(true).toBeTruthy();
+  test.skip('should show AI button in editor when document is editable', async ({ page: _page }) => {
+    // TODO: Implement with authentication and document editing setup
   });
 });
 
 test.describe('AI Assistant - Keyboard Shortcuts', () => {
-  test('should support Ctrl+Shift+A keyboard shortcut', async ({ page: _page }) => {
-    // This test validates that the keyboard shortcut is defined
-    // Full integration requires document editor to be active
-    
-    await page.goto('/workspace');
-    
-    // The shortcut Ctrl+Shift+A should be handled by BlockEditor
-    // when a document is open in edit mode
-    expect(true).toBeTruthy();
+  test.skip('should support Ctrl+Shift+A keyboard shortcut', async ({ page: _page }) => {
+    // TODO: Implement with active document editor
   });
 });
 
 test.describe('AI Assistant - Privacy Features', () => {
-  test('should use DuckDuckGo AI for privacy', async ({ page: _page }) => {
-    // Verify that AI assistant uses privacy-first DuckDuckGo
-    // This is validated in the component implementation
-    
-    // The component should:
-    // - Use @mumulhl/duckduckgo-ai-chat package
-    // - Not store any conversation data
-    // - Process queries client-side only
-    // - Display privacy notice
-    
-    expect(true).toBeTruthy();
+  test.skip('should use DuckDuckGo AI for privacy', async ({ page: _page }) => {
+    // TODO: Validate API calls are made to DuckDuckGo endpoints
   });
 
-  test('should not require API keys or external configuration', async ({ page: _page }) => {
-    // AI should work without additional configuration
-    // This supports self-hostability
-    
-    expect(true).toBeTruthy();
+  test.skip('should not require API keys or external configuration', async ({ page: _page }) => {
+    // TODO: Verify component works without additional configuration
   });
 });

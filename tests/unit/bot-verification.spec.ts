@@ -49,10 +49,14 @@ test.describe('Bot Verification - Cloudflare Turnstile', () => {
     
     // The form should submit without requiring Turnstile token
     // We expect either a navigation or an error message, not a Turnstile error
-    await page.waitForTimeout(1000);
+    const errorLocator = page.locator('text=/Invalid credentials|Username and password are required/i');
+    await Promise.race([
+      page.waitForURL(/\/workspace/, { timeout: 5000 }).catch(() => {}),
+      errorLocator.waitFor({ state: 'visible', timeout: 5000 }).catch(() => {}),
+    ]);
     
     const currentUrl = page.url();
-    const hasError = await page.locator('text=/Invalid credentials|Username and password are required/i').isVisible().catch(() => false);
+    const hasError = await errorLocator.isVisible().catch(() => false);
     
     // Either redirected or got a login error (not Turnstile error)
     expect(currentUrl.includes('/workspace') || hasError).toBeTruthy();

@@ -415,7 +415,8 @@ export default function BlockEditor({
         style={{ WebkitTapHighlightColor: 'transparent' }}
       >
         <BlockNoteView
-          editor={editor as any}
+          // @ts-expect-error - Type mismatch between @blocknote/react and @blocknote/mantine versions
+          editor={editor}
           onChange={handleChange}
           editable={editable}
           theme="light"

@@ -80,10 +80,24 @@ export default function HandwrittenNote({
   }, [initialData]);
 
   const handleClear = () => {
-    if (canvasRef.current) {
-      canvasRef.current.clear();
-      setHasChanges(true);
+    if (!canvasRef.current) return;
+
+    // If canvas is already empty, no need to confirm
+    if (canvasRef.current.isEmpty()) {
+      return;
     }
+
+    // Confirm before clearing
+    const confirmed = window.confirm(
+      "Are you sure you want to clear this handwritten note? This action cannot be undone."
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    canvasRef.current.clear();
+    setHasChanges(true);
   };
 
   const handleUndo = () => {
@@ -107,6 +121,8 @@ export default function HandwrittenNote({
       setHasChanges(false);
     } catch (error) {
       console.error("Error saving handwritten note:", error);
+      // Display error to user
+      alert("Failed to save your handwritten note. Please try again.");
     } finally {
       setIsSaving(false);
     }

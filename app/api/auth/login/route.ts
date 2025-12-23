@@ -66,7 +66,11 @@ export async function POST(request: NextRequest) {
         }
       } catch (error) {
         console.error("Turnstile verification error:", error);
-        // Continue login if Turnstile verification fails (graceful degradation)
+        // Return error if Turnstile is configured but verification fails unexpectedly
+        return NextResponse.json(
+          { error: "Bot verification service is currently unavailable. Please try again later." },
+          { status: 503 }
+        );
       }
     }
 

@@ -47,9 +47,16 @@ export default function AIAssistant({
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [aiEnabled] = useState(true);
+  const [chat, setChat] = useState<any>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  // Initialize chat session once when component opens
+  useEffect(() => {
+    if (isOpen && !chat) {
+      initChat("gpt-4o-mini").then(setChat).catch(console.error);
+    }
+  }, [isOpen, chat]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -71,7 +78,7 @@ export default function AIAssistant({
   }, [isOpen, selectedText, messages.length]);
 
   const handleSendMessage = async () => {
-    if (!input.trim() || isLoading) return;
+    if (!input.trim() || isLoading || !chat) return;
 
     const userMessage: Message = {
       role: "user",
@@ -80,17 +87,15 @@ export default function AIAssistant({
     };
 
     setMessages((prev) => [...prev, userMessage]);
+    const currentInput = input;
     setInput("");
     setIsLoading(true);
 
     try {
-      // Initialize DDG Chat (using gpt-4o-mini model)
-      const chat = await initChat("gpt-4o-mini");
-      
-      // Build context-aware prompt
-      let prompt = input;
-      if (documentContext) {
-        prompt = `Context: ${documentContext.slice(0, 500)}...\n\nQuestion: ${input}`;
+      // Build context-aware prompt only for first message
+      let prompt = currentInput;
+      if (documentContext && messages.length === 0) {
+        prompt = `Context: ${documentContext.slice(0, 500)}...\n\nQuestion: ${currentInput}`;
       }
 
       // Get AI response using fetchFull for complete response
@@ -125,6 +130,8 @@ export default function AIAssistant({
 
   const clearChat = () => {
     setMessages([]);
+    // Reset chat session for new conversation
+    setChat(null);
   };
 
   if (!isOpen) return null;
@@ -210,11 +217,6 @@ export default function AIAssistant({
 
         {/* Input */}
         <div className="p-4 border-t border-leather-300/20">
-          {!aiEnabled && (
-            <div className="mb-3 p-2 bg-amber-500/20 border border-amber-500/50 rounded text-xs text-amber-200">
-              AI features are disabled. Enable them in settings to use the assistant.
-            </div>
-          )}
           <div className="flex gap-2">
             <textarea
               ref={inputRef}
@@ -222,13 +224,13 @@ export default function AIAssistant({
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Ask me anything about your notes..."
-              disabled={!aiEnabled || isLoading}
+              disabled={isLoading || !chat}
               className="flex-1 px-4 py-2 bg-black/30 border border-leather-300/30 rounded-lg text-leather-100 placeholder-leather-400 focus:outline-none focus:ring-2 focus:ring-leather-300/50 resize-none"
               rows={2}
             />
             <button
               onClick={handleSendMessage}
-              disabled={!input.trim() || isLoading || !aiEnabled}
+              disabled={!input.trim() || isLoading || !chat}
               className="px-4 py-2 bg-leather-600 text-leather-50 rounded-lg hover:bg-leather-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               aria-label="Send message"
             >
