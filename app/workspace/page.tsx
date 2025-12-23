@@ -1371,7 +1371,7 @@ function WorkspaceContent() {
                 </LeatherButton>
                 <Link href="/templates">
                   <LeatherButton variant="parchment" size="sm">
-                    <span className="hidden sm:inline flex items-center gap-2">
+                    <span className="hidden sm:inline-flex items-center gap-2">
                       <Icon icon="flat-color-icons:template" width={20} height={20} /> Templates
                     </span>
                     <span className="sm:hidden">
