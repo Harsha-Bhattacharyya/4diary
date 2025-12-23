@@ -165,15 +165,27 @@ export function blockNoteToLaTeX(content: unknown[]): string {
         }
         break;
 
-      case "bulletListItem":
+      case "bulletListItem": {
+        if (inNumberedList) closeOpenLists();
+        if (!inBulletList) {
+          latex += "\\begin{itemize}\n";
+          inBulletList = true;
+        }
         const bulletText = extractPlainText(block.content);
         latex += `\\item ${escapeLatex(bulletText)}\n`;
         break;
+      }
 
-      case "numberedListItem":
+      case "numberedListItem": {
+        if (inBulletList) closeOpenLists();
+        if (!inNumberedList) {
+          latex += "\\begin{enumerate}\n";
+          inNumberedList = true;
+        }
         const numberedText = extractPlainText(block.content);
         latex += `\\item ${escapeLatex(numberedText)}\n`;
         break;
+      }
 
       case "codeBlock":
         const codeText = extractPlainText(block.content);
