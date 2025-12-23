@@ -411,7 +411,10 @@ export default function Home() {
             </p>
             
             <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
+              <table className="w-full text-left border-collapse" aria-label="Feature comparison between 4diary and other note-taking applications">
+                <caption className="sr-only">
+                  Comparison of 4diary features with Google Keep, OneNote, Evernote, Standard Notes, and Notion
+                </caption>
                 <thead>
                   <tr className="border-b-2 border-leather-500">
                     <th className="p-4 text-leather-100 font-bold">Feature</th>
@@ -426,149 +429,149 @@ export default function Home() {
                 <tbody className="text-leather-300">
                   <tr className="border-b border-leather-700/30">
                     <td className="p-4 font-semibold text-leather-200">End-to-End Encryption</td>
-                    <td className="p-4 text-center">
-                      <Icon icon="flat-color-icons:checkmark" width={24} height={24} className="mx-auto" />
+                    <td className="p-4 text-center" aria-label="Supported">
+                      <Icon icon="flat-color-icons:ok" width={24} height={24} className="mx-auto" />
                     </td>
-                    <td className="p-4 text-center">
-                      <Icon icon="flat-color-icons:cancel" width={24} height={24} className="mx-auto" />
+                    <td className="p-4 text-center" aria-label="Not supported">
+                      <Icon icon="flat-color-icons:high-priority" width={24} height={24} className="mx-auto" />
                     </td>
-                    <td className="p-4 text-center">
-                      <Icon icon="flat-color-icons:cancel" width={24} height={24} className="mx-auto" />
+                    <td className="p-4 text-center" aria-label="Not supported">
+                      <Icon icon="flat-color-icons:high-priority" width={24} height={24} className="mx-auto" />
                     </td>
-                    <td className="p-4 text-center">
-                      <Icon icon="flat-color-icons:cancel" width={24} height={24} className="mx-auto" />
+                    <td className="p-4 text-center" aria-label="Not supported">
+                      <Icon icon="flat-color-icons:high-priority" width={24} height={24} className="mx-auto" />
                     </td>
-                    <td className="p-4 text-center">
-                      <Icon icon="flat-color-icons:checkmark" width={24} height={24} className="mx-auto" />
+                    <td className="p-4 text-center" aria-label="Supported">
+                      <Icon icon="flat-color-icons:ok" width={24} height={24} className="mx-auto" />
                     </td>
-                    <td className="p-4 text-center">
-                      <Icon icon="flat-color-icons:cancel" width={24} height={24} className="mx-auto" />
+                    <td className="p-4 text-center" aria-label="Not supported">
+                      <Icon icon="flat-color-icons:high-priority" width={24} height={24} className="mx-auto" />
                     </td>
                   </tr>
                   <tr className="border-b border-leather-700/30">
                     <td className="p-4 font-semibold text-leather-200">Zero-Knowledge Architecture</td>
-                    <td className="p-4 text-center">
-                      <Icon icon="flat-color-icons:checkmark" width={24} height={24} className="mx-auto" />
+                    <td className="p-4 text-center" aria-label="Supported">
+                      <Icon icon="flat-color-icons:ok" width={24} height={24} className="mx-auto" />
                     </td>
-                    <td className="p-4 text-center">
-                      <Icon icon="flat-color-icons:cancel" width={24} height={24} className="mx-auto" />
+                    <td className="p-4 text-center" aria-label="Not supported">
+                      <Icon icon="flat-color-icons:high-priority" width={24} height={24} className="mx-auto" />
                     </td>
-                    <td className="p-4 text-center">
-                      <Icon icon="flat-color-icons:cancel" width={24} height={24} className="mx-auto" />
+                    <td className="p-4 text-center" aria-label="Not supported">
+                      <Icon icon="flat-color-icons:high-priority" width={24} height={24} className="mx-auto" />
                     </td>
-                    <td className="p-4 text-center">
-                      <Icon icon="flat-color-icons:cancel" width={24} height={24} className="mx-auto" />
+                    <td className="p-4 text-center" aria-label="Not supported">
+                      <Icon icon="flat-color-icons:high-priority" width={24} height={24} className="mx-auto" />
                     </td>
-                    <td className="p-4 text-center">
-                      <Icon icon="flat-color-icons:checkmark" width={24} height={24} className="mx-auto" />
+                    <td className="p-4 text-center" aria-label="Supported">
+                      <Icon icon="flat-color-icons:ok" width={24} height={24} className="mx-auto" />
                     </td>
-                    <td className="p-4 text-center">
-                      <Icon icon="flat-color-icons:cancel" width={24} height={24} className="mx-auto" />
+                    <td className="p-4 text-center" aria-label="Not supported">
+                      <Icon icon="flat-color-icons:high-priority" width={24} height={24} className="mx-auto" />
                     </td>
                   </tr>
                   <tr className="border-b border-leather-700/30">
                     <td className="p-4 font-semibold text-leather-200">Open Source (FLOSS)</td>
-                    <td className="p-4 text-center">
-                      <Icon icon="flat-color-icons:checkmark" width={24} height={24} className="mx-auto" />
+                    <td className="p-4 text-center" aria-label="Supported">
+                      <Icon icon="flat-color-icons:ok" width={24} height={24} className="mx-auto" />
                     </td>
-                    <td className="p-4 text-center">
-                      <Icon icon="flat-color-icons:cancel" width={24} height={24} className="mx-auto" />
+                    <td className="p-4 text-center" aria-label="Not supported">
+                      <Icon icon="flat-color-icons:high-priority" width={24} height={24} className="mx-auto" />
                     </td>
-                    <td className="p-4 text-center">
-                      <Icon icon="flat-color-icons:cancel" width={24} height={24} className="mx-auto" />
+                    <td className="p-4 text-center" aria-label="Not supported">
+                      <Icon icon="flat-color-icons:high-priority" width={24} height={24} className="mx-auto" />
                     </td>
-                    <td className="p-4 text-center">
-                      <Icon icon="flat-color-icons:cancel" width={24} height={24} className="mx-auto" />
+                    <td className="p-4 text-center" aria-label="Not supported">
+                      <Icon icon="flat-color-icons:high-priority" width={24} height={24} className="mx-auto" />
                     </td>
-                    <td className="p-4 text-center">
-                      <Icon icon="flat-color-icons:checkmark" width={24} height={24} className="mx-auto" />
+                    <td className="p-4 text-center" aria-label="Supported">
+                      <Icon icon="flat-color-icons:ok" width={24} height={24} className="mx-auto" />
                     </td>
-                    <td className="p-4 text-center">
-                      <Icon icon="flat-color-icons:cancel" width={24} height={24} className="mx-auto" />
+                    <td className="p-4 text-center" aria-label="Not supported">
+                      <Icon icon="flat-color-icons:high-priority" width={24} height={24} className="mx-auto" />
                     </td>
                   </tr>
                   <tr className="border-b border-leather-700/30">
                     <td className="p-4 font-semibold text-leather-200">Self-Hostable</td>
-                    <td className="p-4 text-center">
-                      <Icon icon="flat-color-icons:checkmark" width={24} height={24} className="mx-auto" />
+                    <td className="p-4 text-center" aria-label="Supported">
+                      <Icon icon="flat-color-icons:ok" width={24} height={24} className="mx-auto" />
                     </td>
-                    <td className="p-4 text-center">
-                      <Icon icon="flat-color-icons:cancel" width={24} height={24} className="mx-auto" />
+                    <td className="p-4 text-center" aria-label="Not supported">
+                      <Icon icon="flat-color-icons:high-priority" width={24} height={24} className="mx-auto" />
                     </td>
-                    <td className="p-4 text-center">
-                      <Icon icon="flat-color-icons:cancel" width={24} height={24} className="mx-auto" />
+                    <td className="p-4 text-center" aria-label="Not supported">
+                      <Icon icon="flat-color-icons:high-priority" width={24} height={24} className="mx-auto" />
                     </td>
-                    <td className="p-4 text-center">
-                      <Icon icon="flat-color-icons:cancel" width={24} height={24} className="mx-auto" />
+                    <td className="p-4 text-center" aria-label="Not supported">
+                      <Icon icon="flat-color-icons:high-priority" width={24} height={24} className="mx-auto" />
                     </td>
-                    <td className="p-4 text-center">
-                      <Icon icon="flat-color-icons:checkmark" width={24} height={24} className="mx-auto" />
+                    <td className="p-4 text-center" aria-label="Supported">
+                      <Icon icon="flat-color-icons:ok" width={24} height={24} className="mx-auto" />
                     </td>
-                    <td className="p-4 text-center">
-                      <Icon icon="flat-color-icons:cancel" width={24} height={24} className="mx-auto" />
+                    <td className="p-4 text-center" aria-label="Not supported">
+                      <Icon icon="flat-color-icons:high-priority" width={24} height={24} className="mx-auto" />
                     </td>
                   </tr>
                   <tr className="border-b border-leather-700/30">
                     <td className="p-4 font-semibold text-leather-200">Rich Text Editor (Notion-like)</td>
-                    <td className="p-4 text-center">
-                      <Icon icon="flat-color-icons:checkmark" width={24} height={24} className="mx-auto" />
+                    <td className="p-4 text-center" aria-label="Supported">
+                      <Icon icon="flat-color-icons:ok" width={24} height={24} className="mx-auto" />
                     </td>
-                    <td className="p-4 text-center">
-                      <Icon icon="flat-color-icons:cancel" width={24} height={24} className="mx-auto" />
+                    <td className="p-4 text-center" aria-label="Not supported">
+                      <Icon icon="flat-color-icons:high-priority" width={24} height={24} className="mx-auto" />
                     </td>
-                    <td className="p-4 text-center">
-                      <Icon icon="flat-color-icons:checkmark" width={24} height={24} className="mx-auto" />
+                    <td className="p-4 text-center" aria-label="Supported">
+                      <Icon icon="flat-color-icons:ok" width={24} height={24} className="mx-auto" />
                     </td>
-                    <td className="p-4 text-center">
-                      <Icon icon="flat-color-icons:checkmark" width={24} height={24} className="mx-auto" />
+                    <td className="p-4 text-center" aria-label="Supported">
+                      <Icon icon="flat-color-icons:ok" width={24} height={24} className="mx-auto" />
                     </td>
-                    <td className="p-4 text-center">
-                      <Icon icon="flat-color-icons:cancel" width={24} height={24} className="mx-auto" />
+                    <td className="p-4 text-center" aria-label="Not supported">
+                      <Icon icon="flat-color-icons:high-priority" width={24} height={24} className="mx-auto" />
                     </td>
-                    <td className="p-4 text-center">
-                      <Icon icon="flat-color-icons:checkmark" width={24} height={24} className="mx-auto" />
+                    <td className="p-4 text-center" aria-label="Supported">
+                      <Icon icon="flat-color-icons:ok" width={24} height={24} className="mx-auto" />
                     </td>
                   </tr>
                   <tr className="border-b border-leather-700/30">
                     <td className="p-4 font-semibold text-leather-200">Kanban Boards</td>
-                    <td className="p-4 text-center">
-                      <Icon icon="flat-color-icons:checkmark" width={24} height={24} className="mx-auto" />
+                    <td className="p-4 text-center" aria-label="Supported">
+                      <Icon icon="flat-color-icons:ok" width={24} height={24} className="mx-auto" />
                     </td>
-                    <td className="p-4 text-center">
-                      <Icon icon="flat-color-icons:cancel" width={24} height={24} className="mx-auto" />
+                    <td className="p-4 text-center" aria-label="Not supported">
+                      <Icon icon="flat-color-icons:high-priority" width={24} height={24} className="mx-auto" />
                     </td>
-                    <td className="p-4 text-center">
-                      <Icon icon="flat-color-icons:cancel" width={24} height={24} className="mx-auto" />
+                    <td className="p-4 text-center" aria-label="Not supported">
+                      <Icon icon="flat-color-icons:high-priority" width={24} height={24} className="mx-auto" />
                     </td>
-                    <td className="p-4 text-center">
-                      <Icon icon="flat-color-icons:cancel" width={24} height={24} className="mx-auto" />
+                    <td className="p-4 text-center" aria-label="Not supported">
+                      <Icon icon="flat-color-icons:high-priority" width={24} height={24} className="mx-auto" />
                     </td>
-                    <td className="p-4 text-center">
-                      <Icon icon="flat-color-icons:cancel" width={24} height={24} className="mx-auto" />
+                    <td className="p-4 text-center" aria-label="Not supported">
+                      <Icon icon="flat-color-icons:high-priority" width={24} height={24} className="mx-auto" />
                     </td>
-                    <td className="p-4 text-center">
-                      <Icon icon="flat-color-icons:checkmark" width={24} height={24} className="mx-auto" />
+                    <td className="p-4 text-center" aria-label="Supported">
+                      <Icon icon="flat-color-icons:ok" width={24} height={24} className="mx-auto" />
                     </td>
                   </tr>
                   <tr className="border-b border-leather-700/30">
                     <td className="p-4 font-semibold text-leather-200">Offline Support (PWA)</td>
-                    <td className="p-4 text-center">
-                      <Icon icon="flat-color-icons:checkmark" width={24} height={24} className="mx-auto" />
+                    <td className="p-4 text-center" aria-label="Supported">
+                      <Icon icon="flat-color-icons:ok" width={24} height={24} className="mx-auto" />
                     </td>
-                    <td className="p-4 text-center">
-                      <Icon icon="flat-color-icons:checkmark" width={24} height={24} className="mx-auto" />
+                    <td className="p-4 text-center" aria-label="Supported">
+                      <Icon icon="flat-color-icons:ok" width={24} height={24} className="mx-auto" />
                     </td>
-                    <td className="p-4 text-center">
-                      <Icon icon="flat-color-icons:checkmark" width={24} height={24} className="mx-auto" />
+                    <td className="p-4 text-center" aria-label="Supported">
+                      <Icon icon="flat-color-icons:ok" width={24} height={24} className="mx-auto" />
                     </td>
-                    <td className="p-4 text-center">
-                      <Icon icon="flat-color-icons:checkmark" width={24} height={24} className="mx-auto" />
+                    <td className="p-4 text-center" aria-label="Supported">
+                      <Icon icon="flat-color-icons:ok" width={24} height={24} className="mx-auto" />
                     </td>
-                    <td className="p-4 text-center">
-                      <Icon icon="flat-color-icons:checkmark" width={24} height={24} className="mx-auto" />
+                    <td className="p-4 text-center" aria-label="Supported">
+                      <Icon icon="flat-color-icons:ok" width={24} height={24} className="mx-auto" />
                     </td>
-                    <td className="p-4 text-center">
-                      <Icon icon="flat-color-icons:checkmark" width={24} height={24} className="mx-auto" />
+                    <td className="p-4 text-center" aria-label="Supported">
+                      <Icon icon="flat-color-icons:ok" width={24} height={24} className="mx-auto" />
                     </td>
                   </tr>
                   <tr className="border-b border-leather-700/30">

@@ -147,11 +147,27 @@ export function blockNoteToLaTeX(content: unknown[]): string {
   }
 
   let latex = "";
+  let inBulletList = false;
+  let inNumberedList = false;
 
-  content.forEach((blockUnknown) => {
+  const closeOpenLists = () => {
+    if (inBulletList) {
+      latex += "\\end{itemize}\n\n";
+      inBulletList = false;
+    }
+    if (inNumberedList) {
+      latex += "\\end{enumerate}\n\n";
+      inNumberedList = false;
+    }
+  };
+
+  content.forEach((blockUnknown, index) => {
     const block = blockUnknown as BlockNoteBlock;
+    const nextBlock = content[index + 1] as BlockNoteBlock | undefined;
+    
     switch (block.type) {
       case "heading":
+        closeOpenLists();
         const level = (block.props?.level as number) || 1;
         const headingText = extractPlainText(block.content);
         const headingCmd = level === 1 ? "section" : level === 2 ? "subsection" : "subsubsection";
@@ -159,6 +175,7 @@ export function blockNoteToLaTeX(content: unknown[]): string {
         break;
 
       case "paragraph":
+        closeOpenLists();
         const paragraphText = extractPlainText(block.content);
         if (paragraphText) {
           latex += `${escapeLatex(paragraphText)}\n\n`;
@@ -173,6 +190,12 @@ export function blockNoteToLaTeX(content: unknown[]): string {
         }
         const bulletText = extractPlainText(block.content);
         latex += `\\item ${escapeLatex(bulletText)}\n`;
+        
+        // Close list if next item is not a bullet list item
+        if (!nextBlock || nextBlock.type !== "bulletListItem") {
+          latex += "\\end{itemize}\n\n";
+          inBulletList = false;
+        }
         break;
       }
 
@@ -184,27 +207,38 @@ export function blockNoteToLaTeX(content: unknown[]): string {
         }
         const numberedText = extractPlainText(block.content);
         latex += `\\item ${escapeLatex(numberedText)}\n`;
+        
+        // Close list if next item is not a numbered list item
+        if (!nextBlock || nextBlock.type !== "numberedListItem") {
+          latex += "\\end{enumerate}\n\n";
+          inNumberedList = false;
+        }
         break;
       }
 
       case "codeBlock":
+        closeOpenLists();
         const codeText = extractPlainText(block.content);
-        const language = block.props?.language || "";
         latex += `\\begin{verbatim}\n${codeText}\n\\end{verbatim}\n\n`;
         break;
 
       case "quote":
+        closeOpenLists();
         const quoteText = extractPlainText(block.content);
         latex += `\\begin{quote}\n${escapeLatex(quoteText)}\n\\end{quote}\n\n`;
         break;
 
       default:
+        closeOpenLists();
         const defaultText = extractPlainText(block.content);
         if (defaultText) {
           latex += `${escapeLatex(defaultText)}\n\n`;
         }
     }
   });
+
+  // Close any remaining open lists
+  closeOpenLists();
 
   return latex.trim();
 }
@@ -214,10 +248,10 @@ export function blockNoteToLaTeX(content: unknown[]): string {
  */
 function escapeLatex(text: string): string {
   return text
-    .replace(/\\/g, "\\textbackslash{}")
     .replace(/[&%$#_{}]/g, (char) => `\\${char}`)
     .replace(/~/g, "\\textasciitilde{}")
-    .replace(/\^/g, "\\textasciicircum{}");
+    .replace(/\^/g, "\\textasciicircum{}")
+    .replace(/\\/g, "\\textbackslash{}");
 }
 
 /**

@@ -26,6 +26,9 @@ export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
   const [analyticsEnabled, setAnalyticsEnabled] = useState<boolean | null>(null);
 
   useEffect(() => {
+    // Check if we're in the browser (avoid SSR issues)
+    if (typeof window === "undefined") return;
+    
     // Check user's analytics preference from localStorage
     const preference = localStorage.getItem("analytics-enabled");
     
@@ -65,6 +68,9 @@ export function useAnalytics() {
   const [analyticsEnabled, setAnalyticsEnabled] = useState(false);
 
   useEffect(() => {
+    // Check if we're in the browser (avoid SSR issues)
+    if (typeof window === "undefined") return;
+    
     const preference = localStorage.getItem("analytics-enabled");
     setAnalyticsEnabled(preference === "true");
   }, []);
@@ -75,10 +81,16 @@ export function useAnalytics() {
   };
 
   const toggleAnalytics = (enabled: boolean) => {
+    if (typeof window === "undefined") return;
+    
     localStorage.setItem("analytics-enabled", enabled.toString());
     setAnalyticsEnabled(enabled);
-    // Reload page to apply changes
-    window.location.reload();
+    
+    // Show a message to user that they need to reload
+    // This is better UX than forcing an immediate reload
+    if (window.confirm("Analytics settings updated. Reload the page to apply changes?")) {
+      window.location.reload();
+    }
   };
 
   return {

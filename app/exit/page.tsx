@@ -35,11 +35,23 @@ function ExitContent() {
       try {
         // Validate URL
         const parsedUrl = new URL(targetUrl);
-        // Use a ref or move this outside the effect to avoid cascading renders
-        // For now, we'll use router in the same effect
-        if (parsedUrl.toString()) {
-          setUrl(parsedUrl.toString());
+        
+        // Prevent open redirect vulnerabilities
+        // Only allow external URLs (not relative paths or javascript: schemes)
+        if (parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:") {
+          console.error("Invalid URL protocol:", parsedUrl.protocol);
+          router.push("/");
+          return;
         }
+        
+        // Prevent same-origin redirects (optional security measure)
+        if (typeof window !== "undefined" && parsedUrl.origin === window.location.origin) {
+          console.error("Cannot redirect to same origin");
+          router.push("/");
+          return;
+        }
+        
+        setUrl(parsedUrl.toString());
       } catch (err) {
         console.error("Invalid URL:", err);
         router.push("/");
@@ -47,8 +59,7 @@ function ExitContent() {
     } else {
       router.push("/");
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]);
+  }, [searchParams, router]);
 
   useEffect(() => {
     if (!url || cancelled) return;

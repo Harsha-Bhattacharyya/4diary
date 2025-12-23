@@ -126,13 +126,16 @@ export const semanticIcons = {
   
   // Actions
   export: "export",
+  import: "import",
   package: "package",
   
   // Feedback
   warning: "disclaimer",
   info: "info",
-  error: "cancel",
-  success: "checkmark",
+  error: "high-priority",  // Using high-priority for error/cancel
+  success: "ok",  // Using ok for success/checkmark
+  cancel: "high-priority",  // Using high-priority for cancel
+  checkmark: "ok",  // Using ok for checkmark
   like: "like",
   love: "like",
   
