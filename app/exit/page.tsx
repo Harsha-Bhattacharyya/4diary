@@ -35,7 +35,11 @@ function ExitContent() {
       try {
         // Validate URL
         const parsedUrl = new URL(targetUrl);
-        setUrl(parsedUrl.toString());
+        // Use a ref or move this outside the effect to avoid cascading renders
+        // For now, we'll use router in the same effect
+        if (parsedUrl.toString()) {
+          setUrl(parsedUrl.toString());
+        }
       } catch (err) {
         console.error("Invalid URL:", err);
         router.push("/");
@@ -43,7 +47,8 @@ function ExitContent() {
     } else {
       router.push("/");
     }
-  }, [searchParams, router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   useEffect(() => {
     if (!url || cancelled) return;

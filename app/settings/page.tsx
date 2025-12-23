@@ -18,6 +18,7 @@ import GlassCard from "@/components/ui/GlassCard";
 import LeatherButton from "@/components/ui/LeatherButton";
 import TopMenu from "@/components/ui/TopMenu";
 import { useTheme } from "@/components/ui/ThemeProvider";
+import { useAnalytics } from "@/components/ui/AnalyticsProvider";
 import { SUPPORTED_LANGUAGES, type LanguageCode } from "@/lib/translationTypes";
 import { Icon } from "@iconify/react";
 
@@ -31,6 +32,7 @@ import { Icon } from "@iconify/react";
 export default function SettingsPage() {
   const [exportInProgress, setExportInProgress] = useState(false);
   const { theme, toggleTheme } = useTheme();
+  const { analyticsEnabled, toggleAnalytics } = useAnalytics();
   const [selectedLanguage, setSelectedLanguage] = useState<LanguageCode>("en");
   const [languageSaving, setLanguageSaving] = useState(false);
   const [languageSaved, setLanguageSaved] = useState(false);
@@ -367,24 +369,38 @@ export default function SettingsPage() {
           {/* Privacy Settings */}
           <GlassCard className="mb-6 settings-card">
             <h2 className="text-2xl font-bold mb-4 text-leather-100 flex items-center gap-2">
-              <Icon icon="flat-color-icons:key" width={32} height={32} /> Privacy
+              <Icon icon="flat-color-icons:privacy" width={32} height={32} /> Privacy
             </h2>
             <div className="space-y-4">
               <div className="flex items-center justify-between py-3 border-b border-leather-700">
-                <div>
+                <div className="flex-1">
                   <h3 className="font-bold text-leather-100">
-                    Analytics
+                    Privacy-Focused Analytics
                   </h3>
-                  <p className="text-sm text-leather-300">
-                    Privacy-respecting analytics without PII
+                  <p className="text-sm text-leather-300 mb-2">
+                    Optional telemetry using TelemetryDeck (no PII, no tracking, fully anonymous)
+                  </p>
+                  <p className="text-xs text-leather-400">
+                    ✓ Self-hostable compatible • ✓ No vendor lock-in • ✓ Opt-in only
                   </p>
                 </div>
-                <div className="px-4 py-2 bg-blue-700/40 text-blue-200 text-sm font-bold border-2 border-blue-600">
-                  Anonymous
-                </div>
+                <button
+                  type="button"
+                  onClick={() => toggleAnalytics(!analyticsEnabled)}
+                  role="switch"
+                  aria-checked={analyticsEnabled}
+                  aria-label={`Analytics: ${analyticsEnabled ? "Enabled" : "Disabled"}. Click to toggle.`}
+                  className={`px-6 py-3 rounded-lg transition-all font-medium border-2 ${
+                    analyticsEnabled
+                      ? "bg-green-700/40 text-green-200 border-green-600 hover:bg-green-700/50"
+                      : "bg-red-700/40 text-red-200 border-red-600 hover:bg-red-700/50"
+                  }`}
+                >
+                  {analyticsEnabled ? "✓ Enabled" : "✗ Disabled"}
+                </button>
               </div>
 
-              <div className="flex items-center justify-between py-3">
+              <div className="flex items-center justify-between py-3 border-b border-leather-700">
                 <div>
                   <h3 className="font-bold text-leather-100">
                     Data Collection
@@ -395,6 +411,20 @@ export default function SettingsPage() {
                 </div>
                 <div className="px-4 py-2 bg-green-700/40 text-green-200 text-sm font-bold border-2 border-green-600">
                   Minimal
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between py-3">
+                <div>
+                  <h3 className="font-bold text-leather-100">
+                    User Identification
+                  </h3>
+                  <p className="text-sm text-leather-300">
+                    All analytics sent anonymously with no user tracking
+                  </p>
+                </div>
+                <div className="px-4 py-2 bg-green-700/40 text-green-200 text-sm font-bold border-2 border-green-600">
+                  Anonymous
                 </div>
               </div>
             </div>
