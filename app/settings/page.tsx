@@ -19,6 +19,7 @@ import LeatherButton from "@/components/ui/LeatherButton";
 import TopMenu from "@/components/ui/TopMenu";
 import { useTheme } from "@/components/ui/ThemeProvider";
 import { SUPPORTED_LANGUAGES, type LanguageCode } from "@/lib/translationTypes";
+import { Icon } from "@iconify/react";
 
 /**
  * Render the application Settings page with security, export, privacy, appearance, and self-hosting sections.
@@ -181,8 +182,8 @@ export default function SettingsPage() {
 
           {/* Security Settings */}
           <GlassCard className="mb-6 settings-card">
-            <h2 className="text-2xl font-bold mb-4 text-leather-100">
-              🔒 Security
+            <h2 className="text-2xl font-bold mb-4 text-leather-100 flex items-center gap-2">
+              <Icon icon="flat-color-icons:key" width={32} height={32} /> Security
             </h2>
             <div className="space-y-4">
               <div className="flex items-center justify-between py-3 border-b border-leather-700">
@@ -231,8 +232,8 @@ export default function SettingsPage() {
 
           {/* Appearance Settings */}
           <GlassCard className="mb-6 settings-card">
-            <h2 className="text-2xl font-bold mb-4 text-leather-100">
-              🎨 Appearance
+            <h2 className="text-2xl font-bold mb-4 text-leather-100 flex items-center gap-2">
+              <Icon icon="flat-color-icons:settings" width={32} height={32} /> Appearance
             </h2>
             <div className="space-y-4">
               <div className="flex items-center justify-between py-3 border-b border-leather-700">
@@ -265,8 +266,8 @@ export default function SettingsPage() {
                     Choose your preferred language for the interface
                   </p>
                   {!translationAvailable && (
-                    <p className="text-xs text-amber-400 mt-1">
-                      ⚠️ Translation service not configured. Set LINGO_API_KEY to enable.
+                    <p className="text-xs text-amber-400 mt-1 flex items-center gap-1">
+                      <Icon icon="flat-color-icons:disclaimer" width={16} height={16} /> Translation service not configured. Set LINGO_API_KEY to enable.
                     </p>
                   )}
                 </div>
@@ -297,8 +298,8 @@ export default function SettingsPage() {
 
           {/* Export Settings */}
           <GlassCard className="mb-6 settings-card">
-            <h2 className="text-2xl font-bold mb-4 text-leather-100">
-              📥 Import & Export
+            <h2 className="text-2xl font-bold mb-4 text-leather-100 flex items-center gap-2">
+              <Icon icon="flat-color-icons:package" width={32} height={32} /> Import & Export
             </h2>
             <div className="space-y-4">
               <div>
@@ -341,22 +342,22 @@ export default function SettingsPage() {
                 </h3>
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div className="flex items-center gap-2 text-leather-300">
-                    <span>📝</span> Markdown (.md)
+                    <Icon icon="flat-color-icons:document" width={20} height={20} /> Markdown (.md)
                   </div>
                   <div className="flex items-center gap-2 text-leather-300">
-                    <span>📋</span> Google Keep (Takeout)
+                    <Icon icon="flat-color-icons:document" width={20} height={20} /> Google Keep (Takeout)
                   </div>
                   <div className="flex items-center gap-2 text-leather-300">
-                    <span>🐘</span> Evernote (.enex)
+                    <Icon icon="flat-color-icons:document" width={20} height={20} /> Evernote (.enex)
                   </div>
                   <div className="flex items-center gap-2 text-leather-300">
-                    <span>📓</span> Notion Export
+                    <Icon icon="flat-color-icons:document" width={20} height={20} /> Notion Export
                   </div>
                   <div className="flex items-center gap-2 text-leather-300">
-                    <span>🍎</span> Apple Notes (HTML)
+                    <Icon icon="flat-color-icons:document" width={20} height={20} /> Apple Notes (HTML)
                   </div>
                   <div className="flex items-center gap-2 text-leather-300">
-                    <span>🔒</span> Standard Notes
+                    <Icon icon="flat-color-icons:key" width={20} height={20} /> Standard Notes
                   </div>
                 </div>
               </div>
@@ -365,8 +366,8 @@ export default function SettingsPage() {
 
           {/* Privacy Settings */}
           <GlassCard className="mb-6 settings-card">
-            <h2 className="text-2xl font-bold mb-4 text-leather-100">
-              🕵️ Privacy
+            <h2 className="text-2xl font-bold mb-4 text-leather-100 flex items-center gap-2">
+              <Icon icon="flat-color-icons:key" width={32} height={32} /> Privacy
             </h2>
             <div className="space-y-4">
               <div className="flex items-center justify-between py-3 border-b border-leather-700">
@@ -401,8 +402,8 @@ export default function SettingsPage() {
 
           {/* Self-Hosting Info */}
           <GlassCard className="fade-in">
-            <h2 className="text-2xl font-bold mb-4 text-leather-100">
-              🐳 Self-Hosting
+            <h2 className="text-2xl font-bold mb-4 text-leather-100 flex items-center gap-2">
+              <Icon icon="flat-color-icons:multiple-devices" width={32} height={32} /> Self-Hosting
             </h2>
             <p className="text-leather-300 mb-4">
               4diary supports self-hosting with Docker. Check the README for deployment instructions.

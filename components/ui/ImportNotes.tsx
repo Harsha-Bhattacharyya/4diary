@@ -21,6 +21,7 @@ import {
   type ImportResult,
   type ImportedNote,
 } from "@/lib/import";
+import { Icon } from "@iconify/react";
 
 interface ImportNotesProps {
   /** Callback when import is completed successfully */
@@ -194,8 +195,8 @@ export function ImportNotes({ onImportComplete, isOpen, onClose }: ImportNotesPr
         <div className="p-6 border-b border-leather-700">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-2xl font-bold text-leather-100">
-                📥 Import Notes
+              <h2 className="text-2xl font-bold text-leather-100 flex items-center gap-2">
+                <Icon icon="flat-color-icons:package" width={32} height={32} /> Import Notes
               </h2>
               <p className="text-sm text-leather-300 mt-1">
                 Import notes from other apps
@@ -324,7 +325,9 @@ export function ImportNotes({ onImportComplete, isOpen, onClose }: ImportNotesPr
                     className="hidden"
                     accept=".md,.markdown,.enex,.json,.html,.htm,.txt,.csv,.zip"
                   />
-                  <div className="text-4xl mb-3">📁</div>
+                  <div className="text-4xl mb-3">
+                    <Icon icon="flat-color-icons:document" width={48} height={48} />
+                  </div>
                   <p className="text-leather-200 font-medium">
                     Drop files here or click to browse
                   </p>
@@ -355,11 +358,11 @@ export function ImportNotes({ onImportComplete, isOpen, onClose }: ImportNotesPr
                           className="flex items-center gap-2 text-sm text-leather-300"
                         >
                           <span className="text-lg">
-                            {file.name.endsWith(".md") ? "📝" :
-                             file.name.endsWith(".enex") ? "🐘" :
-                             file.name.endsWith(".json") ? "📋" :
-                             file.name.endsWith(".html") ? "🌐" :
-                             file.name.endsWith(".zip") ? "📦" : "📄"}
+                            {file.name.endsWith(".md") ? <Icon icon="flat-color-icons:document" width={20} height={20} /> :
+                             file.name.endsWith(".enex") ? <Icon icon="flat-color-icons:document" width={20} height={20} /> :
+                             file.name.endsWith(".json") ? <Icon icon="flat-color-icons:document" width={20} height={20} /> :
+                             file.name.endsWith(".html") ? <Icon icon="flat-color-icons:globe" width={20} height={20} /> :
+                             file.name.endsWith(".zip") ? <Icon icon="flat-color-icons:package" width={20} height={20} /> : <Icon icon="flat-color-icons:document" width={20} height={20} />}
                           </span>
                           <span className="truncate flex-1">{file.name}</span>
                           <span className="text-leather-500">
@@ -434,7 +437,9 @@ export function ImportNotes({ onImportComplete, isOpen, onClose }: ImportNotesPr
                       key={i}
                       className="p-3 bg-leather-900/40 rounded-lg flex items-center gap-3"
                     >
-                      <span className="text-xl">📝</span>
+                      <span className="text-xl">
+                        <Icon icon="flat-color-icons:document" width={24} height={24} />
+                      </span>
                       <div className="flex-1 min-w-0">
                         <div className="font-medium text-leather-100 truncate">
                           {note.title}
@@ -457,7 +462,9 @@ export function ImportNotes({ onImportComplete, isOpen, onClose }: ImportNotesPr
           {/* Step 3: Importing */}
           {step === "importing" && (
             <div className="text-center py-8">
-              <div className="text-5xl mb-4">⏳</div>
+              <div className="text-5xl mb-4 flex justify-center">
+                <Icon icon="flat-color-icons:settings" width={64} height={64} />
+              </div>
               <h3 className="text-xl font-bold text-leather-100 mb-2">
                 Importing Notes...
               </h3>
@@ -477,7 +484,9 @@ export function ImportNotes({ onImportComplete, isOpen, onClose }: ImportNotesPr
           {/* Step 4: Complete */}
           {step === "complete" && importResult && (
             <div className="text-center py-8">
-              <div className="text-6xl mb-4">🎉</div>
+              <div className="text-6xl mb-4 flex justify-center">
+                <Icon icon="flat-color-icons:like" width={64} height={64} />
+              </div>
               <h3 className="text-2xl font-bold text-leather-100 mb-2">
                 Import Complete!
               </h3>

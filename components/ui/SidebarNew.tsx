@@ -38,6 +38,7 @@ import {
   GripVertical
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Icon } from "@iconify/react";
 
 interface Document {
   id: string;
@@ -230,8 +231,8 @@ export default function SidebarNew({
               </p>
             </div>
           </div>
-          <div className="text-xs text-neutral-600 dark:text-neutral-400">
-            <span role="img" aria-label="Calendar">📅</span> {currentDate}
+          <div className="text-xs text-neutral-600 dark:text-neutral-400 flex items-center gap-1">
+            <Icon icon="flat-color-icons:document" width={16} height={16} /> {currentDate}
           </div>
         </div>
       )}
@@ -300,8 +301,8 @@ export default function SidebarNew({
             Object.entries(groupedDocs).map(([folder, docs]) => (
               <div key={folder} className="mb-4">
                 {/* Folder Header */}
-                <div className="px-2 py-1 text-xs font-semibold text-neutral-600 dark:text-neutral-300 uppercase tracking-wide">
-                  <span aria-label="Folder">📁</span> {folder}
+                <div className="px-2 py-1 text-xs font-semibold text-neutral-600 dark:text-neutral-300 uppercase tracking-wide flex items-center gap-1">
+                  <Icon icon="flat-color-icons:document" width={16} height={16} /> {folder}
                 </div>
 
                 {/* Documents in Folder */}
@@ -380,8 +381,8 @@ export default function SidebarNew({
       {/* Footer */}
       {!collapsed && (
         <div className="p-4 border-t border-neutral-200 dark:border-neutral-800 flex-shrink-0">
-          <p className="text-xs text-neutral-500 dark:text-neutral-400 text-center">
-            <span aria-label="Secure">🔐</span> End-to-end encrypted
+          <p className="text-xs text-neutral-500 dark:text-neutral-400 text-center flex items-center justify-center gap-1">
+            <Icon icon="flat-color-icons:data-encryption" width={16} height={16} /> End-to-end encrypted
           </p>
         </div>
       )}
