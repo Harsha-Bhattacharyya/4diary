@@ -307,7 +307,7 @@ export default function SidebarNew({
               <div key={folder} className="mb-4">
                 {/* Folder Header */}
                 <div className="px-2 py-1 text-xs font-semibold text-neutral-600 dark:text-neutral-300 uppercase tracking-wide flex items-center gap-1">
-                  <Icon icon="flat-color-icons:document" width={16} height={16} /> {folder}
+                  <Icon icon="flat-color-icons:opened-folder" width={16} height={16} /> {folder}
                 </div>
 
                 {/* Documents in Folder */}
