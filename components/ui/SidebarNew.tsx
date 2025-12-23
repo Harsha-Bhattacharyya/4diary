@@ -233,7 +233,7 @@ export default function SidebarNew({
             </div>
           </div>
           <div className="text-xs text-neutral-600 dark:text-neutral-400 flex items-center gap-1">
-            <Icon icon="flat-color-icons:document" width={16} height={16} /> {currentDate}
+            <Icon icon="flat-color-icons:calendar" width={16} height={16} /> {currentDate}
           </div>
         </div>
       )}
