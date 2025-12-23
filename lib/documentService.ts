@@ -22,7 +22,7 @@ export interface DocumentMetadata {
   tags?: string[];
   folder?: string;
   emojiIcon?: string;
-  type?: "doc" | "board" | "quick";
+  type?: "doc" | "board" | "quick" | "handwritten";
   embedPreviews?: Array<{
     url: string;
     title?: string;

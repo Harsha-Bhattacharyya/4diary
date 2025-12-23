@@ -159,7 +159,7 @@ export interface DocumentType {
     tags?: string[];
     folder?: string;
     emojiIcon?: string; // Emoji icon for the document
-    type?: "doc" | "board" | "quick"; // Document type
+    type?: "doc" | "board" | "quick" | "handwritten"; // Document type
     embedPreviews?: Array<{
       url: string;
       title?: string;
