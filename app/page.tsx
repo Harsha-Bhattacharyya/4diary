@@ -13,6 +13,7 @@
 
 import Link from "next/link";
 import Script from "next/script";
+import { Icon } from "@iconify/react";
 import LeatherBackground from "@/components/ui/LeatherBackground";
 import LeatherButton from "@/components/ui/LeatherButton";
 import TopMenu from "@/components/ui/TopMenu";
@@ -300,7 +301,9 @@ export default function Home() {
         {/* E2E Encryption Section */}
         <section className="min-h-screen flex flex-col items-center justify-center px-6 py-20 bg-black/30">
           <div className="max-w-4xl mx-auto text-center">
-            <div className="text-8xl md:text-9xl mb-8">🔐</div>
+            <div className="text-8xl md:text-9xl mb-8 flex justify-center">
+              <Icon icon="flat-color-icons:data-encryption" width={144} height={144} />
+            </div>
             <h2 className="text-4xl md:text-5xl font-bold text-leather-100 mb-8">
               E2E Encryption
             </h2>
@@ -313,7 +316,9 @@ export default function Home() {
         {/* No Password Storage Section */}
         <section className="min-h-screen flex flex-col items-center justify-center px-6 py-20">
           <div className="max-w-4xl mx-auto text-center">
-            <div className="text-8xl md:text-9xl mb-8">🔑</div>
+            <div className="text-8xl md:text-9xl mb-8 flex justify-center">
+              <Icon icon="flat-color-icons:key" width={144} height={144} />
+            </div>
             <h2 className="text-4xl md:text-5xl font-bold text-leather-100 mb-8">
               Password Leaks? No Problem.
             </h2>
@@ -326,7 +331,9 @@ export default function Home() {
         {/* Web App Section */}
         <section className="min-h-screen flex flex-col items-center justify-center px-6 py-20 bg-black/30">
           <div className="max-w-4xl mx-auto text-center">
-            <div className="text-8xl md:text-9xl mb-8">🌐</div>
+            <div className="text-8xl md:text-9xl mb-8 flex justify-center">
+              <Icon icon="flat-color-icons:globe" width={144} height={144} />
+            </div>
             <h2 className="text-4xl md:text-5xl font-bold text-leather-100 mb-8">
               Works Everywhere
             </h2>
@@ -339,7 +346,9 @@ export default function Home() {
         {/* FLOSS Section */}
         <section className="min-h-screen flex flex-col items-center justify-center px-6 py-20">
           <div className="max-w-4xl mx-auto text-center">
-            <div className="text-8xl md:text-9xl mb-8">💻</div>
+            <div className="text-8xl md:text-9xl mb-8 flex justify-center">
+              <Icon icon="flat-color-icons:multiple-devices" width={144} height={144} />
+            </div>
             <h2 className="text-4xl md:text-5xl font-bold text-leather-100 mb-8">
               Don&apos;t Trust Us? You Don&apos;t Have To!
             </h2>
@@ -391,6 +400,206 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Comparison Section */}
+        <section className="min-h-screen flex flex-col items-center justify-center px-6 py-20">
+          <div className="max-w-6xl mx-auto">
+            <h2 className="text-4xl md:text-5xl font-bold text-leather-100 mb-4 text-center">
+              How Does 4diary Compare?
+            </h2>
+            <p className="text-xl text-leather-300 mb-12 text-center">
+              See why 4diary stands out from other note-taking apps
+            </p>
+            
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse" aria-label="Feature comparison between 4diary and other note-taking applications">
+                <caption className="sr-only">
+                  Comparison of 4diary features with Google Keep, OneNote, Evernote, Standard Notes, and Notion
+                </caption>
+                <thead>
+                  <tr className="border-b-2 border-leather-500">
+                    <th className="p-4 text-leather-100 font-bold">Feature</th>
+                    <th className="p-4 text-leather-100 font-bold text-center">4diary</th>
+                    <th className="p-4 text-leather-200 text-center">Google Keep</th>
+                    <th className="p-4 text-leather-200 text-center">OneNote</th>
+                    <th className="p-4 text-leather-200 text-center">Evernote</th>
+                    <th className="p-4 text-leather-200 text-center">Standard Notes</th>
+                    <th className="p-4 text-leather-200 text-center">Notion</th>
+                  </tr>
+                </thead>
+                <tbody className="text-leather-300">
+                  <tr className="border-b border-leather-700/30">
+                    <td className="p-4 font-semibold text-leather-200">End-to-End Encryption</td>
+                    <td className="p-4 text-center" aria-label="Supported">
+                      <Icon icon="flat-color-icons:ok" width={24} height={24} className="mx-auto" />
+                    </td>
+                    <td className="p-4 text-center" aria-label="Not supported">
+                      <Icon icon="flat-color-icons:high-priority" width={24} height={24} className="mx-auto" />
+                    </td>
+                    <td className="p-4 text-center" aria-label="Not supported">
+                      <Icon icon="flat-color-icons:high-priority" width={24} height={24} className="mx-auto" />
+                    </td>
+                    <td className="p-4 text-center" aria-label="Not supported">
+                      <Icon icon="flat-color-icons:high-priority" width={24} height={24} className="mx-auto" />
+                    </td>
+                    <td className="p-4 text-center" aria-label="Supported">
+                      <Icon icon="flat-color-icons:ok" width={24} height={24} className="mx-auto" />
+                    </td>
+                    <td className="p-4 text-center" aria-label="Not supported">
+                      <Icon icon="flat-color-icons:high-priority" width={24} height={24} className="mx-auto" />
+                    </td>
+                  </tr>
+                  <tr className="border-b border-leather-700/30">
+                    <td className="p-4 font-semibold text-leather-200">Zero-Knowledge Architecture</td>
+                    <td className="p-4 text-center" aria-label="Supported">
+                      <Icon icon="flat-color-icons:ok" width={24} height={24} className="mx-auto" />
+                    </td>
+                    <td className="p-4 text-center" aria-label="Not supported">
+                      <Icon icon="flat-color-icons:high-priority" width={24} height={24} className="mx-auto" />
+                    </td>
+                    <td className="p-4 text-center" aria-label="Not supported">
+                      <Icon icon="flat-color-icons:high-priority" width={24} height={24} className="mx-auto" />
+                    </td>
+                    <td className="p-4 text-center" aria-label="Not supported">
+                      <Icon icon="flat-color-icons:high-priority" width={24} height={24} className="mx-auto" />
+                    </td>
+                    <td className="p-4 text-center" aria-label="Supported">
+                      <Icon icon="flat-color-icons:ok" width={24} height={24} className="mx-auto" />
+                    </td>
+                    <td className="p-4 text-center" aria-label="Not supported">
+                      <Icon icon="flat-color-icons:high-priority" width={24} height={24} className="mx-auto" />
+                    </td>
+                  </tr>
+                  <tr className="border-b border-leather-700/30">
+                    <td className="p-4 font-semibold text-leather-200">Open Source (FLOSS)</td>
+                    <td className="p-4 text-center" aria-label="Supported">
+                      <Icon icon="flat-color-icons:ok" width={24} height={24} className="mx-auto" />
+                    </td>
+                    <td className="p-4 text-center" aria-label="Not supported">
+                      <Icon icon="flat-color-icons:high-priority" width={24} height={24} className="mx-auto" />
+                    </td>
+                    <td className="p-4 text-center" aria-label="Not supported">
+                      <Icon icon="flat-color-icons:high-priority" width={24} height={24} className="mx-auto" />
+                    </td>
+                    <td className="p-4 text-center" aria-label="Not supported">
+                      <Icon icon="flat-color-icons:high-priority" width={24} height={24} className="mx-auto" />
+                    </td>
+                    <td className="p-4 text-center" aria-label="Supported">
+                      <Icon icon="flat-color-icons:ok" width={24} height={24} className="mx-auto" />
+                    </td>
+                    <td className="p-4 text-center" aria-label="Not supported">
+                      <Icon icon="flat-color-icons:high-priority" width={24} height={24} className="mx-auto" />
+                    </td>
+                  </tr>
+                  <tr className="border-b border-leather-700/30">
+                    <td className="p-4 font-semibold text-leather-200">Self-Hostable</td>
+                    <td className="p-4 text-center" aria-label="Supported">
+                      <Icon icon="flat-color-icons:ok" width={24} height={24} className="mx-auto" />
+                    </td>
+                    <td className="p-4 text-center" aria-label="Not supported">
+                      <Icon icon="flat-color-icons:high-priority" width={24} height={24} className="mx-auto" />
+                    </td>
+                    <td className="p-4 text-center" aria-label="Not supported">
+                      <Icon icon="flat-color-icons:high-priority" width={24} height={24} className="mx-auto" />
+                    </td>
+                    <td className="p-4 text-center" aria-label="Not supported">
+                      <Icon icon="flat-color-icons:high-priority" width={24} height={24} className="mx-auto" />
+                    </td>
+                    <td className="p-4 text-center" aria-label="Supported">
+                      <Icon icon="flat-color-icons:ok" width={24} height={24} className="mx-auto" />
+                    </td>
+                    <td className="p-4 text-center" aria-label="Not supported">
+                      <Icon icon="flat-color-icons:high-priority" width={24} height={24} className="mx-auto" />
+                    </td>
+                  </tr>
+                  <tr className="border-b border-leather-700/30">
+                    <td className="p-4 font-semibold text-leather-200">Rich Text Editor (Notion-like)</td>
+                    <td className="p-4 text-center" aria-label="Supported">
+                      <Icon icon="flat-color-icons:ok" width={24} height={24} className="mx-auto" />
+                    </td>
+                    <td className="p-4 text-center" aria-label="Not supported">
+                      <Icon icon="flat-color-icons:high-priority" width={24} height={24} className="mx-auto" />
+                    </td>
+                    <td className="p-4 text-center" aria-label="Supported">
+                      <Icon icon="flat-color-icons:ok" width={24} height={24} className="mx-auto" />
+                    </td>
+                    <td className="p-4 text-center" aria-label="Supported">
+                      <Icon icon="flat-color-icons:ok" width={24} height={24} className="mx-auto" />
+                    </td>
+                    <td className="p-4 text-center" aria-label="Not supported">
+                      <Icon icon="flat-color-icons:high-priority" width={24} height={24} className="mx-auto" />
+                    </td>
+                    <td className="p-4 text-center" aria-label="Supported">
+                      <Icon icon="flat-color-icons:ok" width={24} height={24} className="mx-auto" />
+                    </td>
+                  </tr>
+                  <tr className="border-b border-leather-700/30">
+                    <td className="p-4 font-semibold text-leather-200">Kanban Boards</td>
+                    <td className="p-4 text-center" aria-label="Supported">
+                      <Icon icon="flat-color-icons:ok" width={24} height={24} className="mx-auto" />
+                    </td>
+                    <td className="p-4 text-center" aria-label="Not supported">
+                      <Icon icon="flat-color-icons:high-priority" width={24} height={24} className="mx-auto" />
+                    </td>
+                    <td className="p-4 text-center" aria-label="Not supported">
+                      <Icon icon="flat-color-icons:high-priority" width={24} height={24} className="mx-auto" />
+                    </td>
+                    <td className="p-4 text-center" aria-label="Not supported">
+                      <Icon icon="flat-color-icons:high-priority" width={24} height={24} className="mx-auto" />
+                    </td>
+                    <td className="p-4 text-center" aria-label="Not supported">
+                      <Icon icon="flat-color-icons:high-priority" width={24} height={24} className="mx-auto" />
+                    </td>
+                    <td className="p-4 text-center" aria-label="Supported">
+                      <Icon icon="flat-color-icons:ok" width={24} height={24} className="mx-auto" />
+                    </td>
+                  </tr>
+                  <tr className="border-b border-leather-700/30">
+                    <td className="p-4 font-semibold text-leather-200">Offline Support (PWA)</td>
+                    <td className="p-4 text-center" aria-label="Supported">
+                      <Icon icon="flat-color-icons:ok" width={24} height={24} className="mx-auto" />
+                    </td>
+                    <td className="p-4 text-center" aria-label="Supported">
+                      <Icon icon="flat-color-icons:ok" width={24} height={24} className="mx-auto" />
+                    </td>
+                    <td className="p-4 text-center" aria-label="Supported">
+                      <Icon icon="flat-color-icons:ok" width={24} height={24} className="mx-auto" />
+                    </td>
+                    <td className="p-4 text-center" aria-label="Supported">
+                      <Icon icon="flat-color-icons:ok" width={24} height={24} className="mx-auto" />
+                    </td>
+                    <td className="p-4 text-center" aria-label="Supported">
+                      <Icon icon="flat-color-icons:ok" width={24} height={24} className="mx-auto" />
+                    </td>
+                    <td className="p-4 text-center" aria-label="Supported">
+                      <Icon icon="flat-color-icons:ok" width={24} height={24} className="mx-auto" />
+                    </td>
+                  </tr>
+                  <tr className="border-b border-leather-700/30">
+                    <td className="p-4 font-semibold text-leather-200">Pricing</td>
+                    <td className="p-4 text-center text-green-400 font-bold">Free</td>
+                    <td className="p-4 text-center text-green-400">Free</td>
+                    <td className="p-4 text-center text-yellow-400">Freemium</td>
+                    <td className="p-4 text-center text-yellow-400">Freemium</td>
+                    <td className="p-4 text-center text-yellow-400">Freemium</td>
+                    <td className="p-4 text-center text-yellow-400">Freemium</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div className="mt-12 text-center">
+              <p className="text-leather-300 mb-6">
+                4diary combines the best of privacy, security, and functionality—completely free and open source.
+              </p>
+              <Link href="/workspace">
+                <LeatherButton variant="gradient" size="lg">
+                  Try 4diary Now
+                </LeatherButton>
+              </Link>
+            </div>
+          </div>
+        </section>
+
         {/* Final CTA Section */}
         <section className="min-h-screen flex flex-col items-center justify-center px-6 py-20">
           <div className="max-w-4xl mx-auto text-center">
@@ -437,7 +646,9 @@ export default function Home() {
 
         {/* Footer */}
         <footer className="text-center text-leather-300 text-sm py-12 bg-black/40">
-          <p>Made with ❤️ in 🇮🇳</p>
+          <p className="flex items-center justify-center gap-2">
+            Made with <Icon icon="flat-color-icons:like" width={20} height={20} /> in 🇮🇳
+          </p>
         </footer>
       </main>
     </div>

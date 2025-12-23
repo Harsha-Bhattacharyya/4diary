@@ -16,6 +16,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
+import { Icon } from "@iconify/react";
 import Link from "next/link";
 import type { Document } from "@/lib/documentService";
 
@@ -182,10 +183,15 @@ export default function CalendarView({ documents }: CalendarViewProps) {
                   <Link
                     key={doc.id}
                     href={`/workspace?doc=${doc.id}`}
-                    className="block text-xs p-1 rounded bg-amber-50 hover:bg-amber-100 transition-colors truncate"
+                    className="block text-xs p-1 rounded bg-amber-50 hover:bg-amber-100 transition-colors truncate flex items-center gap-1"
                     title={doc.metadata.title}
                   >
-                    {doc.metadata.emojiIcon || "📄"} {doc.metadata.title}
+                    <Icon 
+                      icon={`flat-color-icons:${doc.metadata.emojiIcon || "document"}`} 
+                      width={16} 
+                      height={16} 
+                    /> 
+                    {doc.metadata.title}
                   </Link>
                 ))}
                 {day.documents.length > 3 && (
