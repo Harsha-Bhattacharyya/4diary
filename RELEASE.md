@@ -1,6 +1,202 @@
 # 4diary Release Notes
 
-## v0.1.0-alpha (Alpha Release)
+## v2.0.0 (Major Update)
+
+**Release Date:** 2025-12-24
+
+This is a major update to 4diary with comprehensive UI modernization using shadcn/ui, multilingual support, advanced mathematics, enhanced search, functional settings, and many new features.
+
+**✨ Highlights:**
+- 🎨 Complete UI overhaul with shadcn/ui components
+- 🌍 Multi-language support (English, Bengali, Hindi) with lingo.dev
+- 📐 Full LaTeX math notation support
+- 🔢 Enhanced calculator with LaTeX-style math
+- 🎯 Powerful fuzzy search with filters
+- ⚙️ Functional settings menu (encryption toggle, date formats, etc.)
+- 🔐 Two-factor authentication (2FA) with authenticator apps
+- 🔒 Password-protected notes with account/2FA unlock
+- 🎨 12 Google Keep-style colored backgrounds for notes
+- ✍️ Handwritten notes support
+- 📖 Read-only mode and archive system
+- 🤖 Privacy-friendly AI assistant (DuckDuckGo)
+- 🛡️ Cloudflare bot verification
+- 🎨 React icons SVG (Flat Colored icon set)
+- 📊 Comparison with alternatives (Google Keep, OneNote, Evernote, Standard Notes, Notion)
+- 🚪 Cool redirect page for external links
+- 📊 TelemetryDeck privacy-friendly analytics
+- 📤 Multiple export formats (TXT, LaTeX, MD) with password + 2FA protection
+
+### What's New in v2.0.0
+
+#### Component System Modernization
+- Migrated to shadcn/ui for all UI components
+- Drawer component for note settings
+- Redesigned sidebar with profile section, navigation, and document listing
+- Shows emoji icons for each note in sidebar
+- Iconed hamburger menu and card components
+
+#### Internationalization
+- lingo.dev integration for translations
+- 3 languages implemented: English, Bengali, Hindi
+- 5 more planned: Tamil, Mandarin, Russian, French, German
+- Self-hostable without vendor lock-in
+
+#### Advanced Mathematics
+- Full LaTeX math notation (`$...$` and `$$...$$`)
+- Enhanced calculator with LaTeX display
+- Short-hand notation support
+
+#### Enhanced Search & Highlighting
+- Fuzzy search across all content
+- Search filters: All, Title, Content, Tags, Folder
+- Text highlighting system
+- Visual search result highlights
+
+#### Functional Settings
+- Toggle encryption on/off
+- Customize date format
+- Language preferences
+- Analytics opt-in/out
+- Profile management
+
+#### Security Enhancements
+- 2FA with authenticator apps
+- Per-note password protection
+- Cloudflare Turnstile bot verification
+- Password + 2FA required for workspace export
+
+#### Document Features
+- 12 colored backgrounds (Google Keep-style)
+- Handwritten notes with drawing tools
+- Read-only mode toggle
+- Archive system
+- Multiple export formats (TXT, LaTeX, MD)
+
+#### UI/UX Improvements
+- Privacy-friendly AI assistant built-in
+- React icons SVG (Flat Colored)
+- Alternatives comparison section
+- Exit redirect page
+- TelemetryDeck analytics (privacy-respecting)
+
+---
+
+## v1.0.0 (Production Release)
+
+**Release Date:** 2025-12-01
+
+First production-ready release with fully stylized UI, comprehensive features, and enterprise-grade security. Complete overhaul from the alpha prototype.
+
+**✨ Highlights:**
+- 🎨 Professional leather-themed UI
+- ⌨️ Full Vim mode with all keybindings
+- 🖥️ Working modes (full-screen, reader, focus)
+- 🔒 Complete end-to-end encryption
+- 📝 Notion-like editor with BlockNote
+- 📋 Kanban boards with drag-and-drop
+- ⚡ Quick note capture (Ctrl/Cmd + Q)
+- 🔗 Backlinks and bidirectional linking
+- 📅 Calendar view
+- 📚 Version history (50 versions)
+- 📱 PWA with offline support
+- 📥 Import/export functionality
+- 🔗 Ephemeral share links
+
+### What's New in v1.0.0
+
+#### Professional UI & Theme
+- Custom leather-themed design system
+- Polished components with Framer Motion
+- Glass card frosted effects
+- Responsive, mobile-first design
+- Touch-optimized with 44px targets
+
+#### Vim Mode
+- Complete Vim keybindings
+- Four modes: NORMAL, INSERT, REPLACE, COMMAND
+- Visual selection modes
+- Count prefixes (5j, 3w, etc.)
+- Full navigation and editing commands
+- Toggle with Ctrl+Shift+V
+
+#### Working Modes
+- Full-screen distraction-free mode
+- Quick Read mode with adjustable fonts
+- Focus mode with minimal UI
+- Normal editing mode
+
+#### Document Management
+- Rich text editor with BlockNote
+- Auto-save with change detection
+- LaTeX math notation
+- Syntax highlighting (50+ languages)
+- Multiple document types (docs, boards, quick notes, handwritten)
+
+#### Organization
+- Folders and tags
+- Favorites and archive
+- Emoji icons
+- Background colors
+- Backlinks (wiki-style)
+- Version history
+- Calendar view
+
+#### Security
+- AES-256-GCM encryption
+- Zero-knowledge architecture
+- Master key in IndexedDB
+- Document-level encryption
+- PBKDF2 key derivation
+
+#### Collaboration
+- Ephemeral share links (24h TTL)
+- View/edit permissions
+- Revocable tokens
+- Rate limiting
+
+---
+
+## v1.0-alpha (Alpha Prototype)
+
+**Release Date:** 2025-11-13
+
+Initial alpha prototype with barely functional features. Basic proof-of-concept to validate core encryption and document management concepts before building the full production version.
+
+### Prototyped Features
+- Basic note editor (simple text, no rich formatting)
+- Encryption concept (initial implementation, not fully functional)
+- Authentication skeleton (basic login/signup forms)
+- Document storage (MongoDB integration)
+- Simple UI (bare-bones, no styling)
+- Workspace concept (basic structure)
+
+### Known Issues
+- Incomplete encryption implementation
+- No professional styling or theme
+- Limited functionality
+- Many features not working
+- Proof-of-concept only
+- Not recommended for any use
+
+### What Was Missing
+Everything that makes 4diary production-ready:
+- No Vim mode
+- No working modes
+- No leather theme
+- No 2FA or advanced security
+- No AI assistant
+- No calculator or search
+- No import/export
+- No PWA support
+- No multilingual support
+- No kanban boards
+- No handwritten notes
+- No backlinks or version history
+- Basic functionality only
+
+---
+
+## v0.1.0-alpha (Deprecated - see v1.0-alpha)
 
 **Release Date:** 2025-11-13
 
