@@ -143,9 +143,12 @@ export function useAnalytics() {
         const preference = await retrieveSetting<boolean>(ANALYTICS_KEY);
         
         if (isMounted) {
+          // Check if app ID is configured
+          const hasAppID = process.env.NEXT_PUBLIC_TELEMETRYDECK_APP_ID !== undefined;
+          
           // Default to false (privacy-first approach)
-          // User must explicitly opt-in
-          setAnalyticsEnabled(preference === true);
+          // User must explicitly opt-in AND app ID must be configured
+          setAnalyticsEnabled(preference === true && hasAppID);
           setIsLoaded(true);
         }
       } catch (error) {
