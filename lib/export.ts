@@ -97,6 +97,240 @@ export function blockNoteToMarkdown(content: unknown[]): string {
 }
 
 /**
+ * Extract plain text from BlockNote content (no formatting)
+ */
+function extractPlainText(content: unknown): string {
+  if (!content) return "";
+  if (typeof content === "string") return content;
+  if (Array.isArray(content)) {
+    return content
+      .map((item) => {
+        if (typeof item === "string") return item;
+        if (item.type === "text") {
+          return item.text || "";
+        }
+        return "";
+      })
+      .join("");
+  }
+  return "";
+}
+
+/**
+ * Convert BlockNote content to plain text
+ */
+export function blockNoteToPlainText(content: unknown[]): string {
+  if (!Array.isArray(content)) {
+    return "";
+  }
+
+  let text = "";
+
+  content.forEach((blockUnknown) => {
+    const block = blockUnknown as BlockNoteBlock;
+    const plainText = extractPlainText(block.content);
+    
+    if (plainText) {
+      text += `${plainText}\n`;
+    }
+  });
+
+  return text.trim();
+}
+
+/**
+ * Convert BlockNote content to LaTeX
+ */
+export function blockNoteToLaTeX(content: unknown[]): string {
+  if (!Array.isArray(content)) {
+    return "";
+  }
+
+  let latex = "";
+  let inBulletList = false;
+  let inNumberedList = false;
+
+  const closeOpenLists = () => {
+    if (inBulletList) {
+      latex += "\\end{itemize}\n\n";
+      inBulletList = false;
+    }
+    if (inNumberedList) {
+      latex += "\\end{enumerate}\n\n";
+      inNumberedList = false;
+    }
+  };
+
+  content.forEach((blockUnknown, index) => {
+    const block = blockUnknown as BlockNoteBlock;
+    const nextBlock = content[index + 1] as BlockNoteBlock | undefined;
+    
+    switch (block.type) {
+      case "heading":
+        closeOpenLists();
+        const level = (block.props?.level as number) || 1;
+        const headingText = extractPlainText(block.content);
+        const headingCmd = level === 1 ? "section" : level === 2 ? "subsection" : "subsubsection";
+        latex += `\\${headingCmd}{${escapeLatex(headingText)}}\n\n`;
+        break;
+
+      case "paragraph":
+        closeOpenLists();
+        const paragraphText = extractPlainText(block.content);
+        if (paragraphText) {
+          latex += `${escapeLatex(paragraphText)}\n\n`;
+        }
+        break;
+
+      case "bulletListItem": {
+        if (inNumberedList) closeOpenLists();
+        if (!inBulletList) {
+          latex += "\\begin{itemize}\n";
+          inBulletList = true;
+        }
+        const bulletText = extractPlainText(block.content);
+        latex += `\\item ${escapeLatex(bulletText)}\n`;
+        
+        // Close list if next item is not a bullet list item
+        if (!nextBlock || nextBlock.type !== "bulletListItem") {
+          latex += "\\end{itemize}\n\n";
+          inBulletList = false;
+        }
+        break;
+      }
+
+      case "numberedListItem": {
+        if (inBulletList) closeOpenLists();
+        if (!inNumberedList) {
+          latex += "\\begin{enumerate}\n";
+          inNumberedList = true;
+        }
+        const numberedText = extractPlainText(block.content);
+        latex += `\\item ${escapeLatex(numberedText)}\n`;
+        
+        // Close list if next item is not a numbered list item
+        if (!nextBlock || nextBlock.type !== "numberedListItem") {
+          latex += "\\end{enumerate}\n\n";
+          inNumberedList = false;
+        }
+        break;
+      }
+
+      case "codeBlock":
+        closeOpenLists();
+        const codeText = extractPlainText(block.content);
+        latex += `\\begin{verbatim}\n${codeText}\n\\end{verbatim}\n\n`;
+        break;
+
+      case "quote":
+        closeOpenLists();
+        const quoteText = extractPlainText(block.content);
+        latex += `\\begin{quote}\n${escapeLatex(quoteText)}\n\\end{quote}\n\n`;
+        break;
+
+      default:
+        closeOpenLists();
+        const defaultText = extractPlainText(block.content);
+        if (defaultText) {
+          latex += `${escapeLatex(defaultText)}\n\n`;
+        }
+    }
+  });
+
+  // Close any remaining open lists
+  closeOpenLists();
+
+  return latex.trim();
+}
+
+/**
+ * Escape special LaTeX characters
+ */
+function escapeLatex(text: string): string {
+  return text
+    .replace(/[&%$#_{}]/g, (char) => `\\${char}`)
+    .replace(/~/g, "\\textasciitilde{}")
+    .replace(/\^/g, "\\textasciicircum{}")
+    .replace(/\\/g, "\\textbackslash{}");
+}
+
+/**
+ * Export a single document as plain text
+ */
+export function exportDocumentAsPlainText(document: ExportDocument): string {
+  let text = `${document.title}\n`;
+  text += "=".repeat(document.title.length) + "\n\n";
+
+  if (document.tags && document.tags.length > 0) {
+    text += `Tags: ${document.tags.join(", ")}\n\n`;
+  }
+
+  text += blockNoteToPlainText(Array.isArray(document.content) ? document.content : []);
+
+  return text;
+}
+
+/**
+ * Export a single document as LaTeX
+ */
+export function exportDocumentAsLaTeX(document: ExportDocument): string {
+  let latex = `\\documentclass{article}\n`;
+  latex += `\\usepackage[utf8]{inputenc}\n`;
+  latex += `\\usepackage{hyperref}\n\n`;
+  latex += `\\title{${escapeLatex(document.title)}}\n`;
+  latex += `\\author{4diary}\n`;
+  latex += `\\date{\\today}\n\n`;
+  latex += `\\begin{document}\n\n`;
+  latex += `\\maketitle\n\n`;
+
+  if (document.tags && document.tags.length > 0) {
+    latex += `\\textbf{Tags:} ${document.tags.map(t => escapeLatex(t)).join(", ")}\n\n`;
+  }
+
+  latex += blockNoteToLaTeX(Array.isArray(document.content) ? document.content : []);
+  
+  latex += `\n\\end{document}`;
+
+  return latex;
+}
+
+/**
+ * Download a single document as .txt file
+ */
+export function downloadTextFile(
+  filename: string,
+  content: string
+): void {
+  const blob = new Blob([content], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `${sanitizeFilename(filename)}.txt`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+/**
+ * Download a single document as .tex file
+ */
+export function downloadLaTeXFile(
+  filename: string,
+  content: string
+): void {
+  const blob = new Blob([content], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `${sanitizeFilename(filename)}.tex`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+/**
  * Extract text from BlockNote content
  */
 function extractText(content: unknown): string {

@@ -16,6 +16,9 @@ import { useRouter } from "next/navigation";
 import LeatherBackground from "@/components/ui/LeatherBackground";
 import GlassCard from "@/components/ui/GlassCard";
 import LeatherButton from "@/components/ui/LeatherButton";
+import { Turnstile } from "@marsidev/react-turnstile";
+import { Icon } from "@iconify/react";
+
 
 /**
  * Authentication page component that displays and manages login and signup forms.
@@ -35,6 +38,10 @@ export default function AuthPage() {
   const [agreeToTerms, setAgreeToTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  
+  // Get Turnstile site key from environment (optional)
+  const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
   const generateSecurePassword = () => {
     const length = 16;
@@ -93,13 +100,19 @@ export default function AuthPage() {
       return;
     }
     
+    // Check Turnstile token if feature is enabled
+    if (turnstileSiteKey && !turnstileToken) {
+      setError("Please complete the bot verification");
+      return;
+    }
+    
     setLoading(true);
 
     try {
       const endpoint = isLogin ? "/api/auth/login" : "/api/auth/signup";
       const body = isLogin
-        ? { username, password }
-        : { username, password, name: name || username };
+        ? { username, password, turnstileToken }
+        : { username, password, name: name || username, turnstileToken };
 
       const response = await fetch(endpoint, {
         method: "POST",
@@ -215,9 +228,9 @@ export default function AuthPage() {
                 <button
                   type="button"
                   onClick={handleCopyPassword}
-                  className="mt-2 text-xs text-leather-300 hover:text-leather-100"
+                  className="mt-2 text-xs text-leather-300 hover:text-leather-100 flex items-center gap-1"
                 >
-                  📋 Copy password
+                  <Icon icon="flat-color-icons:document" width={16} height={16} /> Copy password
                 </button>
               )}
             </div>
@@ -266,6 +279,21 @@ export default function AuthPage() {
               </div>
             )}
 
+            {/* Cloudflare Turnstile Bot Verification (optional) */}
+            {turnstileSiteKey && (
+              <div className="flex justify-center">
+                <Turnstile
+                  siteKey={turnstileSiteKey}
+                  onSuccess={(token) => setTurnstileToken(token)}
+                  onError={() => setTurnstileToken(null)}
+                  onExpire={() => setTurnstileToken(null)}
+                  options={{
+                    theme: "dark",
+                  }}
+                />
+              </div>
+            )}
+
             {/* Submit Button */}
             <LeatherButton
               type="submit"
@@ -295,8 +323,8 @@ export default function AuthPage() {
 
           {/* Encryption Notice */}
           <div className="mt-6 pt-6 border-t border-leather-300/20 text-center">
-            <p className="text-xs text-leather-400">
-              🔐 End-to-end encrypted • Zero-knowledge architecture
+            <p className="text-xs text-leather-400 flex items-center justify-center gap-2">
+              <Icon icon="flat-color-icons:data-encryption" width={20} height={20} /> End-to-end encrypted • Zero-knowledge architecture
             </p>
           </div>
         </div>

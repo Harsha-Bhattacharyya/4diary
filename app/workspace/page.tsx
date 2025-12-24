@@ -14,13 +14,14 @@
 import React, { useState, useEffect, Suspense, useCallback } from "react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
+import { Icon } from "@iconify/react";
 import LeatherBackground from "@/components/ui/LeatherBackground";
 import SidebarNew from "@/components/ui/SidebarNew";
 import GlassCard from "@/components/ui/GlassCard";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import LeatherButton from "@/components/ui/LeatherButton";
 import EditableTitle from "@/components/ui/EditableTitle";
-import { EmojiPickerComponent } from "@/components/ui/EmojiPicker";
+import { IconPickerComponent } from "@/components/ui/IconPicker";
 import { QuickNote } from "@/components/ui/QuickNote";
 import SaveTemplateModal from "@/components/ui/SaveTemplateModal";
 import NoteSettings, { type EditorFontType } from "@/components/ui/NoteSettings";
@@ -45,6 +46,11 @@ import type { ImportedNote } from "@/lib/import";
 
 // Dynamic import to avoid SSR issues with BlockNote
 const BlockEditor = dynamic(() => import("@/components/editor/BlockEditor"), {
+  ssr: false,
+});
+
+// Dynamic import for handwritten notes
+const HandwrittenNote = dynamic(() => import("@/components/ui/HandwrittenNote"), {
   ssr: false,
 });
 
@@ -357,6 +363,25 @@ function WorkspaceContent() {
           return;
         }
 
+        // If new=handwritten, create a handwritten note
+        if (newType === 'handwritten') {
+          const doc = await createDocument({
+            workspaceId: workspace.id,
+            userId: userEmail,
+            content: [{ handwritten: "" }], // Empty canvas initially
+            metadata: {
+              title: "New Handwritten Note",
+              type: "handwritten",
+            },
+          });
+
+          // Open the handwritten note for editing
+          setCurrentDocument(doc);
+          setIsEditMode(true);
+          router.push(`/workspace?id=${doc.id}`);
+          return;
+        }
+
         setLoading(false);
       } catch (err) {
         console.error("Initialization error:", err);
@@ -512,13 +537,13 @@ function WorkspaceContent() {
     }
   };
 
-  const handleEmojiChange = async (newEmoji: string) => {
+  const handleIconChange = async (newIcon: string) => {
     if (!currentDocument || !userEmail) return;
 
     try {
       const updatedMetadata = {
         ...currentDocument.metadata,
-        emojiIcon: newEmoji,
+        emojiIcon: newIcon,
       };
 
       await updateDocument({
@@ -534,14 +559,14 @@ function WorkspaceContent() {
         metadata: updatedMetadata,
       });
 
-      // Reload documents list to reflect the emoji change
+      // Reload documents list to reflect the icon change
       if (workspaceId) {
         const updatedDocs = await listDocuments(workspaceId, userEmail);
         setDocuments(updatedDocs);
       }
     } catch (err) {
-      console.error("Emoji update error:", err);
-      setError(err instanceof Error ? err.message : "Failed to update emoji");
+      console.error("Icon update error:", err);
+      setError(err instanceof Error ? err.message : "Failed to update icon");
     }
   };
 
@@ -910,7 +935,9 @@ function WorkspaceContent() {
         <LeatherBackground />
         <GlassCard className="relative z-10">
           <div className="p-8 text-center">
-            <div className="text-4xl mb-4">🔐</div>
+            <div className="text-4xl mb-4 flex justify-center">
+              <Icon icon="flat-color-icons:data-encryption" width={64} height={64} />
+            </div>
             <p className="text-leather-300">Initializing encryption keys...</p>
           </div>
         </GlassCard>
@@ -924,7 +951,9 @@ function WorkspaceContent() {
         <LeatherBackground />
         <GlassCard className="relative z-10">
           <div className="p-8 text-center">
-            <div className="text-4xl mb-4">⚠️</div>
+            <div className="text-4xl mb-4 flex justify-center">
+              <Icon icon="flat-color-icons:disclaimer" width={64} height={64} />
+            </div>
             <h2 className="text-xl font-bold mb-2 text-leather-100">Error</h2>
             <p className="text-leather-300 mb-4">{error}</p>
             <LeatherButton variant="leather" onClick={() => window.location.reload()}>
@@ -981,11 +1010,11 @@ function WorkspaceContent() {
               </svg>
             </button>
 
-            {/* Title, Emoji and Share Button */}
+            {/* Title, Icon and Share Button */}
             <div className="flex-1 mx-6 flex items-center justify-center gap-3">
-              <EmojiPickerComponent
-                selectedEmoji={currentDocument.metadata.emojiIcon || "📄"}
-                onEmojiSelect={handleEmojiChange}
+              <IconPickerComponent
+                selectedIcon={currentDocument.metadata.emojiIcon || "document"}
+                onIconSelect={handleIconChange}
               />
               <EditableTitle
                 title={currentDocument.metadata.title}
@@ -1063,9 +1092,9 @@ function WorkspaceContent() {
               <Link href="/templates">
                 <button
                   type="button"
-                  className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+                  className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors flex items-center gap-2"
                 >
-                  📄 Templates
+                  <Icon icon="flat-color-icons:template" width={20} height={20} /> Templates
                 </button>
               </Link>
               <div className="border-t border-gray-200 my-2"></div>
@@ -1137,9 +1166,9 @@ function WorkspaceContent() {
               <button
                 type="button"
                 onClick={handleExportDocument}
-                className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+                className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors flex items-center gap-2"
               >
-                📥 Export
+                <Icon icon="flat-color-icons:export" width={20} height={20} /> Export
               </button>
               <button
                 type="button"
@@ -1147,25 +1176,25 @@ function WorkspaceContent() {
                   setShowSaveTemplateModal(true);
                   setDropdownOpen(false);
                 }}
-                className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+                className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors flex items-center gap-2"
               >
-                💾 Save as Template
+                <Icon icon="flat-color-icons:template" width={20} height={20} /> Save as Template
               </button>
               {documents.length > 0 && (
                 <button
                   type="button"
                   onClick={handleExportWorkspace}
-                  className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+                  className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors flex items-center gap-2"
                 >
-                  📦 Export All
+                  <Icon icon="flat-color-icons:package" width={20} height={20} /> Export All
                 </button>
               )}
               <Link href="/settings">
                 <button
                   type="button"
-                  className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+                  className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors flex items-center gap-2"
                 >
-                  ⚙️ Settings
+                  <Icon icon="flat-color-icons:settings" width={20} height={20} /> Settings
                 </button>
               </Link>
               <div className="border-t border-gray-200 my-2"></div>
@@ -1175,13 +1204,13 @@ function WorkspaceContent() {
                   setShowDeleteConfirm(true);
                   setDropdownOpen(false);
                 }}
-                className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-600 transition-colors"
+                className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-600 transition-colors flex items-center gap-2"
               >
-                🗑️ Delete Note
+                <Icon icon="flat-color-icons:delete-database" width={20} height={20} /> Delete Note
               </button>
               <div className="border-t border-gray-200 my-2"></div>
-              <div className="px-4 py-2 text-sm text-gray-500">
-                🔐 End-to-end encrypted
+              <div className="px-4 py-2 text-sm text-gray-500 flex items-center gap-2">
+                <Icon icon="flat-color-icons:data-encryption" width={16} height={16} /> End-to-end encrypted
               </div>
             </div>
           )}
@@ -1219,6 +1248,31 @@ function WorkspaceContent() {
                   });
                 }}
               />
+            ) : currentDocument.metadata.type === 'handwritten' ? (
+              // Render HandwrittenNote for handwritten documents
+              <HandwrittenNote
+                initialData={
+                  Array.isArray(currentDocument.content) && 
+                  currentDocument.content.length > 0 && 
+                  (currentDocument.content[0] as { handwritten?: string })?.handwritten
+                    ? (currentDocument.content[0] as { handwritten: string }).handwritten
+                    : undefined
+                }
+                onSave={async (data) => {
+                  if (!userEmail) return;
+                  await updateDocument({
+                    id: currentDocument.id,
+                    userId: userEmail,
+                    content: [{ handwritten: data }],
+                    metadata: currentDocument.metadata,
+                  });
+                  setCurrentDocument({
+                    ...currentDocument,
+                    content: [{ handwritten: data }],
+                  });
+                }}
+                editable={isEditMode}
+              />
             ) : (
               // Render regular BlockEditor for other documents
               <BlockEditor
@@ -1243,7 +1297,7 @@ function WorkspaceContent() {
           </div>
 
           {/* Backlinks Sidebar */}
-          {showBacklinks && currentDocument.metadata.type !== 'board' && workspaceId && userEmail && (
+          {showBacklinks && currentDocument.metadata.type !== 'board' && currentDocument.metadata.type !== 'handwritten' && workspaceId && userEmail && (
             <div className="w-80 flex-shrink-0">
               <Backlinks
                 documentTitle={currentDocument.metadata.title}
@@ -1255,8 +1309,8 @@ function WorkspaceContent() {
           )}
         </div>
 
-        {/* Floating Edit Button - Only show in read mode for non-board documents */}
-        {!isEditMode && currentDocument.metadata.type !== 'board' && (
+        {/* Floating Edit Button - Only show in read mode for non-board and non-handwritten documents */}
+        {!isEditMode && currentDocument.metadata.type !== 'board' && currentDocument.metadata.type !== 'handwritten' && (
           <button
             type="button"
             onClick={() => setIsEditMode(true)}
@@ -1282,8 +1336,8 @@ function WorkspaceContent() {
           </button>
         )}
 
-        {/* Edit Mode Bar - Only show for non-board documents in edit mode */}
-        {isEditMode && currentDocument.metadata.type !== 'board' && (
+        {/* Edit Mode Bar - Only show for non-board and non-handwritten documents in edit mode */}
+        {isEditMode && currentDocument.metadata.type !== 'board' && currentDocument.metadata.type !== 'handwritten' && (
           <div className="fixed bottom-14 left-0 right-0 z-40 pointer-events-none">
             <div className="max-w-4xl mx-auto px-6 flex justify-between items-center">
               {/* Edit Mode Indicator */}
@@ -1477,8 +1531,12 @@ function WorkspaceContent() {
                 </LeatherButton>
                 <Link href="/templates">
                   <LeatherButton variant="parchment" size="sm">
-                    <span className="hidden sm:inline">📄 Templates</span>
-                    <span className="sm:hidden">📄</span>
+                    <span className="hidden sm:inline-flex items-center gap-2">
+                      <Icon icon="flat-color-icons:template" width={20} height={20} /> Templates
+                    </span>
+                    <span className="sm:hidden">
+                      <Icon icon="flat-color-icons:template" width={20} height={20} />
+                    </span>
                   </LeatherButton>
                 </Link>
               </div>
@@ -1517,8 +1575,12 @@ function WorkspaceContent() {
               </GlassCard>
               
               <GlassCard className="p-4">
-                <div className="text-2xl sm:text-3xl font-bold text-leather-100 mb-1">
-                  {initialized ? '🔐' : '⚠️'}
+                <div className="text-2xl sm:text-3xl font-bold text-leather-100 mb-1 flex items-center gap-2">
+                  {initialized ? (
+                    <Icon icon="flat-color-icons:data-encryption" width={40} height={40} />
+                  ) : (
+                    <Icon icon="flat-color-icons:disclaimer" width={40} height={40} />
+                  )}
                 </div>
                 <div className="text-xs sm:text-sm text-leather-300">
                   {initialized ? 'Encrypted' : 'Demo Mode'}
@@ -1561,12 +1623,12 @@ function WorkspaceContent() {
                 onClick={handleCreateDocument}
                 className="flex flex-col items-center justify-center p-4 rounded-lg bg-leather-900/30 hover:bg-leather-900/50 transition-all border border-leather-700/30 hover:border-leather-600"
               >
-                <span className="text-3xl mb-2">📝</span>
+                <Icon icon="flat-color-icons:document" width={48} height={48} className="mb-2" />
                 <span className="text-xs sm:text-sm text-leather-200 text-center">New Note</span>
               </button>
               
               <Link href="/templates" className="flex flex-col items-center justify-center p-4 rounded-lg bg-leather-900/30 hover:bg-leather-900/50 transition-all border border-leather-700/30 hover:border-leather-600">
-                <span className="text-3xl mb-2">📄</span>
+                <Icon icon="flat-color-icons:template" width={48} height={48} className="mb-2" />
                 <span className="text-xs sm:text-sm text-leather-200 text-center">Templates</span>
               </Link>
               
@@ -1574,8 +1636,16 @@ function WorkspaceContent() {
                 onClick={() => router.push('/workspace?new=kanban')}
                 className="flex flex-col items-center justify-center p-4 rounded-lg bg-leather-900/30 hover:bg-leather-900/50 transition-all border border-leather-700/30 hover:border-leather-600"
               >
-                <span className="text-3xl mb-2">📊</span>
+                <Icon icon="flat-color-icons:bar-chart" width={48} height={48} className="mb-2" />
                 <span className="text-xs sm:text-sm text-leather-200 text-center">Kanban</span>
+              </button>
+              
+              <button
+                onClick={() => router.push('/workspace?new=handwritten')}
+                className="flex flex-col items-center justify-center p-4 rounded-lg bg-leather-900/30 hover:bg-leather-900/50 transition-all border border-leather-700/30 hover:border-leather-600"
+              >
+                <span className="text-3xl mb-2">✍️</span>
+                <span className="text-xs sm:text-sm text-leather-200 text-center">Handwritten</span>
               </button>
               
               <button
@@ -1583,7 +1653,7 @@ function WorkspaceContent() {
                 onClick={() => setShowImportNotes(true)}
                 className="flex flex-col items-center justify-center p-4 rounded-lg bg-leather-900/30 hover:bg-leather-900/50 transition-all border border-leather-700/30 hover:border-leather-600"
               >
-                <span className="text-3xl mb-2">📥</span>
+                <Icon icon="flat-color-icons:import" width={48} height={48} className="mb-2" />
                 <span className="text-xs sm:text-sm text-leather-200 text-center">Import</span>
               </button>
               
@@ -1592,13 +1662,13 @@ function WorkspaceContent() {
                   onClick={handleExportWorkspace}
                   className="flex flex-col items-center justify-center p-4 rounded-lg bg-leather-900/30 hover:bg-leather-900/50 transition-all border border-leather-700/30 hover:border-leather-600"
                 >
-                  <span className="text-3xl mb-2">📦</span>
+                  <Icon icon="flat-color-icons:package" width={48} height={48} className="mb-2" />
                   <span className="text-xs sm:text-sm text-leather-200 text-center">Export</span>
                 </button>
               )}
               
               <Link href="/settings" className="flex flex-col items-center justify-center p-4 rounded-lg bg-leather-900/30 hover:bg-leather-900/50 transition-all border border-leather-700/30 hover:border-leather-600">
-                <span className="text-3xl mb-2">⚙️</span>
+                <Icon icon="flat-color-icons:settings" width={48} height={48} className="mb-2" />
                 <span className="text-xs sm:text-sm text-leather-200 text-center">Settings</span>
               </Link>
               
@@ -1666,7 +1736,11 @@ function WorkspaceContent() {
                               )}
                             </div>
                             <span className="text-2xl ml-2">
-                              {doc.metadata.emojiIcon || "📄"}
+                              <Icon 
+                                icon={`flat-color-icons:${doc.metadata.emojiIcon || "document"}`} 
+                                width={32} 
+                                height={32} 
+                              />
                             </span>
                           </div>
                           
@@ -1708,9 +1782,11 @@ function WorkspaceContent() {
                           className="p-4 hover:bg-leather-900/30 cursor-pointer transition-colors group"
                         >
                           <div className="flex items-center gap-4">
-                            <span className="text-2xl">
-                              {doc.metadata.emojiIcon || "📄"}
-                            </span>
+                            <Icon 
+                              icon={`flat-color-icons:${doc.metadata.emojiIcon || "document"}`} 
+                              width={32} 
+                              height={32} 
+                            />
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 mb-1">
                                 <h3 className="text-sm sm:text-base font-semibold text-leather-100 truncate group-hover:text-leather-50 transition-colors">
@@ -1724,6 +1800,11 @@ function WorkspaceContent() {
                                 {doc.metadata.type === 'quick' && (
                                   <span className="text-xs bg-yellow-500/20 text-yellow-300 px-2 py-0.5 rounded-full">
                                     Quick Note
+                                  </span>
+                                )}
+                                {doc.metadata.type === 'handwritten' && (
+                                  <span className="text-xs bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-full">
+                                    Handwritten
                                   </span>
                                 )}
                               </div>
@@ -1755,7 +1836,9 @@ function WorkspaceContent() {
             /* Empty State */
             <div className="text-center py-12">
               <GlassCard className="max-w-2xl mx-auto p-8 sm:p-12">
-                <div className="text-6xl sm:text-7xl mb-6">📝</div>
+                <div className="text-6xl sm:text-7xl mb-6 flex justify-center">
+                  <Icon icon="flat-color-icons:document" width={112} height={112} />
+                </div>
                 <h2 className="text-2xl sm:text-3xl font-bold text-leather-100 mb-4">
                   Welcome to 4diary
                 </h2>
@@ -1772,15 +1855,17 @@ function WorkspaceContent() {
                     ➕ Create First Document
                   </LeatherButton>
                   <Link href="/templates" className="w-full sm:w-auto">
-                    <LeatherButton variant="parchment" className="w-full">
-                      📄 Browse Templates
+                    <LeatherButton variant="parchment" className="w-full flex items-center justify-center gap-2">
+                      <Icon icon="flat-color-icons:template" width={20} height={20} /> Browse Templates
                     </LeatherButton>
                   </Link>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-left">
                   <div className="p-4 rounded-lg bg-leather-900/20 border border-leather-700/20">
-                    <div className="text-3xl mb-2">🔐</div>
+                    <div className="text-3xl mb-2 flex">
+                      <Icon icon="flat-color-icons:data-encryption" width={48} height={48} />
+                    </div>
                     <h3 className="font-semibold text-leather-100 mb-1 text-sm">
                       End-to-End Encrypted
                     </h3>

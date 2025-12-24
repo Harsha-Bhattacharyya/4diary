@@ -29,13 +29,49 @@ const LOCK_DURATION = 15 * 60 * 1000; // 15 minutes
  */
 export async function POST(request: NextRequest) {
   try {
-    const { username, password } = await request.json();
+    const { username, password, turnstileToken } = await request.json();
 
     if (!username || !password) {
       return NextResponse.json(
         { error: "Username and password are required" },
         { status: 400 }
       );
+    }
+
+    // Verify Cloudflare Turnstile token if configured (optional, no vendor lock-in)
+    const turnstileSecretKey = process.env.TURNSTILE_SECRET_KEY;
+    if (turnstileSecretKey && turnstileToken) {
+      try {
+        const turnstileResponse = await fetch(
+          "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              secret: turnstileSecretKey,
+              response: turnstileToken,
+            }),
+          }
+        );
+
+        const turnstileResult = await turnstileResponse.json();
+        
+        if (!turnstileResult.success) {
+          return NextResponse.json(
+            { error: "Bot verification failed. Please try again." },
+            { status: 403 }
+          );
+        }
+      } catch (error) {
+        console.error("Turnstile verification error:", error);
+        // Return error if Turnstile is configured but verification fails unexpectedly
+        return NextResponse.json(
+          { error: "Bot verification service is currently unavailable. Please try again later." },
+          { status: 503 }
+        );
+      }
     }
 
     // Check rate limiting

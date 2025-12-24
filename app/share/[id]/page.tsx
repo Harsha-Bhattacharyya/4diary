@@ -16,6 +16,7 @@ import { useParams } from "next/navigation";
 import LeatherBackground from "@/components/ui/LeatherBackground";
 import GlassCard from "@/components/ui/GlassCard";
 import dynamic from "next/dynamic";
+import { Icon } from "@iconify/react";
 
 // Dynamic import to avoid SSR issues with BlockNote
 const BlockEditor = dynamic(() => import("@/components/editor/BlockEditor"), {
@@ -83,7 +84,9 @@ export default function SharePage() {
         <LeatherBackground />
         <GlassCard className="relative z-10">
           <div className="p-8 text-center">
-            <div className="text-4xl mb-4">📄</div>
+            <div className="text-4xl mb-4 flex justify-center">
+              <Icon icon="flat-color-icons:document" width={48} height={48} />
+            </div>
             <p className="text-leather-300">Loading shared document...</p>
           </div>
         </GlassCard>
@@ -97,7 +100,9 @@ export default function SharePage() {
         <LeatherBackground />
         <GlassCard className="relative z-10">
           <div className="p-8 text-center">
-            <div className="text-4xl mb-4">⚠️</div>
+            <div className="text-4xl mb-4 flex justify-center">
+              <Icon icon="flat-color-icons:disclaimer" width={48} height={48} />
+            </div>
             <h2 className="text-xl font-bold mb-2 text-leather-100">Error</h2>
             <p className="text-leather-300 mb-4">{error}</p>
             <p className="text-sm text-leather-400">
@@ -143,8 +148,8 @@ export default function SharePage() {
                 Shared on {createdDateString} • Expires {expiresDateString}
               </p>
             </div>
-            <div className="text-sm text-gray-500">
-              🔗 Read-only
+            <div className="text-sm text-gray-500 flex items-center gap-1">
+              <Icon icon="flat-color-icons:key" width={20} height={20} /> Read-only
             </div>
           </div>
         </div>
@@ -164,8 +169,8 @@ export default function SharePage() {
 
       {/* Footer Notice */}
       <div className="relative z-10 max-w-4xl mx-auto px-6 py-4">
-        <p className="text-center text-sm text-leather-400">
-          🔐 This is a temporary share link powered by 4diary
+        <p className="text-center text-sm text-leather-400 flex items-center justify-center gap-2">
+          <Icon icon="flat-color-icons:data-encryption" width={20} height={20} /> This is a temporary share link powered by 4diary
         </p>
       </div>
     </div>

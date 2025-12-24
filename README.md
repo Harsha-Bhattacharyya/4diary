@@ -9,9 +9,12 @@ A privacy-focused, end-to-end encrypted note-taking application built with Next.
 - 🔒 **End-to-End Encryption**: AES-256-GCM encryption using Web Crypto API
 - 🔐 **Zero Knowledge**: Server never sees unencrypted content
 - 🔑 **Email Authentication**: Secure sign-up and login with session cookies
+- 🤖 **Optional Bot Protection**: Cloudflare Turnstile for login (optional, self-hostable)
 
 ### Document Management
 - ✍️ **Notion-like Editor**: Rich text editing with BlockNote
+- ✏️ **Handwritten Notes**: Draw and save handwritten notes with encryption support
+- 🤖 **AI Assistant**: Privacy-first AI chat powered by DuckDuckGo (Ctrl+Shift+A)
 - ⌨️ **Vim Mode**: Full Vim keybindings support (Ctrl+Shift+V to toggle)
 - 📁 **Smart Organization**: Folders, tags, favorites, and archives
 - 📄 **Templates**: Pre-built templates for various use cases
@@ -30,10 +33,11 @@ A privacy-focused, end-to-end encrypted note-taking application built with Next.
 
 ### Advanced Features
 - 📋 **Kanban Boards**: Drag-and-drop task management with encrypted boards
+- 🎨 **Drawing Canvas**: Full-featured handwriting support with colors, pen widths, and tools
 - 🔗 **Embed Previews**: Rich URL previews with sanitized metadata
 - 📥 **Import Notes**: Import from Google Keep, Evernote, Notion, Apple Notes, Standard Notes, or Markdown
-- 📤 **Export Freedom**: Export as Markdown or ZIP files
-- 📦 **Self-Hostable**: Docker-ready deployment
+- 📤 **Export Freedom**: Export as Markdown, PNG (handwritten), or ZIP files
+- 📦 **Self-Hostable**: Docker-ready deployment with no vendor lock-in
 - 📱 **PWA Support**: Install as a progressive web app with offline capabilities
 - 🌍 **Multi-Language**: Support for English, Bengali, Hindi (more languages coming soon)
 - 🔢 **Built-in Calculator**: Quick math calculations with LaTeX support (Ctrl+Shift+C)
@@ -44,7 +48,7 @@ A privacy-focused, end-to-end encrypted note-taking application built with Next.
 ### UI/UX
 - 🎨 **Leather Theme**: Rich, warm color palette inspired by leather journals
 - 🖥️ **Full-screen Editor**: Distraction-free editing experience
-- 🎯 **Keyboard Shortcuts**: Quick note (Ctrl/Cmd + Q), Vim mode (Ctrl+Shift+V), Calculator (Ctrl+Shift+C), Search (Ctrl/Cmd + Shift + F)
+- 🎯 **Keyboard Shortcuts**: Quick note (Ctrl/Cmd + Q), Vim mode (Ctrl+Shift+V), AI Assistant (Ctrl+Shift+A), Calculator (Ctrl+Shift+C), Search (Ctrl/Cmd + Shift + F)
 
 ## 🚀 Getting Started
 
@@ -310,10 +314,48 @@ For detailed instructions, see [Import Guide](docs/guides/import.md).
 4. Access the app from your home screen or app drawer
 5. Works offline with automatic sync when back online
 
+### AI Assistant (Privacy-First)
+
+1. Open any document in edit mode
+2. Click the sparkle ✨ button (bottom right) or press `Ctrl+Shift+A`
+3. Ask questions, get writing suggestions, or request help
+4. All queries are processed through DuckDuckGo's privacy-focused AI
+5. No data is stored or used for training
+6. No API keys or configuration required
+
+### Handwritten Notes
+
+1. Go to Workspace
+2. Click "✍️ Handwritten" in Quick Actions
+3. Use the drawing tools to create your note:
+   - Select pen or eraser
+   - Choose from 7 colors
+   - Adjust pen width (thin/medium/thick/bold)
+   - Undo last stroke or clear entire canvas
+4. Click "Save" to encrypt and store your handwritten note
+5. Download as PNG image anytime
+6. Supports both mouse and touch input
+
+### Bot Protection (Optional)
+
+1. Get free Cloudflare Turnstile keys from https://dash.cloudflare.com/
+2. Add to `.env.local`:
+   ```
+   NEXT_PUBLIC_TURNSTILE_SITE_KEY=your-site-key-here
+   TURNSTILE_SECRET_KEY=your-secret-key-here
+   ```
+3. Restart the app - Turnstile widget will appear on login page
+4. To disable: simply remove the environment variables
+5. Self-hosted instances work perfectly without Turnstile
+
 ## ⌨️ Keyboard Shortcuts
 
 - `Ctrl+Q` / `Cmd+Q`: Toggle Quick Note modal
-- `ESC`: Close Quick Note or Reader Mode
+- `Ctrl+Shift+A`: Toggle AI Assistant
+- `Ctrl+Shift+V`: Toggle Vim Mode
+- `Ctrl+Shift+C`: Toggle Calculator
+- `Ctrl/Cmd+Shift+F`: Toggle Search
+- `ESC`: Close Quick Note, AI Assistant, or Reader Mode
 
 ## 🤝 Contributing
 

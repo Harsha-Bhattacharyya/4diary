@@ -38,6 +38,7 @@ import {
   GripVertical
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Icon } from "@iconify/react";
 
 interface Document {
   id: string;
@@ -46,6 +47,7 @@ interface Document {
   favorite?: boolean;
   sortOrder?: number;
   tags?: string[];
+  emojiIcon?: string;
 }
 
 interface SidebarNewProps {
@@ -230,8 +232,8 @@ export default function SidebarNew({
               </p>
             </div>
           </div>
-          <div className="text-xs text-neutral-600 dark:text-neutral-400">
-            <span role="img" aria-label="Calendar">📅</span> {currentDate}
+          <div className="text-xs text-neutral-600 dark:text-neutral-400 flex items-center gap-1">
+            <Icon icon="flat-color-icons:calendar" width={16} height={16} /> {currentDate}
           </div>
         </div>
       )}
@@ -280,7 +282,11 @@ export default function SidebarNew({
               className="relative"
               title={doc.title}
             >
-              <File className="h-5 w-5" />
+              <Icon 
+                icon={`flat-color-icons:${doc.emojiIcon || "document"}`} 
+                width={20} 
+                height={20} 
+              />
               {doc.favorite && (
                 <Star className="absolute top-0 right-0 h-3 w-3 fill-yellow-500 text-yellow-500" />
               )}
@@ -300,8 +306,8 @@ export default function SidebarNew({
             Object.entries(groupedDocs).map(([folder, docs]) => (
               <div key={folder} className="mb-4">
                 {/* Folder Header */}
-                <div className="px-2 py-1 text-xs font-semibold text-neutral-600 dark:text-neutral-300 uppercase tracking-wide">
-                  <span aria-label="Folder">📁</span> {folder}
+                <div className="px-2 py-1 text-xs font-semibold text-neutral-600 dark:text-neutral-300 uppercase tracking-wide flex items-center gap-1">
+                  <Icon icon="flat-color-icons:opened-folder" width={16} height={16} /> {folder}
                 </div>
 
                 {/* Documents in Folder */}
@@ -350,7 +356,13 @@ export default function SidebarNew({
                             </button>
                           )}
                           
-                          <File className="h-4 w-4 text-neutral-600 dark:text-neutral-400 flex-shrink-0" />
+                          {/* Document icon - use selected icon or default */}
+                          <Icon 
+                            icon={`flat-color-icons:${doc.emojiIcon || "document"}`} 
+                            width={16} 
+                            height={16} 
+                            className="flex-shrink-0"
+                          />
                           <span className="text-sm truncate flex-1 text-left">{doc.title}</span>
                         </div>
                       </Button>
@@ -380,8 +392,8 @@ export default function SidebarNew({
       {/* Footer */}
       {!collapsed && (
         <div className="p-4 border-t border-neutral-200 dark:border-neutral-800 flex-shrink-0">
-          <p className="text-xs text-neutral-500 dark:text-neutral-400 text-center">
-            <span aria-label="Secure">🔐</span> End-to-end encrypted
+          <p className="text-xs text-neutral-500 dark:text-neutral-400 text-center flex items-center justify-center gap-1">
+            <Icon icon="flat-color-icons:data-encryption" width={16} height={16} /> End-to-end encrypted
           </p>
         </div>
       )}

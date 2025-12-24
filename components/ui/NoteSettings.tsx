@@ -24,6 +24,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { X } from "lucide-react";
+import { Icon } from "@iconify/react";
 
 export type EditorFontType = "normal" | "serif" | "condensed";
 
@@ -259,8 +260,8 @@ export default function NoteSettings({
         <div className="mx-auto w-full max-w-2xl">
           <DrawerHeader className="text-left">
             <div className="flex items-center justify-between">
-              <DrawerTitle className="text-2xl font-bold">
-                <span role="img" aria-label="Settings">⚙️</span> Note Settings
+              <DrawerTitle className="text-2xl font-bold flex items-center gap-2">
+                <Icon icon="flat-color-icons:settings" width={32} height={32} /> Note Settings
               </DrawerTitle>
               <DrawerClose asChild>
                 <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -328,9 +329,9 @@ export default function NoteSettings({
               <div className="mb-4">
                 <label
                   htmlFor="note-folder"
-                  className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2"
+                  className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2 flex items-center gap-1"
                 >
-                  📁 Folder
+                  <Icon icon="flat-color-icons:document" width={20} height={20} /> Folder
                 </label>
                 <input
                   id="note-folder"
@@ -349,9 +350,9 @@ export default function NoteSettings({
               <div>
                 <label
                   htmlFor="note-tags"
-                  className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2"
+                  className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2 flex items-center gap-1"
                 >
-                  🏷️ Tags
+                  <Icon icon="flat-color-icons:document" width={20} height={20} /> Tags
                 </label>
                 <div className="flex gap-2 mb-2">
                   <input
@@ -676,8 +677,8 @@ export default function NoteSettings({
 
             {/* Hash Generation */}
             <div>
-              <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-50 mb-4">
-                🔐 Hash Generation
+              <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-50 mb-4 flex items-center gap-2">
+                <Icon icon="flat-color-icons:data-encryption" width={24} height={24} /> Hash Generation
               </h3>
               
               <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4">
