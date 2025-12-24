@@ -312,7 +312,7 @@ export default function BlockEditor({
     return () => {
       document.removeEventListener('keydown', handleGlobalKeyDown);
     };
-  }, [vimEnabled, handleKeyDown, vimState]);
+  }, [vimEnabled, handleKeyDown, vimState, editable]);
   // Note: Read-only behavior for vim NORMAL/COMMAND/VISUAL modes is enforced via keyboard event interception
 
   // Auto-save functionality - only save when there are changes
@@ -415,7 +415,6 @@ export default function BlockEditor({
         style={{ WebkitTapHighlightColor: 'transparent' }}
       >
         <BlockNoteView
-          // @ts-expect-error - Type mismatch between @blocknote/react and @blocknote/mantine versions
           editor={editor}
           onChange={handleChange}
           editable={editable}

@@ -18,7 +18,7 @@
 
 import React, { useState } from "react";
 import { Icon } from "@iconify/react";
-import { allPickerIcons, type IconDefinition } from "@/lib/iconMapping";
+import { allPickerIcons } from "@/lib/iconMapping";
 
 interface IconPickerComponentProps {
   selectedIcon?: string;

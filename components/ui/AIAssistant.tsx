@@ -12,7 +12,7 @@
  */
 
 import React, { useState, useRef, useEffect } from "react";
-import { initChat } from "@mumulhl/duckduckgo-ai-chat";
+import { initChat, type Chat } from "@mumulhl/duckduckgo-ai-chat";
 import { X, Send, Sparkles, Loader2 } from "lucide-react";
 import GlassCard from "./GlassCard";
 
@@ -47,7 +47,7 @@ export default function AIAssistant({
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [chat, setChat] = useState<any>(null);
+  const [chat, setChat] = useState<Chat | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 

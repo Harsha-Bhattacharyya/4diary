@@ -13,6 +13,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import LeatherBackground from "@/components/ui/LeatherBackground";
 import GlassCard from "@/components/ui/GlassCard";
 import LeatherButton from "@/components/ui/LeatherButton";
@@ -418,7 +419,7 @@ export default function SettingsPage() {
                       </p>
                       {qrCode && (
                         <div className="bg-white p-4 rounded inline-block">
-                          <img src={qrCode} alt="2FA QR Code" className="w-48 h-48" />
+                          <Image src={qrCode} alt="2FA QR Code" width={192} height={192} />
                         </div>
                       )}
                     </div>
