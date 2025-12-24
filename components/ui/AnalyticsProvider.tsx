@@ -11,8 +11,8 @@
 
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { TelemetryDeckProvider, TelemetryDeckContext } from "@typedigital/telemetrydeck-react";
+import React, { useState, useMemo } from "react";
+import { TelemetryDeckProvider, createTelemetryDeck, useTelemetryDeck } from "@typedigital/telemetrydeck-react";
 
 interface AnalyticsProviderProps {
   children: React.ReactNode;
@@ -23,38 +23,20 @@ interface AnalyticsProviderProps {
  * Respects user's privacy preferences stored in localStorage
  */
 export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
-  const [analyticsEnabled, setAnalyticsEnabled] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    // Check if we're in the browser (avoid SSR issues)
-    if (typeof window === "undefined") return;
-    
-    // Check user's analytics preference from localStorage
-    const preference = localStorage.getItem("analytics-enabled");
-    
-    // Default to disabled for privacy-first approach
-    // Users must explicitly opt-in
-    setAnalyticsEnabled(preference === "true");
-  }, []);
-
-  // Don't render TelemetryDeck if analytics is disabled or still loading
-  if (analyticsEnabled === null || !analyticsEnabled) {
-    return <>{children}</>;
-  }
-
-  // Only render with TelemetryDeck if user has opted in
-  const appID = process.env.NEXT_PUBLIC_TELEMETRYDECK_APP_ID;
+  // Get app ID - use a dummy value if not configured to keep the provider happy
+  const appID = process.env.NEXT_PUBLIC_TELEMETRYDECK_APP_ID || "dummy-app-id";
   
-  if (!appID) {
-    console.warn("TelemetryDeck App ID not configured");
-    return <>{children}</>;
-  }
+  // Create TelemetryDeck instance - always create to maintain provider structure
+  const telemetryDeck = useMemo(() => {
+    return createTelemetryDeck({
+      appID,
+      clientUser: "anonymous", // Privacy-first: no user identification
+    });
+  }, [appID]);
 
+  // Always wrap with provider to maintain consistent React tree
   return (
-    <TelemetryDeckProvider
-      appID={appID}
-      clientUser="anonymous" // Privacy-first: no user identification
-    >
+    <TelemetryDeckProvider telemetryDeck={telemetryDeck}>
       {children}
     </TelemetryDeckProvider>
   );
@@ -64,20 +46,27 @@ export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
  * Hook to access TelemetryDeck signal functionality
  */
 export function useAnalytics() {
-  const context = React.useContext(TelemetryDeckContext);
-  const [analyticsEnabled, setAnalyticsEnabled] = useState(false);
-
-  useEffect(() => {
+  const telemetryDeck = useTelemetryDeck();
+  
+  // Initialize with localStorage value directly to avoid setState in useEffect
+  const [analyticsEnabled, setAnalyticsEnabled] = useState(() => {
     // Check if we're in the browser (avoid SSR issues)
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined") return false;
     
+    // Check user's analytics preference from localStorage
     const preference = localStorage.getItem("analytics-enabled");
-    setAnalyticsEnabled(preference === "true");
-  }, []);
+    
+    // Also check if app ID is configured
+    const hasAppID = process.env.NEXT_PUBLIC_TELEMETRYDECK_APP_ID !== undefined;
+    
+    // Default to disabled for privacy-first approach
+    // Users must explicitly opt-in AND app ID must be configured
+    return preference === "true" && hasAppID;
+  });
 
   const signal = (eventName: string, metadata?: Record<string, string>) => {
-    if (!analyticsEnabled || !context) return;
-    context.signal(eventName, metadata);
+    if (!analyticsEnabled) return;
+    telemetryDeck.signal(eventName, metadata);
   };
 
   const toggleAnalytics = (enabled: boolean) => {

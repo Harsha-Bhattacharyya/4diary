@@ -11,7 +11,7 @@
 
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState, useMemo, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Icon } from "@iconify/react";
@@ -25,41 +25,46 @@ import LeatherButton from "@/components/ui/LeatherButton";
 function ExitContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [url, setUrl] = useState<string>("");
   const [countdown, setCountdown] = useState(10);
   const [cancelled, setCancelled] = useState(false);
-
-  useEffect(() => {
+  
+  // Validate URL synchronously during render to avoid setState in useEffect
+  const url = useMemo(() => {
     const targetUrl = searchParams.get("url");
-    if (targetUrl) {
-      try {
-        // Validate URL
-        const parsedUrl = new URL(targetUrl);
-        
-        // Prevent open redirect vulnerabilities
-        // Only allow external URLs (not relative paths or javascript: schemes)
-        if (parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:") {
-          console.error("Invalid URL protocol:", parsedUrl.protocol);
-          router.push("/");
-          return;
-        }
-        
-        // Prevent same-origin redirects (optional security measure)
-        if (typeof window !== "undefined" && parsedUrl.origin === window.location.origin) {
-          console.error("Cannot redirect to same origin");
-          router.push("/");
-          return;
-        }
-        
-        setUrl(parsedUrl.toString());
-      } catch (err) {
-        console.error("Invalid URL:", err);
-        router.push("/");
+    if (!targetUrl) {
+      return null;
+    }
+    
+    try {
+      // Validate URL
+      const parsedUrl = new URL(targetUrl);
+      
+      // Prevent open redirect vulnerabilities
+      // Only allow external URLs (not relative paths or javascript: schemes)
+      if (parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:") {
+        console.error("Invalid URL protocol:", parsedUrl.protocol);
+        return null;
       }
-    } else {
+      
+      // Prevent same-origin redirects (optional security measure)
+      if (typeof window !== "undefined" && parsedUrl.origin === window.location.origin) {
+        console.error("Cannot redirect to same origin");
+        return null;
+      }
+      
+      return parsedUrl.toString();
+    } catch (err) {
+      console.error("Invalid URL:", err);
+      return null;
+    }
+  }, [searchParams]);
+
+  // Handle navigation when URL is invalid
+  useEffect(() => {
+    if (url === null) {
       router.push("/");
     }
-  }, [searchParams, router]);
+  }, [url, router]);
 
   useEffect(() => {
     if (!url || cancelled) return;

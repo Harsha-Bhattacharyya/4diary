@@ -26,7 +26,7 @@ export { SUPPORTED_LANGUAGES } from './translationTypes';
 import { SUPPORTED_LANGUAGES, type LanguageCode, type TranslationRequest, type TranslationResponse } from './translationTypes';
 
 // Import SDK - this will only work server-side
-import type { LingoDotDevEngine as LingoDotDevEngineType } from '@lingo.dev/_sdk';
+// Note: LingoDotDevEngine type is only imported for type checking during development
 
 // Simple console logger for server-side
 const log = {

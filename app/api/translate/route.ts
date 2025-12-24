@@ -23,7 +23,7 @@ import { logger } from "@/lib/logger";
  * GET /api/translate
  * Get translation service status and supported languages
  */
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     const available = isTranslationServiceAvailable();
 

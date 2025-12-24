@@ -9,7 +9,7 @@
  * modification, are permitted provided that the conditions in the LICENSE file are met.
  */
 
-import { test, expect } from '@playwright/test';
+import { test } from '@playwright/test';
 
 /**
  * Unit tests for Handwritten Notes component

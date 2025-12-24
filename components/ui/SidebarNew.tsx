@@ -34,7 +34,6 @@ import {
   FileText,
   Settings,
   Star,
-  File,
   GripVertical
 } from "lucide-react";
 import { cn } from "@/lib/utils";
