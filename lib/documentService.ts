@@ -30,6 +30,7 @@ export interface DocumentMetadata {
     image?: string;
   }>;
   isQuickReadSaved?: boolean;
+  backgroundColor?: string; // Background color for the note
 }
 
 export interface Document {
@@ -39,6 +40,8 @@ export interface Document {
   content: unknown[];
   favorite: boolean;
   archived: boolean;
+  readOnly?: boolean; // Whether the note is read-only
+  passwordProtected?: boolean; // Whether note requires password
   sortOrder?: number;
   createdAt: string;
   updatedAt: string;
@@ -58,6 +61,9 @@ export interface UpdateDocumentParams {
   metadata?: DocumentMetadata;
   favorite?: boolean;
   archived?: boolean;
+  readOnly?: boolean;
+  passwordProtected?: boolean;
+  passwordHash?: string;
   sortOrder?: number;
 }
 
@@ -149,6 +155,9 @@ export async function updateDocument(
       metadata: params.metadata,
       favorite: params.favorite,
       archived: params.archived,
+      readOnly: params.readOnly,
+      passwordProtected: params.passwordProtected,
+      passwordHash: params.passwordHash,
       sortOrder: params.sortOrder,
     }),
   });
@@ -185,6 +194,8 @@ async function decryptDocument(encryptedDoc: {
   metadata: DocumentMetadata;
   favorite: boolean;
   archived: boolean;
+  readOnly?: boolean;
+  passwordProtected?: boolean;
   sortOrder?: number;
   createdAt: string;
   updatedAt: string;
@@ -216,6 +227,8 @@ async function decryptDocument(encryptedDoc: {
     content: JSON.parse(content),
     favorite: encryptedDoc.favorite,
     archived: encryptedDoc.archived,
+    readOnly: encryptedDoc.readOnly,
+    passwordProtected: encryptedDoc.passwordProtected,
     sortOrder: encryptedDoc.sortOrder,
     createdAt: encryptedDoc.createdAt,
     updatedAt: encryptedDoc.updatedAt,

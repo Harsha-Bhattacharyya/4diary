@@ -149,7 +149,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Clear failed attempts on successful login
+    // Check if 2FA is enabled
+    if (user.twoFactorEnabled) {
+      // Don't clear failed attempts yet - wait for 2FA verification
+      return NextResponse.json(
+        { 
+          requires2FA: true,
+          message: "2FA verification required"
+        },
+        { status: 200 }
+      );
+    }
+
+    // Clear failed attempts on successful login (without 2FA)
     loginAttempts.delete(clientIdentifier);
 
     // Derive encryption key (should match stored key)
