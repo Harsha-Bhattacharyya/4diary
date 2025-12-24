@@ -163,7 +163,7 @@ export default function FormattingToolbar({ editor, position = 'top' }: Formatti
   if (position === 'bottom') {
     return (
       <div 
-        className="fixed left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-lg transition-all duration-200 pb-safe"
+        className="fixed left-0 right-0 z-50 bg-white dark:bg-leather-800 border-t border-gray-200 dark:border-leather-600 shadow-lg transition-all duration-200 pb-safe"
         style={{ 
           bottom: keyboardHeight,
           paddingBottom: keyboardHeight > 0 ? '8px' : undefined
@@ -173,7 +173,7 @@ export default function FormattingToolbar({ editor, position = 'top' }: Formatti
         <div className="max-w-4xl mx-auto px-4 py-2 overflow-x-auto scrollbar-hide">
           <div className="flex items-center gap-1 min-w-max">
             {/* Text Formatting */}
-            <div className="flex items-center gap-1 pr-2 border-r border-gray-300">
+            <div className="flex items-center gap-1 pr-2 border-r border-gray-300 dark:border-leather-500">
               {toolbarButtons.map((button, index) => (
                 <button
                   key={index}
@@ -183,6 +183,7 @@ export default function FormattingToolbar({ editor, position = 'top' }: Formatti
                   }}
                   className={`px-3 py-2 text-sm font-medium rounded transition-all duration-200 
                     hover:bg-gray-100 active:bg-gray-200 text-gray-800
+                    dark:text-white dark:hover:bg-leather-700 dark:active:bg-leather-600
                     ${button.style}`}
                   title={button.title}
                   type="button"
@@ -203,7 +204,8 @@ export default function FormattingToolbar({ editor, position = 'top' }: Formatti
                     button.action();
                   }}
                   className="px-3 py-2 text-sm font-medium rounded transition-all duration-200 
-                    hover:bg-gray-100 active:bg-gray-200 text-gray-800"
+                    hover:bg-gray-100 active:bg-gray-200 text-gray-800
+                    dark:text-white dark:hover:bg-leather-700 dark:active:bg-leather-600"
                   title={button.title}
                   type="button"
                   style={{ touchAction: 'none' }}
@@ -220,10 +222,10 @@ export default function FormattingToolbar({ editor, position = 'top' }: Formatti
 
   // Top toolbar (default)
   return (
-    <div className="sticky top-0 z-20 glass-card p-2 mb-4 rounded-lg shadow-md touch-manipulation overflow-x-auto scrollbar-hide bg-leather-100/90 backdrop-blur-sm">
+    <div className="sticky top-0 z-20 glass-card p-2 mb-4 rounded-lg shadow-md touch-manipulation overflow-x-auto scrollbar-hide bg-leather-100/90 dark:bg-leather-800/90 backdrop-blur-sm">
       <div className="flex flex-wrap items-center gap-1">
         {/* Text Formatting */}
-        <div className="flex items-center gap-1 pr-2 border-r border-leather-500">
+        <div className="flex items-center gap-1 pr-2 border-r border-leather-500 dark:border-leather-400">
           {toolbarButtons.map((button, index) => (
             <button
               key={index}
@@ -233,6 +235,7 @@ export default function FormattingToolbar({ editor, position = 'top' }: Formatti
               }}
               className={`px-3 py-1.5 text-sm font-medium rounded transition-all duration-200 
                 bg-leather-200 text-leather-800 hover:bg-leather-600 hover:text-leather-100 active:bg-leather-700
+                dark:bg-leather-700 dark:text-white dark:hover:bg-leather-500 dark:active:bg-leather-400
                 ${button.style}`}
               title={button.title}
               type="button"
@@ -253,7 +256,8 @@ export default function FormattingToolbar({ editor, position = 'top' }: Formatti
                 button.action();
               }}
               className="px-3 py-1.5 text-sm font-medium rounded transition-all duration-200 
-                bg-leather-200 text-leather-800 hover:bg-leather-600 hover:text-leather-100 active:bg-leather-700"
+                bg-leather-200 text-leather-800 hover:bg-leather-600 hover:text-leather-100 active:bg-leather-700
+                dark:bg-leather-700 dark:text-white dark:hover:bg-leather-500 dark:active:bg-leather-400"
               title={button.title}
               type="button"
               style={{ touchAction: 'none' }}

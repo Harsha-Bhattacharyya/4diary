@@ -24,6 +24,7 @@ import { VimMode, RecordedKey } from "@/lib/vim/VimMode";
 import { VimNavigationHandler } from "@/lib/vim/VimNavigationHandler";
 import AIAssistant from "@/components/ui/AIAssistant";
 import { Sparkles } from "lucide-react";
+import { useTheme } from "@/components/ui/ThemeProvider";
 
 import type { EditorFontType } from "@/components/ui/NoteSettings";
 
@@ -79,6 +80,7 @@ export default function BlockEditor({
   const [showAI, setShowAI] = useState(false);
   const editorContainerRef = useRef<HTMLDivElement>(null);
   const vimNavigationHandlerRef = useRef<VimNavigationHandler | null>(null);
+  const { theme } = useTheme();
 
   // Create editor instance
   const editor = useCreateBlockNote({
@@ -418,7 +420,7 @@ export default function BlockEditor({
           editor={editor}
           onChange={handleChange}
           editable={editable}
-          theme="light"
+          theme={theme}
           sideMenu={false}
           slashMenu={true}
         />
