@@ -265,6 +265,37 @@ function WorkspaceContent() {
     checkAuth();
   }, [router]);
 
+  // Helper function to create kanban board and navigate
+  const createKanbanAndNavigate = useCallback(async (wsId: string, userId: string) => {
+    const doc = await createDocument({
+      workspaceId: wsId,
+      userId,
+      content: [{ board: { columns: [], cards: {} } }],
+      metadata: {
+        title: "New Kanban Board",
+        type: "board",
+      },
+    });
+    router.push(`/workspace/${wsId}/board/${doc.id}`);
+  }, [router]);
+
+  // Helper function to create handwritten note and open it
+  const createHandwrittenAndOpen = useCallback(async (wsId: string, userId: string) => {
+    const doc = await createDocument({
+      workspaceId: wsId,
+      userId,
+      content: [{ handwritten: "" }],
+      metadata: {
+        title: "New Handwritten Note",
+        type: "handwritten",
+      },
+    });
+    setCurrentDocument(doc);
+    setIsEditMode(true);
+    const updatedDocs = await listDocuments(wsId, userId);
+    setDocuments(updatedDocs);
+  }, []);
+
   // Initialize workspace and load documents
   useEffect(() => {
     if (!userEmail) return;
@@ -348,37 +379,13 @@ function WorkspaceContent() {
 
         // If new=kanban, create a kanban board
         if (newType === 'kanban') {
-          const doc = await createDocument({
-            workspaceId: workspace.id,
-            userId: userEmail,
-            content: [{ board: { columns: [], cards: {} } }],
-            metadata: {
-              title: "New Kanban Board",
-              type: "board",
-            },
-          });
-
-          // Navigate to the board page
-          router.push(`/workspace/${workspace.id}/board/${doc.id}`);
+          await createKanbanAndNavigate(workspace.id, userEmail);
           return;
         }
 
         // If new=handwritten, create a handwritten note
         if (newType === 'handwritten') {
-          const doc = await createDocument({
-            workspaceId: workspace.id,
-            userId: userEmail,
-            content: [{ handwritten: "" }], // Empty canvas initially
-            metadata: {
-              title: "New Handwritten Note",
-              type: "handwritten",
-            },
-          });
-
-          // Open the handwritten note for editing
-          setCurrentDocument(doc);
-          setIsEditMode(true);
-          router.push(`/workspace?id=${doc.id}`);
+          await createHandwrittenAndOpen(workspace.id, userEmail);
           return;
         }
 
@@ -391,7 +398,7 @@ function WorkspaceContent() {
     }
 
     initialize();
-  }, [templateId, newType, userEmail, router]);
+  }, [templateId, newType, userEmail, router, createKanbanAndNavigate, createHandwrittenAndOpen]);
 
   const handleSave = async (content: unknown[]) => {
     if (!currentDocument || !workspaceId) return;
@@ -507,18 +514,7 @@ function WorkspaceContent() {
     if (!workspaceId || !userEmail) return;
 
     try {
-      const doc = await createDocument({
-        workspaceId,
-        userId: userEmail,
-        content: [{ board: { columns: [], cards: {} } }],
-        metadata: {
-          title: "New Kanban Board",
-          type: "board",
-        },
-      });
-
-      // Navigate to the board page
-      router.push(`/workspace/${workspaceId}/board/${doc.id}`);
+      await createKanbanAndNavigate(workspaceId, userEmail);
     } catch (err) {
       console.error("Create kanban error:", err);
       setError(err instanceof Error ? err.message : "Failed to create kanban board");
@@ -529,23 +525,7 @@ function WorkspaceContent() {
     if (!workspaceId || !userEmail) return;
 
     try {
-      const doc = await createDocument({
-        workspaceId,
-        userId: userEmail,
-        content: [{ handwritten: "" }], // Empty canvas initially
-        metadata: {
-          title: "New Handwritten Note",
-          type: "handwritten",
-        },
-      });
-
-      // Open the handwritten note for editing
-      setCurrentDocument(doc);
-      setIsEditMode(true);
-
-      // Reload documents list
-      const updatedDocs = await listDocuments(workspaceId, userEmail);
-      setDocuments(updatedDocs);
+      await createHandwrittenAndOpen(workspaceId, userEmail);
     } catch (err) {
       console.error("Create handwritten error:", err);
       setError(err instanceof Error ? err.message : "Failed to create handwritten note");
