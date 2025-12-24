@@ -305,10 +305,14 @@ function WorkspaceContent() {
             // Load the newly created document
             const doc = await getDocument(docId, userEmail);
             setCurrentDocument(doc);
+            setIsEditMode(true); // Enable edit mode for new template document
 
             // Reload documents list
             const updatedDocs = await listDocuments(workspace.id, userEmail);
             setDocuments(updatedDocs);
+
+            // Clear the template parameter from URL to prevent re-creation on refresh
+            router.replace('/workspace', { scroll: false });
           } catch {
             // If it fails, try as a custom template from database
             try {
@@ -332,10 +336,14 @@ function WorkspaceContent() {
                 });
 
                 setCurrentDocument(doc);
+                setIsEditMode(true); // Enable edit mode for new template document
 
                 // Reload documents list
                 const updatedDocs = await listDocuments(workspace.id, userEmail);
                 setDocuments(updatedDocs);
+
+                // Clear the template parameter from URL to prevent re-creation on refresh
+                router.replace('/workspace', { scroll: false });
               } else {
                 throw new Error("Template not found");
               }
