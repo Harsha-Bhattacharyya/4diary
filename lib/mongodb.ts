@@ -87,6 +87,8 @@ export const collections = {
   documents: "documents",
   templates: "templates",
   analyticsEvents: "analytics_events",
+  users: "users",
+  userSettings: "user_settings",
 } as const;
 
 /**
@@ -167,9 +169,13 @@ export interface DocumentType {
       image?: string;
     }>; // Cached embed previews
     isQuickReadSaved?: boolean; // Whether quick read mode was saved
+    backgroundColor?: string; // Background color for the note (e.g., "#fff9e6")
   };
   favorite: boolean;
   archived: boolean;
+  readOnly?: boolean; // Whether the note is read-only
+  passwordProtected?: boolean; // Whether note requires password to open
+  passwordHash?: string; // Hashed password for note (if passwordProtected)
   sortOrder?: number; // Custom sort order for documents in sidebar
   burnAfterReading?: boolean;
   selfDestructAt?: Date;
@@ -197,4 +203,27 @@ export interface AnalyticsEvent {
   metadata?: object;
   timestamp: Date;
   sessionId?: string;
+}
+
+export interface User {
+  _id?: ObjectId;
+  username: string;
+  passwordHash: string;
+  encryptionKey: string;
+  name: string;
+  createdAt: Date;
+  // 2FA settings
+  twoFactorEnabled?: boolean;
+  twoFactorSecret?: string; // Encrypted TOTP secret
+  backupCodes?: string[]; // Hashed backup codes
+  // User preferences
+  encryptionEnabled?: boolean; // Global encryption toggle (default: true)
+}
+
+export interface UserSettings {
+  _id?: ObjectId;
+  userId: string;
+  encryptionEnabled: boolean; // Global encryption preference
+  createdAt: Date;
+  updatedAt: Date;
 }
