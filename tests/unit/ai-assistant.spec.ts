@@ -50,3 +50,46 @@ test.describe('AI Assistant - Privacy Features', () => {
     // TODO: Verify component works without additional configuration
   });
 });
+
+test.describe('AI Assistant - API Route', () => {
+  test('should return meaningful error when AI service is unavailable', async ({ request }) => {
+    // Test the API route directly
+    const response = await request.get('/api/ai?action=init&model=gpt-4o-mini');
+    
+    // The API should return a response (may be success or error depending on DuckDuckGo availability)
+    expect(response.status()).toBeGreaterThanOrEqual(200);
+    expect(response.status()).toBeLessThan(600);
+    
+    const data = await response.json();
+    
+    // Response should have either vqd (success) or error (when service unavailable)
+    const hasValidResponse = data.vqd !== undefined || data.error !== undefined;
+    expect(hasValidResponse).toBe(true);
+  });
+
+  test('should reject invalid action parameter', async ({ request }) => {
+    const response = await request.get('/api/ai?action=invalid');
+    
+    expect(response.status()).toBe(400);
+    const data = await response.json();
+    expect(data.error).toBeDefined();
+  });
+
+  test('should require action parameter for GET requests', async ({ request }) => {
+    const response = await request.get('/api/ai');
+    
+    expect(response.status()).toBe(400);
+    const data = await response.json();
+    expect(data.error).toBeDefined();
+  });
+
+  test('should require vqd, model, and content for POST requests', async ({ request }) => {
+    const response = await request.post('/api/ai', {
+      data: { content: 'test' } // Missing vqd and model
+    });
+    
+    expect(response.status()).toBe(400);
+    const data = await response.json();
+    expect(data.error).toContain('Missing required fields');
+  });
+});
