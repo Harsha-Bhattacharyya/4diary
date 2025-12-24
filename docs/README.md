@@ -15,6 +15,10 @@ Perfect for new users and first-time installations.
 Detailed guides for using 4Diary's features effectively.
 
 - [Editor Guide](guides/editor.md) - Master the BlockNote editor
+- [AI Assistant](guides/ai-assistant.md) - Privacy-first AI chat assistance
+- [Handwritten Notes](guides/handwritten-notes.md) - Draw and save handwritten notes
+- [Math, Calculator & Search](guides/math-search-features.md) - LaTeX math, calculator, fuzzy search
+- [Community Features](guides/community-features.md) - Backlinks, calendar, version history, PWA
 - [Templates](guides/templates.md) - Use and create document templates
 - [Kanban Boards](guides/kanban.md) - Manage tasks with drag-and-drop boards
 - [Quick Note](guides/quick-note.md) - Lightning-fast note capture with Ctrl+Q
@@ -22,6 +26,8 @@ Detailed guides for using 4Diary's features effectively.
 - [Sharing & Collaboration](guides/sharing.md) - Share documents securely
 - [Import Notes](guides/import.md) - Import from Google Keep, Evernote, Notion & more
 - [Export & Backup](guides/export-backup.md) - Export your data in multiple formats
+- [Translation Support](guides/translation.md) - Multi-language interface support
+- [Bot Protection](guides/bot-protection.md) - Optional Cloudflare Turnstile integration
 - [Security & Privacy](guides/security-privacy.md) - Understand your data protection
 - [Keyboard Shortcuts](guides/shortcuts.md) - Work faster with hotkeys
 - [Troubleshooting](guides/troubleshooting.md) - Common issues and solutions
@@ -84,11 +90,13 @@ Resources for contributors and developers.
 
 ### By Feature
 
-- **Writing & Editing**: [Editor Guide](guides/editor.md), [Templates](guides/templates.md)
-- **Organization**: [Kanban Boards](guides/kanban.md), [Quick Note](guides/quick-note.md)
+- **Writing & Editing**: [Editor Guide](guides/editor.md), [Templates](guides/templates.md), [Handwritten Notes](guides/handwritten-notes.md)
+- **Organization**: [Kanban Boards](guides/kanban.md), [Quick Note](guides/quick-note.md), [Community Features](guides/community-features.md)
+- **Intelligence**: [AI Assistant](guides/ai-assistant.md), [Math & Search](guides/math-search-features.md)
 - **Sharing**: [Sharing & Collaboration](guides/sharing.md)
 - **Reading**: [Reader Mode](guides/reader-mode.md)
-- **Data Management**: [Export & Backup](guides/export-backup.md)
+- **Data Management**: [Export & Backup](guides/export-backup.md), [Import Notes](guides/import.md)
+- **Customization**: [Translation Support](guides/translation.md), [Custom Themes](advanced/theming.md)
 
 ## 🆘 Getting Help
 
@@ -100,9 +108,13 @@ Resources for contributors and developers.
 ## 📄 Additional Resources
 
 - [Main README](../README.md) - Project overview and quick start
+- [Features Summary](FEATURES_SUMMARY.md) - Comprehensive feature checklist and comparison
+- [New Features](NEW_FEATURES.md) - Latest security and customization features
+- [Vim Mode Guide](VIM_MODE.md) - Complete Vim mode documentation
+- [Release Notes](../RELEASE.md) - What's new in each version
+- [Changelog](../CHANGELOG.md) - Detailed version-by-version changes
 - [Code of Conduct](../CODE_OF_CONDUCT.md) - Community guidelines
 - [License](../LICENSE) - BSD-3 Clause License
-- [Release Notes](../RELEASE.md) - What's new in each version
 
 ## 🌟 Contributing to Documentation
 
@@ -125,7 +137,7 @@ Documentation contributions are welcome! To improve or add documentation:
 
 ---
 
-**Last Updated**: November 2025  
+**Last Updated**: December 2025  
 **Version**: 0.1.0-alpha
 
 Built with ♥️ for privacy-conscious note takers

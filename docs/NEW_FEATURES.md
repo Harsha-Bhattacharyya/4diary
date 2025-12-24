@@ -2,6 +2,17 @@
 
 This document describes the new features added to 4diary to enhance security, customization, and user control.
 
+## Quick Navigation
+
+Jump to a specific feature:
+- [Two-Factor Authentication (2FA)](#two-factor-authentication-2fa)
+- [Encryption Toggle](#encryption-toggle)
+- [Note Background Colors](#note-background-colors)
+- [Read-Only Notes](#read-only-notes)
+- [Archive Notes](#archive-notes)
+- [Password-Protected Notes](#password-protected-notes)
+- [API Reference](#api-reference)
+
 ## Table of Contents
 
 1. [Two-Factor Authentication (2FA)](#two-factor-authentication-2fa)
@@ -11,6 +22,12 @@ This document describes the new features added to 4diary to enhance security, cu
 5. [Archive Notes](#archive-notes)
 6. [Password-Protected Notes](#password-protected-notes)
 7. [API Reference](#api-reference)
+8. [Database Schema Changes](#database-schema-changes)
+9. [Self-Hosting Considerations](#self-hosting-considerations)
+10. [Security Best Practices](#security-best-practices)
+11. [Future Enhancements](#future-enhancements)
+12. [Troubleshooting](#troubleshooting)
+13. [Support](#support)
 
 ---
 
