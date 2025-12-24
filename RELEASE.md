@@ -4,14 +4,47 @@
 
 **Release Date:** 2025-11-13
 
-This is the first alpha release of 4diary, featuring core privacy-first E2EE functionality and advanced collaboration features.
+This is the first alpha release of 4diary, featuring core privacy-first E2EE functionality, advanced collaboration features, AI assistance, multi-language support, and comprehensive document management tools.
+
+**✨ Highlights:**
+- 🔒 End-to-end encryption with zero-knowledge architecture
+- 🤖 Privacy-first AI assistant powered by DuckDuckGo
+- 🌍 Multi-language support (English, Bengali, Hindi)
+- ⌨️ Full Vim mode with visual modes and command support
+- 🔢 Built-in calculator with LaTeX display
+- 🔍 Powerful fuzzy search across all documents
+- ✍️ Handwritten notes with drawing tools
+- 📋 Kanban boards with drag-and-drop
+- 🔗 Backlinks (bidirectional linking) for knowledge graphs
+- 📅 Calendar view for date-based organization
+- 📚 Automatic version history (last 50 versions)
+- 📱 Progressive Web App with offline support
+- 🔐 Two-factor authentication (2FA) with backup codes
+- 🎨 12 Google Keep-style background colors
+- 📐 LaTeX math notation support
+- 💻 Enhanced syntax highlighting for 50+ languages
+- 📥 Import from Google Keep, Evernote, Notion, Apple Notes, Standard Notes, and Markdown
+- 📤 Export as Markdown or workspace ZIP
 
 ### New Features
 
 #### 🔐 Privacy & Security
-- **End-to-End Encryption (E2EE)**: All document content and keys are encrypted client-side. Server never sees plaintext.
-- **Email-based Authentication**: Secure sign-up and login with session cookies
-- **Session Management**: Session validation and secure logout
+- **End-to-End Encryption (E2EE)**: AES-256-GCM encryption using Web Crypto API
+  - All document content and keys encrypted client-side
+  - Server never sees plaintext
+  - Master keys generated in browser and stored in IndexedDB only
+  - Each document has its own encryption key
+  - PBKDF2 key derivation with 100,000 iterations
+- **Email-based Authentication**: Secure sign-up and login with bcrypt password hashing
+- **Session Management**: JWT-based session validation with HTTP-only secure cookies
+- **Two-Factor Authentication (2FA)**: TOTP-based 2FA with authenticator app support
+  - QR code setup for easy configuration
+  - 10 single-use backup codes for account recovery
+  - Rate limiting (5 attempts per 15 minutes)
+  - Self-hosted compatible without external dependencies
+- **Optional Bot Protection**: Cloudflare Turnstile for login pages
+  - Fully optional and self-hostable
+  - Easy to enable/disable via environment variables
 
 #### 📤 Sharing & Collaboration
 - **Ephemeral Share Links**: Create temporary share links with 24-hour expiry (feature #4)
@@ -21,100 +54,389 @@ This is the first alpha release of 4diary, featuring core privacy-first E2EE fun
   - Rate limiting for security
   - Server never accesses plaintext content
 
-#### 📝 Document Features
-- **Emoji Icons**: Add emoji icons to documents for quick visual identification (feature #6)
-  - Integrated emoji picker UI
-  - Stored in document metadata
-  
-- **Kanban Boards**: Full kanban board support with drag-and-drop (feature #7)
-  - Board type stored encrypted
-  - Columns and cards UI
-  - Real-time auto-save
-  - Same E2EE model as documents
+#### 📝 Rich Text Editing
+- **BlockNote Editor**: Notion-like editing experience with full formatting
+- **Auto-save**: Automatic saving with intelligent change detection
+- **Full-screen Mode**: Distraction-free editing experience
+- **LaTeX Math Notation**: Inline (`$...$`) and display (`$$...$$`) math expressions
+  - Greek letters, operators, fractions, matrices
+  - Rendered beautifully with KaTeX
+- **Syntax Highlighting**: Enhanced code blocks for 50+ languages
+  - Custom leather-themed highlighting
+  - Powered by highlight.js
 
-- **Quick Note**: Lightning-fast note capture (feature #8)
+#### ⌨️ Vim Mode (NEW!)
+- **Full Vim Keybindings**: Complete Vim editing experience in the editor
+- **Four Modes**: NORMAL, INSERT, REPLACE, COMMAND
+- **Visual Modes**: Character-wise and line-wise visual selection
+- **Navigation**: hjkl, w, b, e, 0, $, gg, G with count prefixes
+- **Editing**: d, y, p, c, x, r and more
+- **Command Mode**: :wq, :q, :x to exit
+- **Visual Indicator**: Shows current mode with color coding
+- **Toggle**: Ctrl+Shift+V to enable/disable
+
+#### 📄 Document Types
+- **Regular Documents**: Rich text documents with full encryption
+- **Kanban Boards**: Drag-and-drop task management (feature #7)
+  - Column-based organization (To Do, In Progress, Done)
+  - Card state management
+  - Fully encrypted board data
+  - Powered by @hello-pangea/dnd
+- **Quick Notes**: Lightning-fast note capture (feature #8)
   - Hotkey activation (Ctrl/Cmd + Q)
   - Local-first auto-save to browser storage
   - Optional sync to workspace when ready
   - Minimal, distraction-free UI
+- **Handwritten Notes**: Drawing canvas with full encryption support (NEW!)
+  - Pen and eraser tools
+  - 7 preset colors (leather, black, blue, red, green, purple, orange)
+  - 4 pen widths (thin, medium, thick, bold)
+  - Undo last stroke and clear canvas
+  - Mouse and touch input support
+  - Export as PNG
+  - Stored as encrypted base64 PNG images
 
-- **Quick Read**: Reader mode for distraction-free reading (feature #9)
+#### 📁 Document Organization
+- **Emoji Icons**: Visual identification with emoji document icons (feature #6)
+  - Integrated emoji picker UI
+  - Custom icons per document
+- **Background Colors**: 12 Google Keep-style background colors (NEW!)
+  - Coral, Peach, Sand, Mint, Sage, Fog, Storm, Dusk, Blossom, Clay, Chalk
+  - Instant visual organization and categorization
+- **Folders**: Hierarchical folder structure for organization
+- **Tags**: Tag documents for easy filtering and search
+- **Favorites**: Mark important documents for quick access
+- **Archive**: Archive documents without deleting (NEW!)
+  - Hidden from main workspace list
+  - Reversible via settings or API
+- **Read-Only Mode**: Lock documents to prevent accidental edits (NEW!)
+  - Visual "🔒 Read-Only" badge
+  - Editor and toolbar disabled when active
+
+#### 🔗 Advanced Document Features (NEW!)
+- **Backlinks (Bidirectional Linking)**: Build knowledge graphs
+  - Wiki-style `[[Document Title]]` syntax
+  - Automatic link detection and indexing
+  - Backlinks sidebar shows incoming links
+  - Navigate between linked documents
+  - Perfect for research and personal knowledge management
+- **Version History**: Automatic document versioning
+  - Saves every time you save
+  - Keeps last 50 versions per document
+  - Stored in browser's IndexedDB (zero-knowledge maintained)
+  - Preview and restore previous versions
+  - No server storage needed
+- **Calendar View**: Date-based document organization
+  - Monthly calendar navigation
+  - Visual indicators for days with documents
+  - Toggle between list and calendar views
+  - Great for journals and meeting notes
+- **Password-Protected Notes**: Extra security layer per document (NEW!)
+  - Bcrypt password hashing (10 rounds)
+  - Independent of account password and 2FA
+  - Per-document password protection
+  - Cannot be recovered if forgotten
+
+#### 📖 Quick Read
+- **Reader Mode**: Distraction-free reading (feature #9)
   - Clean, focused reading interface
-  - Adjustable font size
-  - Optional privacy-preserving summarizer (disabled by default)
+  - Adjustable font size (A-/A+ buttons)
+  - Press ESC to exit
 
-- **Embed Previews**: Rich URL previews with privacy controls (feature #10)
+#### 🔗 Embed Previews
+- **Rich URL Previews**: Preview metadata for links (feature #10)
   - Server-side preview fetcher
   - Sanitized HTML to prevent XSS
   - OG/meta tag parsing
-  - Optional full-page embed with user consent
+  - Cached for performance
+
+#### 🤖 AI & Intelligence Features (NEW!)
+
+##### AI Assistant
+- **Privacy-First AI**: Powered by DuckDuckGo AI Chat
+- **Context-Aware**: Understands current document content
+- **No API Keys Required**: Works out-of-the-box
+- **Zero Data Retention**: Queries not stored or used for training
+- **Keyboard Shortcut**: Ctrl+Shift+A to toggle
+- **Floating Button**: Sparkle ✨ button for easy access
+- **Features**: Writing help, content generation, editing, brainstorming
+
+##### Built-in Calculator
+- **Mathematical Expressions**: Full math.js support
+- **LaTeX Display**: Toggle to show results as LaTeX
+- **Functions**: sqrt, sin, cos, tan, log, abs, exp, pow
+- **Constants**: pi, e
+- **History**: View last 10 calculations
+- **Insert to Editor**: Add results directly to documents
+- **Keyboard Shortcut**: Ctrl+Shift+C to toggle
+
+##### Powerful Search
+- **Fuzzy Matching**: Find results even with typos
+- **Search Filters**: All, Title, Content, Tags, Folder
+- **Visual Highlights**: Matching text highlighted in yellow
+- **Keyboard Navigation**: Arrow keys and Enter
+- **Client-Side Search**: On decrypted content (privacy-safe)
+- **Keyboard Shortcut**: Ctrl/Cmd+Shift+F to toggle
 
 #### 🎨 UI/UX
 - **Leather Theme**: Rich, warm color palette inspired by leather journals
+  - Custom gradients: gradient-leather and gradient-parchment
+  - Leather button styles with hover effects
+  - Glass card frosted effect with backdrop blur
+  - Shadow variations (shadow-leather, shadow-deep)
 - **Full-screen Editor**: Distraction-free editing experience
 - **Formatting Toolbar**: Rich text editing with BlockNote
 - **Card-based Workspace**: Modern, organized workspace layout
 - **Top Navigation**: Streamlined navigation across features
+- **Touch Optimization**: 44px minimum touch targets for mobile
+  - touch-manipulation class for better responsiveness
+  - Touch handlers with active state feedback
+- **Responsive Design**: Mobile-first approach
+  - Sidebar overlay on mobile with backdrop blur
+  - Multiple viewport support (375x667, 768x1024, 1920x1080)
+- **Keyboard Shortcuts**: Comprehensive shortcut support
+  - Quick Note: Ctrl/Cmd+Q
+  - AI Assistant: Ctrl+Shift+A
+  - Vim Mode: Ctrl+Shift+V
+  - Calculator: Ctrl+Shift+C
+  - Search: Ctrl/Cmd+Shift+F
 
-#### 📄 Pages
-- Documentation page
-- About page
-- Authentication pages
-- Templates gallery
-- Workspace management
-- Settings
+#### 📥 Import & Export (NEW!)
+
+##### Import Support
+- **Multiple Formats**: Import notes from popular apps
+  - Markdown (.md files)
+  - Google Keep (Google Takeout export)
+  - Evernote (.enex files)
+  - Notion (exported workspace)
+  - Standard Notes (backup files)
+  - Apple Notes (HTML/text export)
+- **Auto-Detection**: Automatically detects import format
+- **Batch Import**: Import multiple files at once
+- **Preview**: Preview notes before importing
+- **Encryption on Import**: Content encrypted immediately
+
+##### Export Functionality
+- **Markdown Export**: Export individual documents as Markdown
+- **Workspace Export**: Full workspace as ZIP file
+  - Maintains folder structure
+  - Decrypts content during export (client-side)
+  - Includes metadata preservation
+- **PNG Export**: Handwritten notes as PNG images
+
+#### 📱 Progressive Web App (PWA) (NEW!)
+- **Installable**: Add 4Diary to device home screen
+- **Offline Support**: Access and edit documents without internet
+- **Service Worker**: Background caching and automatic sync
+- **Automatic Updates**: Always get the latest version
+- **App-Like Experience**: Full-screen mode without browser UI
+- **Fast Loading**: Cached resources for instant startup
+- **Custom Manifest**: Professional app icons and splash screens
+
+#### 🌍 Multi-Language Support (NEW!)
+- **Three Languages (Phase 1)**:
+  - English (en)
+  - Bengali (bn) - বাংলা
+  - Hindi (hi) - हिन्दी
+- **lingo.dev Integration**: Server-side translation API
+- **In-Memory Caching**: LRU cache for up to 1000 translations
+- **Batch Processing**: Multiple texts in single API call
+- **Optional Feature**: Works perfectly without API key (defaults to English)
+- **Privacy-Preserved**: Only UI elements translated, not encrypted content
+
+#### 📄 Pages & Navigation
+- **Workspace**: Main document management page
+- **Documentation**: Comprehensive guides and help
+- **About**: Project information and acknowledgments
+- **Authentication**: Sign up, login, 2FA verification
+- **Templates**: Pre-built template gallery
+- **Settings**: User preferences, 2FA setup, encryption toggle, language selection
+- **Share**: Public share pages for documents
 
 ### Technical Improvements
 
-#### Dependencies Added
-- `ioredis`: Redis client for ephemeral share tokens
-- `emoji-picker-react`: Emoji picker component
-- `@asseinfo/react-kanban`: Kanban board UI
-- `react-hotkeys-hook`: Keyboard shortcuts
-- `sanitize-html`: HTML sanitization for security
-- `uuid`: Secure token generation
+#### Major Dependencies
+- `next@16.0.10`: App Router framework
+- `react@19.2.3` & `react-dom@19.2.3`: UI library
+- `typescript@5.9.3`: Type safety
+- `tailwindcss@4`: Utility-first styling
+- `mongodb@7.0.0`: Database driver
+- `ioredis@5.8.2`: Redis client for ephemeral share tokens (optional)
+- `@blocknote/react@0.45.0`: Rich text editor
+- `framer-motion@12.23.25`: Animations
+- `bcrypt@6.0.0`: Password hashing
+- `jose@6.1.0`: JWT session tokens
+- `uuid@13.0.0`: Secure token generation
+- `jszip@3.10.1`: ZIP file creation for exports
+- `emoji-picker-react@4.16.1`: Emoji picker component
+- `@hello-pangea/dnd@18.0.1`: Drag and drop for kanban
+- `@caldwell619/react-kanban@0.0.12`: Kanban board UI
+- `sanitize-html@2.17.0`: HTML sanitization for XSS protection
+- `qrcode@1.5.4`: QR code generation for 2FA
+- `speakeasy@2.0.0`: TOTP for two-factor authentication
+- `react-hotkeys-hook@5.2.1`: Keyboard shortcuts management
+- `@mumulhl/duckduckgo-ai-chat@3.3.0`: Privacy-first AI assistant
+- `mathjs@15.1.0`: Calculator mathematical expressions
+- `katex@0.16.27`: LaTeX math rendering
+- `highlight.js@11.11.1`: Syntax highlighting for code blocks
+- `react-markdown@10.1.0`: Markdown rendering
+- `react-signature-canvas@1.1.0-alpha.2`: Handwritten notes canvas
+- `fast-xml-parser@5.3.2`: XML parsing for Evernote imports
+- `@sentry/nextjs@10.29.0`: Error tracking and performance monitoring
+- `@vercel/analytics@1.6.1`: Web analytics (GDPR compliant)
+- `@lingo.dev/_sdk@0.13.4`: Multi-language translation service
 
 #### Database Schema Updates
-- Extended document metadata to support:
+- **User Model Extended**:
+  - `twoFactorEnabled`: Boolean flag for 2FA status
+  - `twoFactorSecret`: TOTP secret for 2FA
+  - `backupCodes`: Array of single-use backup codes
+  - `encryptionEnabled`: Toggle for encryption (default: true)
+  - `languagePreference`: User's selected language code
+- **Document Model Extended**:
   - `emojiIcon`: Emoji identifier for documents
-  - `type`: Document type (doc/board/quick)
+  - `type`: Document type (doc/board/quick/handwritten)
   - `embedPreviews`: Cached URL preview metadata
   - `isQuickReadSaved`: Quick read mode state
+  - `readOnly`: Boolean flag for read-only mode
+  - `passwordProtected`: Boolean flag for password protection
+  - `passwordHash`: Bcrypt hash of document password
+  - `archived`: Boolean flag for archived documents
+  - `metadata.backgroundColor`: Background color for visual organization
 
 #### API Endpoints
-- `/api/shares`: Create, retrieve, update, and revoke share tokens
-- `/api/embed`: Fetch and sanitize URL previews
+- **Authentication**:
+  - `/api/auth/login` - User login
+  - `/api/auth/signup` - User registration
+  - `/api/auth/logout` - User logout
+  - `/api/auth/session` - Session validation
+  - `/api/auth/2fa/setup` - Initialize 2FA setup
+  - `/api/auth/2fa/verify` - Verify TOTP token
+  - `/api/auth/2fa/enable` - Enable 2FA after verification
+  - `/api/auth/2fa/disable` - Disable 2FA (requires password)
+  - `/api/auth/2fa/status` - Check 2FA status
+  - `/api/auth/2fa/login` - Complete login with 2FA
+- **Documents**:
+  - `/api/documents` - Document CRUD operations
+  - `/api/documents/[id]` - Single document operations
+  - `/api/documents/[id]/lock` - Set password protection
+  - `/api/documents/[id]/unlock` - Remove password protection
+  - `/api/documents/[id]/verify-password` - Verify document password
+  - `/api/docs` - Document metadata operations
+  - `/api/docs/content` - Document content operations
+- **Workspaces**:
+  - `/api/workspaces` - Workspace management
+- **Sharing**:
+  - `/api/shares` - Create, retrieve, update, and revoke share tokens
+  - `/api/share` - Public share access
+- **Features**:
+  - `/api/templates` - Template operations
+  - `/api/backlinks` - Backlink indexing and retrieval
+  - `/api/embed` - URL embed preview generation
+  - `/api/analytics` - Privacy-respecting analytics events
+  - `/api/translate` - Multi-language translation
+  - `/api/settings` - User settings (encryption, language, etc.)
 
 #### Security
-- Rate limiting on share creation
-- Token ownership verification
-- HTML sanitization for embed previews
-- Privacy-first design: server never sees plaintext
+- **Client-Side Only Encryption**: All encryption happens in browser
+- **Rate Limiting**: Share creation (10 per 15 min), 2FA login attempts (5 per 15 min)
+- **Input Validation**: All inputs validated before processing
+- **HTML Sanitization**: XSS protection for embed previews
+- **Password Hashing**: bcrypt with cost factor 10
+- **Session Security**: HTTP-only, secure cookies with JWT
+- **CSRF Protection**: Built into Next.js framework
+- **No Secret Exposure**: Never log or expose sensitive data
+- **Token Ownership Verification**: Verify user owns resources before access
+- **Privacy-First Design**: Server never sees plaintext content
 
 ### Documentation
-- CONTRIBUTING.md: Contribution guidelines
-- CODE_OF_CONDUCT.md: Community standards
-- Updated README with new features
 
-### CI/CD
-- GitHub Actions workflow for continuous integration
-- Dockerfile with healthcheck
-- Improved database connection robustness
+#### Comprehensive Guides
+- **Getting Started**: introduction.md, installation.md, quickstart.md
+- **Feature Guides**: ai-assistant.md, bot-protection.md, community-features.md, editor.md, export-backup.md, handwritten-notes.md, import.md, kanban.md, math-search-features.md, quick-note.md, reader-mode.md, security-privacy.md, sharing.md, shortcuts.md, templates.md, translation.md, troubleshooting.md
+- **Advanced Topics**: encryption.md, performance.md, self-hosting.md, theming.md
+- **Architecture**: api-reference.md, architecture.md, database-schema.md, deployment.md, security-architecture.md
+- **Special Docs**: VIM_MODE.md, NEW_FEATURES.md
+
+#### Project Documentation
+- **README.md**: Comprehensive feature list and setup guide
+- **RELEASE.md**: Alpha release notes (this file)
+- **CHANGELOG.md**: Version-by-version change tracking
+- **CONTRIBUTING.md**: Contribution guidelines
+- **CODE_OF_CONDUCT.md**: Community standards
+- **SECURITY.md**: Security policy and vulnerability reporting
+
+### CI/CD & Monitoring
+
+#### Docker & Deployment
+- **Multi-Stage Docker Build**: Optimized image with Next.js standalone mode
+- **Docker Compose**: Full stack with MongoDB and Redis
+- **Debug Profile**: Optional Mongo Express for database management
+- **Health Checks**: Container health monitoring
+- **Environment Configuration**: Flexible environment variable setup
+
+#### Monitoring & Observability
+- **Sentry Integration**: Error tracking and performance monitoring
+  - Automatic error capture and reporting
+  - Performance monitoring for slow operations
+  - Source maps uploaded in CI for readable stack traces
+  - Tunnel route (`/monitoring`) to bypass ad-blockers
+  - Vercel Cron Monitors enabled
+- **Vercel Analytics**: Web analytics and speed insights
+  - GDPR compliant analytics
+  - Real user monitoring (RUM)
+  - No personal data collection
+- **Custom Logging**: Structured logging with request tracking
+  - Log levels: debug, info, warn, error
+  - Context tracking with request IDs
+  - Privacy-safe (no sensitive data logged)
+
+#### Testing
+- **Playwright**: E2E and unit testing framework
+  - Multiple viewport testing (mobile, tablet, desktop)
+  - Network mocking for API testing
+  - Accessibility testing
+  - Keyboard navigation tests
+- **Test Commands**: 
+  - `npm test` - Run all tests
+  - `npm run test:unit` - Unit tests only
+  - `npm run test:e2e` - E2E tests only
+  - `npm run test:ui` - Playwright UI mode
+  - `npm run test:headed` - Visible browser mode
+  - `npm run test:debug` - Debug mode
+
+#### CI/CD Pipeline
+- **GitHub Actions**: Continuous integration workflow
+- **Linting**: ESLint 9 with Next.js config
+- **Type Checking**: TypeScript compilation
+- **Build Verification**: Next.js build validation
+- **Dockerfile**: With healthcheck for production
 
 ### Known Limitations (Alpha)
 - Redis is optional; if not configured, share tokens will be unavailable
 - Summarizer endpoint is disabled by default (privacy-first approach)
 - Quick note sync requires active workspace session
-- Some edge cases in kanban board drag-and-drop may need refinement
+- Vim mode limited to BlockNote editor capabilities
+- Backlinks require exact title match (case-sensitive)
+- Version history limited to 50 versions per document
+- PWA offline mode requires initial online visit
+- Translation requires lingo.dev API key (optional feature)
 - Master key storage uses base64 encoding; post-alpha will implement PBKDF2-based password encryption
+- Handwritten notes have fixed canvas size (no zoom/pan)
+- Calculator LaTeX display is basic (no advanced formatting)
 
 ### Upcoming Features (Post-Alpha)
-- Real-time collaboration
-- Mobile app
-- Offline-first PWA support
-- Advanced search and filtering
-- Document versioning
-- More templates
+- **Collaboration**: Real-time collaborative editing
+- **Mobile Apps**: Native iOS and Android applications
+- **Search Enhancements**: Date range filters, search operators, saved searches
+- **Document Features**: Graph view of relationships, version comparison (diff), more templates
+- **PWA Improvements**: Push notifications, better background sync
+- **Languages**: Phase 2 languages (Tamil, Mandarin, Russian, French, German)
+- **Authentication**: Biometric authentication, hardware key (FIDO2) support
+- **Handwritten Notes**: OCR for handwriting-to-text, multi-page support, shape tools
+- **Translation**: Offline translation models, custom translations
+- **Export/Import**: More formats, batch operations
+- **Customization**: Theme customization, custom keyboard shortcuts
 
 ### Breaking Changes
 None (first release)
