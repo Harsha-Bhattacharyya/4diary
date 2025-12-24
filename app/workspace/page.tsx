@@ -503,6 +503,55 @@ function WorkspaceContent() {
     }
   };
 
+  const handleCreateKanban = async () => {
+    if (!workspaceId || !userEmail) return;
+
+    try {
+      const doc = await createDocument({
+        workspaceId,
+        userId: userEmail,
+        content: [{ board: { columns: [], cards: {} } }],
+        metadata: {
+          title: "New Kanban Board",
+          type: "board",
+        },
+      });
+
+      // Navigate to the board page
+      router.push(`/workspace/${workspaceId}/board/${doc.id}`);
+    } catch (err) {
+      console.error("Create kanban error:", err);
+      setError(err instanceof Error ? err.message : "Failed to create kanban board");
+    }
+  };
+
+  const handleCreateHandwritten = async () => {
+    if (!workspaceId || !userEmail) return;
+
+    try {
+      const doc = await createDocument({
+        workspaceId,
+        userId: userEmail,
+        content: [{ handwritten: "" }], // Empty canvas initially
+        metadata: {
+          title: "New Handwritten Note",
+          type: "handwritten",
+        },
+      });
+
+      // Open the handwritten note for editing
+      setCurrentDocument(doc);
+      setIsEditMode(true);
+
+      // Reload documents list
+      const updatedDocs = await listDocuments(workspaceId, userEmail);
+      setDocuments(updatedDocs);
+    } catch (err) {
+      console.error("Create handwritten error:", err);
+      setError(err instanceof Error ? err.message : "Failed to create handwritten note");
+    }
+  };
+
   const handleTitleChange = async (newTitle: string) => {
     if (!currentDocument || !userEmail) return;
 
@@ -1620,6 +1669,7 @@ function WorkspaceContent() {
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
               <button
+                type="button"
                 onClick={handleCreateDocument}
                 className="flex flex-col items-center justify-center p-4 rounded-lg bg-leather-900/30 hover:bg-leather-900/50 transition-all border border-leather-700/30 hover:border-leather-600"
               >
@@ -1633,7 +1683,8 @@ function WorkspaceContent() {
               </Link>
               
               <button
-                onClick={() => router.push('/workspace?new=kanban')}
+                type="button"
+                onClick={handleCreateKanban}
                 className="flex flex-col items-center justify-center p-4 rounded-lg bg-leather-900/30 hover:bg-leather-900/50 transition-all border border-leather-700/30 hover:border-leather-600"
               >
                 <Icon icon="flat-color-icons:bar-chart" width={48} height={48} className="mb-2" />
@@ -1641,7 +1692,8 @@ function WorkspaceContent() {
               </button>
               
               <button
-                onClick={() => router.push('/workspace?new=handwritten')}
+                type="button"
+                onClick={handleCreateHandwritten}
                 className="flex flex-col items-center justify-center p-4 rounded-lg bg-leather-900/30 hover:bg-leather-900/50 transition-all border border-leather-700/30 hover:border-leather-600"
               >
                 <span className="text-3xl mb-2">✍️</span>
@@ -1659,6 +1711,7 @@ function WorkspaceContent() {
               
               {documents.length > 0 && (
                 <button
+                  type="button"
                   onClick={handleExportWorkspace}
                   className="flex flex-col items-center justify-center p-4 rounded-lg bg-leather-900/30 hover:bg-leather-900/50 transition-all border border-leather-700/30 hover:border-leather-600"
                 >
