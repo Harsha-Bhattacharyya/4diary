@@ -11,10 +11,9 @@
 
 import type { Metadata, Viewport } from "next";
 import { IM_Fell_DW_Pica, IM_Fell_English, JetBrains_Mono, Roboto_Condensed } from "next/font/google";
-import { Analytics } from "@vercel/analytics/react";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 import Script from "next/script";
 import { ThemeProvider } from "@/components/ui/ThemeProvider";
+import { AnalyticsProvider } from "@/components/ui/AnalyticsProvider";
 import "./globals.css";
 
 // Note: IM Fell fonts only support weight 400. Bold text will be synthesized by the browser.
@@ -218,8 +217,8 @@ export const metadata: Metadata = {
     "monitoring",
     "sentry integration",
     "analytics",
-    "vercel analytics",
-    "speed insights",
+    "privacy analytics",
+    "telemetry",
     "performance monitoring",
     "uptime monitoring",
     "status page",
@@ -794,10 +793,10 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
         />
         <ThemeProvider>
-          {children}
+          <AnalyticsProvider>
+            {children}
+          </AnalyticsProvider>
         </ThemeProvider>
-        <Analytics />
-        <SpeedInsights />
       </body>
     </html>
   );

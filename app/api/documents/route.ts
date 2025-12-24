@@ -177,6 +177,9 @@ export async function PUT(request: NextRequest) {
       metadata,
       favorite,
       archived,
+      readOnly,
+      passwordProtected,
+      passwordHash,
       sortOrder,
     } = body;
 
@@ -196,6 +199,9 @@ export async function PUT(request: NextRequest) {
       if (metadata) updates.metadata = metadata;
       if (favorite !== undefined) updates.favorite = favorite;
       if (archived !== undefined) updates.archived = archived;
+      if (readOnly !== undefined) updates.readOnly = readOnly;
+      if (passwordProtected !== undefined) updates.passwordProtected = passwordProtected;
+      if (passwordHash !== undefined) updates.passwordHash = passwordHash;
       if (sortOrder !== undefined) updates.sortOrder = sortOrder;
 
       const success = inMemoryStorage.updateDocument(id, updates);
@@ -220,6 +226,9 @@ export async function PUT(request: NextRequest) {
     if (metadata) updateFields.metadata = metadata;
     if (favorite !== undefined) updateFields.favorite = favorite;
     if (archived !== undefined) updateFields.archived = archived;
+    if (readOnly !== undefined) updateFields.readOnly = readOnly;
+    if (passwordProtected !== undefined) updateFields.passwordProtected = passwordProtected;
+    if (passwordHash !== undefined) updateFields.passwordHash = passwordHash;
     if (sortOrder !== undefined) updateFields.sortOrder = sortOrder;
 
     const result = await db.collection(collections.documents).updateOne(

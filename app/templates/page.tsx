@@ -18,6 +18,7 @@ import GlassCard from "@/components/ui/GlassCard";
 import LeatherButton from "@/components/ui/LeatherButton";
 import TopMenu from "@/components/ui/TopMenu";
 import { builtInTemplates, getTemplateCategories } from "@/lib/templates";
+import { Icon } from "@iconify/react";
 
 interface CustomTemplate {
   _id: string;
@@ -160,7 +161,9 @@ export default function TemplatesPage() {
               {customTemplates.map((template) => (
                 <GlassCard key={template._id} hover>
                   <div className="flex items-start gap-4">
-                    <div className="text-4xl">📝</div>
+                    <div className="text-4xl">
+                      <Icon icon="flat-color-icons:document" width={48} height={48} />
+                    </div>
                     <div className="flex-1">
                       <h3 className="text-xl font-bold mb-2 text-leather-100">
                         {template.name}
@@ -188,9 +191,9 @@ export default function TemplatesPage() {
                           <button
                             type="button"
                             onClick={() => handleDeleteTemplate(template._id)}
-                            className="px-3 py-2 text-xs bg-red-900/40 hover:bg-red-900/60 text-red-300 border border-red-700 transition-colors"
+                            className="px-3 py-2 text-xs bg-red-900/40 hover:bg-red-900/60 text-red-300 border border-red-700 transition-colors flex items-center gap-1"
                           >
-                            🗑️
+                            <Icon icon="flat-color-icons:disclaimer" width={16} height={16} />
                           </button>
                         )}
                       </div>

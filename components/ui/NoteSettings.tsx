@@ -24,6 +24,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { X } from "lucide-react";
+import { Icon } from "@iconify/react";
 
 export type EditorFontType = "normal" | "serif" | "condensed";
 
@@ -40,6 +41,12 @@ interface NoteSettingsProps {
   onUpdateTags?: (tags: string[]) => void;
   editorFont?: EditorFontType;
   onFontChange?: (font: EditorFontType) => void;
+  backgroundColor?: string;
+  onBackgroundColorChange?: (color: string) => void;
+  readOnly?: boolean;
+  onToggleReadOnly?: (readOnly: boolean) => void;
+  archived?: boolean;
+  onToggleArchived?: (archived: boolean) => void;
 }
 
 /**
@@ -74,6 +81,12 @@ export default function NoteSettings({
   onUpdateTags,
   editorFont = "normal",
   onFontChange,
+  backgroundColor = "",
+  onBackgroundColorChange,
+  readOnly = false,
+  onToggleReadOnly,
+  archived = false,
+  onToggleArchived,
 }: NoteSettingsProps) {
   // For folder and tags, we work directly with props
   // The parent component manages the state and passes callbacks
@@ -88,6 +101,12 @@ export default function NoteSettings({
   } | null>(null);
   const [generatingHashes, setGeneratingHashes] = useState(false);
   const [copiedHash, setCopiedHash] = useState<string | null>(null);
+  
+  // Password protection state
+  const [passwordProtected, setPasswordProtected] = useState(false);
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   // Calculate statistics
   const stats = useMemo(() => {
@@ -241,8 +260,8 @@ export default function NoteSettings({
         <div className="mx-auto w-full max-w-2xl">
           <DrawerHeader className="text-left">
             <div className="flex items-center justify-between">
-              <DrawerTitle className="text-2xl font-bold">
-                <span role="img" aria-label="Settings">⚙️</span> Note Settings
+              <DrawerTitle className="text-2xl font-bold flex items-center gap-2">
+                <Icon icon="flat-color-icons:settings" width={32} height={32} /> Note Settings
               </DrawerTitle>
               <DrawerClose asChild>
                 <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -310,9 +329,9 @@ export default function NoteSettings({
               <div className="mb-4">
                 <label
                   htmlFor="note-folder"
-                  className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2"
+                  className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2 flex items-center gap-1"
                 >
-                  📁 Folder
+                  <Icon icon="flat-color-icons:document" width={20} height={20} /> Folder
                 </label>
                 <input
                   id="note-folder"
@@ -331,9 +350,9 @@ export default function NoteSettings({
               <div>
                 <label
                   htmlFor="note-tags"
-                  className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2"
+                  className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2 flex items-center gap-1"
                 >
-                  🏷️ Tags
+                  <Icon icon="flat-color-icons:document" width={20} height={20} /> Tags
                 </label>
                 <div className="flex gap-2 mb-2">
                   <input
@@ -444,14 +463,222 @@ export default function NoteSettings({
                   </Button>
                 </div>
               </div>
+
+              {/* Background Color */}
+              <div className="mt-4 p-4 bg-neutral-50 dark:bg-neutral-900 rounded-lg">
+                <div className="mb-3">
+                  <div className="font-medium text-neutral-900 dark:text-neutral-50">Background Color</div>
+                  <div className="text-sm text-neutral-600 dark:text-neutral-400">
+                    Choose a background color for this note
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {/* Color presets inspired by Google Keep */}
+                  {[
+                    { name: "Default", color: "" },
+                    { name: "Coral", color: "#f28b82" },
+                    { name: "Peach", color: "#fbbc04" },
+                    { name: "Sand", color: "#fff475" },
+                    { name: "Mint", color: "#ccff90" },
+                    { name: "Sage", color: "#a7ffeb" },
+                    { name: "Fog", color: "#cbf0f8" },
+                    { name: "Storm", color: "#aecbfa" },
+                    { name: "Dusk", color: "#d7aefb" },
+                    { name: "Blossom", color: "#fdcfe8" },
+                    { name: "Clay", color: "#e6c9a8" },
+                    { name: "Chalk", color: "#e8eaed" },
+                  ].map(({ name, color }) => (
+                    <button
+                      key={name}
+                      type="button"
+                      onClick={() => onBackgroundColorChange?.(color)}
+                      className={`w-12 h-12 rounded-lg border-2 transition-all hover:scale-110 ${
+                        backgroundColor === color
+                          ? "border-neutral-900 dark:border-neutral-50 ring-2 ring-offset-2 ring-neutral-900 dark:ring-neutral-50"
+                          : "border-neutral-300 dark:border-neutral-600"
+                      }`}
+                      style={{ backgroundColor: color || "#ffffff" }}
+                      title={name}
+                      aria-label={`Set background color to ${name}`}
+                    >
+                      {!color && <span className="text-xl">🚫</span>}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <Separator className="my-6" />
+
+            {/* Note State Settings */}
+            <div>
+              <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-50 mb-4">
+                Note State
+              </h3>
+
+              {/* Read-Only Toggle */}
+              <div className="flex items-center justify-between p-4 bg-neutral-50 dark:bg-neutral-900 rounded-lg mb-4">
+                <div>
+                  <div className="font-medium text-neutral-900 dark:text-neutral-50">Read-Only Mode</div>
+                  <div className="text-sm text-neutral-600 dark:text-neutral-400">
+                    Prevent editing this note
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => onToggleReadOnly?.(!readOnly)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    readOnly ? "bg-neutral-900 dark:bg-neutral-50" : "bg-neutral-300 dark:bg-neutral-700"
+                  }`}
+                  role="switch"
+                  aria-checked={readOnly}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white dark:bg-neutral-900 transition-transform ${
+                      readOnly ? "translate-x-6" : "translate-x-1"
+                    }`}
+                  />
+                </button>
+              </div>
+
+              {/* Archived Toggle */}
+              <div className="flex items-center justify-between p-4 bg-neutral-50 dark:bg-neutral-900 rounded-lg">
+                <div>
+                  <div className="font-medium text-neutral-900 dark:text-neutral-50">Archive Note</div>
+                  <div className="text-sm text-neutral-600 dark:text-neutral-400">
+                    Hide this note from your main workspace
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => onToggleArchived?.(!archived)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    archived ? "bg-neutral-900 dark:bg-neutral-50" : "bg-neutral-300 dark:bg-neutral-700"
+                  }`}
+                  role="switch"
+                  aria-checked={archived}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white dark:bg-neutral-900 transition-transform ${
+                      archived ? "translate-x-6" : "translate-x-1"
+                    }`}
+                  />
+                </button>
+              </div>
+            </div>
+
+            <Separator className="my-6" />
+
+            {/* Password Protection */}
+            <div>
+              <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-50 mb-4">
+                Password Protection
+              </h3>
+
+              {!passwordProtected ? (
+                <div className="p-4 bg-neutral-50 dark:bg-neutral-900 rounded-lg">
+                  <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4">
+                    Lock this note with a password for extra security.
+                  </p>
+                  <Button
+                    type="button"
+                    onClick={() => setShowPasswordDialog(true)}
+                  >
+                    Set Password
+                  </Button>
+                </div>
+              ) : (
+                <div className="p-4 bg-neutral-50 dark:bg-neutral-900 rounded-lg">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="text-2xl">🔒</span>
+                    <span className="text-sm font-medium text-neutral-900 dark:text-neutral-50">
+                      This note is password protected
+                    </span>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    onClick={() => setPasswordProtected(false)}
+                  >
+                    Remove Password
+                  </Button>
+                </div>
+              )}
+
+              {/* Password Dialog */}
+              {showPasswordDialog && (
+                <div className="mt-4 p-4 bg-neutral-100 dark:bg-neutral-800 rounded-lg border-2 border-neutral-300 dark:border-neutral-600">
+                  <h4 className="font-medium text-neutral-900 dark:text-neutral-50 mb-3">
+                    Set Note Password
+                  </h4>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-sm text-neutral-700 dark:text-neutral-300 mb-1">
+                        Password
+                      </label>
+                      <input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Enter password"
+                        className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-neutral-950 dark:focus:ring-neutral-300 bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-50"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-neutral-700 dark:text-neutral-300 mb-1">
+                        Confirm Password
+                      </label>
+                      <input
+                        type="password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        placeholder="Confirm password"
+                        className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-neutral-950 dark:focus:ring-neutral-300 bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-50"
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        onClick={() => {
+                          if (password !== confirmPassword) {
+                            alert("Passwords do not match");
+                            return;
+                          }
+                          if (password.length < 4) {
+                            alert("Password must be at least 4 characters");
+                            return;
+                          }
+                          setPasswordProtected(true);
+                          setShowPasswordDialog(false);
+                          setPassword("");
+                          setConfirmPassword("");
+                        }}
+                      >
+                        Set Password
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => {
+                          setShowPasswordDialog(false);
+                          setPassword("");
+                          setConfirmPassword("");
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             <Separator className="my-6" />
 
             {/* Hash Generation */}
             <div>
-              <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-50 mb-4">
-                🔐 Hash Generation
+              <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-50 mb-4 flex items-center gap-2">
+                <Icon icon="flat-color-icons:data-encryption" width={24} height={24} /> Hash Generation
               </h3>
               
               <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4">

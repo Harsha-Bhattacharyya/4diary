@@ -18,6 +18,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import { Icon } from "@iconify/react";
 
 interface PlaywriterModeProps {
   content: string;
@@ -183,8 +184,8 @@ export function PlaywriterMode({
                 />
               </svg>
             </button>
-            <span id="playwriter-mode-label" className="text-xl text-[#E8DCC4]">
-              🎭 Playwriter Mode
+            <span id="playwriter-mode-label" className="text-xl text-[#E8DCC4] flex items-center gap-2">
+              <Icon icon="flat-color-icons:document" width={24} height={24} /> Playwriter Mode
             </span>
             {hasUnsavedChanges && (
               <span className="text-xs text-yellow-400 bg-yellow-900/30 px-2 py-1 rounded">
@@ -241,7 +242,9 @@ export function PlaywriterMode({
         {/* Screenplay format info */}
         <div className="mb-6 p-4 bg-[#1A1410] border border-[#8B7355] rounded-lg">
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-xl">📝</span>
+            <span className="text-xl">
+              <Icon icon="flat-color-icons:document" width={24} height={24} />
+            </span>
             <span className="font-semibold text-[#E8DCC4]">Screenplay Tips</span>
           </div>
           <ul className="text-sm text-[#C4B8A0] space-y-1">

@@ -17,6 +17,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { Icon } from "@iconify/react";
 
 interface EmbedPreview {
   url: string;
@@ -90,7 +91,7 @@ export function EmbedPreview({ url, onLoad }: EmbedPreviewProps) {
     return (
       <div className="border border-[#8B7355] rounded-lg p-4 bg-[#2D2416]">
         <div className="flex items-center gap-2 text-[#C4B8A0]">
-          <span>⚠️</span>
+          <Icon icon="flat-color-icons:disclaimer" width={20} height={20} />
           <span>Failed to load preview: {error}</span>
         </div>
         <a
