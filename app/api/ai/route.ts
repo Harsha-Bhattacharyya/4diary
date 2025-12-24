@@ -166,7 +166,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
                 fullText += parsed.message;
               }
             } catch {
-              // Skip invalid JSON
+              // Skip invalid JSON chunks - DuckDuckGo's streaming API may send
+              // partial or malformed data chunks that don't parse as valid JSON.
+              // This is expected behavior for server-sent events.
             }
           }
         }
@@ -183,7 +185,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
             fullText += parsed.message;
           }
         } catch {
-          // Skip invalid JSON
+          // Skip invalid JSON - same as above, partial data is expected
         }
       }
     }

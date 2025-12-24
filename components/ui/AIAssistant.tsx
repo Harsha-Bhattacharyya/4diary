@@ -210,6 +210,13 @@ export default function AIAssistant({
     setInitError(null);
   };
 
+  // Compute placeholder text based on current state
+  const getPlaceholderText = (): string => {
+    if (isInitializing) return "Connecting to AI service...";
+    if (chatSession) return "Ask me anything about your notes...";
+    return "Type your message (AI service may be unavailable)...";
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -310,7 +317,7 @@ export default function AIAssistant({
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={isInitializing ? "Connecting to AI service..." : (chatSession ? "Ask me anything about your notes..." : "Type your message (AI service may be unavailable)...")}
+              placeholder={getPlaceholderText()}
               disabled={isLoading || isInitializing}
               className="flex-1 px-4 py-2 bg-black/30 border border-leather-300/30 rounded-lg text-leather-100 placeholder-leather-400 focus:outline-none focus:ring-2 focus:ring-leather-300/50 resize-none disabled:opacity-50"
               rows={2}
