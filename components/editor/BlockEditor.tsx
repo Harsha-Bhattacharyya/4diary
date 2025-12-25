@@ -163,12 +163,12 @@ export default function BlockEditor({
 
   // Initialize lastContentHash when editor is ready with initialContent
   useEffect(() => {
-    // Wait for next tick to ensure editor is initialized with initialContent
+    // Wait a short time to ensure editor is initialized with initialContent
     const timer = setTimeout(() => {
       const hash = hashContent(editor.document);
       setLastContentHash(hash);
       setIsInitialized(true);
-    }, 0);
+    }, 100);
     
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
