@@ -97,8 +97,11 @@ export default function BoardPage() {
   }, [boardId, userId]);
 
   useEffect(() => {
-    loadBoard();
-  }, [loadBoard]);
+    // Only load board after userId is set to avoid race condition
+    if (userId) {
+      loadBoard();
+    }
+  }, [loadBoard, userId]);
 
   const handleBoardChange = async (newBoard: KanbanBoardData) => {
     setBoardData(newBoard);
