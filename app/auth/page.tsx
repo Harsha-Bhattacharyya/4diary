@@ -40,6 +40,11 @@ export default function AuthPage() {
   const [error, setError] = useState<string | null>(null);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   
+  // 2FA states
+  const [showTwoFactor, setShowTwoFactor] = useState(false);
+  const [twoFactorToken, setTwoFactorToken] = useState("");
+  const [isBackupCode, setIsBackupCode] = useState(false);
+  
   // Get Turnstile site key from environment (optional)
   const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
@@ -129,6 +134,51 @@ export default function AuthPage() {
         throw new Error(data.error || "Authentication failed");
       }
 
+      // Check if 2FA is required
+      if (data.requires2FA) {
+        setShowTwoFactor(true);
+        setLoading(false);
+        return;
+      }
+
+      // Redirect to workspace on success
+      router.push("/workspace");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handle2FASubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    
+    if (!twoFactorToken) {
+      setError("Please enter your 2FA token");
+      return;
+    }
+    
+    setLoading(true);
+
+    try {
+      const response = await fetch("/api/auth/2fa/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username,
+          password,
+          token: twoFactorToken,
+          isBackupCode,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "2FA verification failed");
+      }
+
       // Redirect to workspace on success
       router.push("/workspace");
     } catch (err) {
@@ -145,7 +195,7 @@ export default function AuthPage() {
       <GlassCard className="relative z-10 w-full max-w-md">
         <div className="p-8">
           <h1 className="text-3xl font-bold text-center mb-6 text-leather-100">
-            {isLogin ? "Log In" : "Sign Up"}
+            {showTwoFactor ? "Two-Factor Authentication" : (isLogin ? "Log In" : "Sign Up")}
           </h1>
 
           {error && (
@@ -154,7 +204,70 @@ export default function AuthPage() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          {showTwoFactor ? (
+            /* 2FA Verification Form */
+            <form onSubmit={handle2FASubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-leather-200 mb-2">
+                  {isBackupCode ? "Backup Code" : "Authentication Code"} <span className="text-red-400">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={twoFactorToken}
+                  onChange={(e) => setTwoFactorToken(e.target.value.replace(/\s/g, ''))}
+                  required
+                  className="w-full px-4 py-2 bg-black/30 border border-leather-300/30 rounded-lg text-leather-100 placeholder-leather-400 focus:outline-none focus:ring-2 focus:ring-leather-300/50"
+                  placeholder={isBackupCode ? "Enter backup code" : "Enter 6-digit code"}
+                  maxLength={isBackupCode ? 20 : 6}
+                  autoFocus
+                />
+                <p className="mt-1 text-xs text-leather-400">
+                  {isBackupCode 
+                    ? "Enter one of your backup codes" 
+                    : "Enter the 6-digit code from your authenticator app"}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="useBackupCode"
+                  checked={isBackupCode}
+                  onChange={(e) => {
+                    setIsBackupCode(e.target.checked);
+                    setTwoFactorToken("");
+                  }}
+                />
+                <label htmlFor="useBackupCode" className="text-sm text-leather-200">
+                  Use backup code instead
+                </label>
+              </div>
+
+              <LeatherButton
+                type="submit"
+                variant="leather"
+                className="w-full"
+                disabled={loading}
+              >
+                {loading ? "Verifying..." : "Verify"}
+              </LeatherButton>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setShowTwoFactor(false);
+                  setTwoFactorToken("");
+                  setIsBackupCode(false);
+                  setError(null);
+                }}
+                className="w-full text-sm text-leather-300 hover:text-leather-100 text-center"
+              >
+                ← Back to login
+              </button>
+            </form>
+          ) : (
+            /* Regular Login/Signup Form */
+            <form onSubmit={handleSubmit} className="space-y-4">
             {/* Username Field */}
             <div>
               <label className="block text-sm font-medium text-leather-200 mb-2">
@@ -304,22 +417,25 @@ export default function AuthPage() {
               {loading ? "..." : "Enter"}
             </LeatherButton>
           </form>
+          )}
 
-          {/* Toggle Login/Signup */}
-          <div className="mt-6 text-center">
-            <button
-              type="button"
-              onClick={() => {
-                setIsLogin(!isLogin);
-                setError(null);
-              }}
-              className="text-sm text-leather-300 hover:text-leather-100"
-            >
-              {isLogin
-                ? "Don't have an account? Sign up"
-                : "Already have an account? Log in"}
-            </button>
-          </div>
+          {/* Toggle Login/Signup - Only show when not in 2FA mode */}
+          {!showTwoFactor && (
+            <div className="mt-6 text-center">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsLogin(!isLogin);
+                  setError(null);
+                }}
+                className="text-sm text-leather-300 hover:text-leather-100"
+              >
+                {isLogin
+                  ? "Don't have an account? Sign up"
+                  : "Already have an account? Log in"}
+              </button>
+            </div>
+          )}
 
           {/* Encryption Notice */}
           <div className="mt-6 pt-6 border-t border-leather-300/20 text-center">
