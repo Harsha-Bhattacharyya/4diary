@@ -203,6 +203,15 @@ function WorkspaceContent() {
     return "normal";
   });
 
+  // Ref to track the latest editor content (for saving on close)
+  const latestContentRef = React.useRef<unknown[] | null>(null);
+
+  // Callback to track editor content changes
+  const handleEditorChange = useCallback((content: unknown[]) => {
+    // Track latest content in ref for use when closing
+    latestContentRef.current = content;
+  }, []);
+
   // Persist font preference to localStorage
   const handleFontChange = useCallback((font: EditorFontType) => {
     setEditorFont(font);
@@ -412,6 +421,9 @@ function WorkspaceContent() {
   const handleSave = async (content: unknown[]) => {
     if (!currentDocument || !workspaceId) return;
 
+    // Store the latest content in ref for use when closing
+    latestContentRef.current = content;
+
     try {
       await updateDocument({
         id: currentDocument.id,
@@ -496,6 +508,8 @@ function WorkspaceContent() {
 
       setCurrentDocument(doc);
       setIsEditMode(true); // Start in edit mode for new documents
+      // Reset the latest content ref when creating a new document
+      latestContentRef.current = null;
 
       // Reload documents list
       const updatedDocs = await listDocuments(workspaceId, userEmail);
@@ -513,6 +527,8 @@ function WorkspaceContent() {
       const doc = await getDocument(docId, userEmail);
       setCurrentDocument(doc);
       setIsEditMode(false); // Start in read mode
+      // Reset the latest content ref when opening a new document
+      latestContentRef.current = null;
     } catch (err) {
       console.error("Open error:", err);
       setError(err instanceof Error ? err.message : "Failed to open document");
@@ -1004,6 +1020,22 @@ function WorkspaceContent() {
   }
 
   const handleCloseDocument = async () => {
+    // Save any unsaved changes before closing
+    if (currentDocument && userEmail && latestContentRef.current !== null) {
+      try {
+        await updateDocument({
+          id: currentDocument.id,
+          userId: userEmail,
+          content: latestContentRef.current,
+          metadata: currentDocument.metadata,
+        });
+        // Clear the ref after saving
+        latestContentRef.current = null;
+      } catch (err) {
+        console.error("Failed to save before closing:", err);
+      }
+    }
+    
     // Reload documents list to show any new or updated documents
     if (workspaceId && userEmail) {
       try {
@@ -1028,11 +1060,11 @@ function WorkspaceContent() {
             <button
               type="button"
               onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="p-2 hover:bg-leather-100 rounded-lg transition-colors"
+              className="p-2 hover:bg-leather-100 dark:hover:bg-leather-700 rounded-lg transition-colors"
               aria-label="Toggle menu"
             >
               <svg
-                className="w-6 h-6 text-leather-800"
+                className="w-6 h-6 text-gray-900 dark:text-leather-100"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -1096,11 +1128,11 @@ function WorkspaceContent() {
             <button
               type="button"
               onClick={handleCloseDocument}
-              className="p-2 hover:bg-leather-100 rounded-lg transition-colors"
+              className="p-2 hover:bg-leather-100 dark:hover:bg-leather-700 rounded-lg transition-colors"
               aria-label="Close document"
             >
               <svg
-                className="w-6 h-6 text-leather-800"
+                className="w-6 h-6 text-gray-900 dark:text-leather-100"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -1315,6 +1347,7 @@ function WorkspaceContent() {
               // Render regular BlockEditor for other documents
               <BlockEditor
                 initialContent={currentDocument.content}
+                onChange={handleEditorChange}
                 onSave={handleSave}
                 autoSave={true}
                 showToolbar={isEditMode && !currentDocument.readOnly}
