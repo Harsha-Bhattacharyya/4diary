@@ -18,14 +18,18 @@ test.describe('Save on Close', () => {
     
     // Wait for initialization
     await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(2000);
+    
+    // Wait for workspace to be fully loaded (look for key elements)
+    await page.waitForSelector('text=/Workspace|My Workspace/i', { timeout: 10000 });
     
     // Create a new document
     const newDocButton = page.getByRole('button', { name: /New Document/i });
     
     if (await newDocButton.isVisible()) {
       await newDocButton.click();
-      await page.waitForTimeout(1000);
+      
+      // Wait for editor to load
+      await page.waitForSelector('.bn-editor, [role="textbox"]', { timeout: 5000 });
       
       // Edit the title
       const title = page.getByRole('heading', { name: /Untitled/i }).first();
@@ -35,7 +39,8 @@ test.describe('Save on Close', () => {
         if (await titleInput.isVisible()) {
           await titleInput.fill('Test Document');
           await titleInput.press('Enter');
-          await page.waitForTimeout(1000);
+          // Wait for title to be saved
+          await page.waitForSelector('text=/Test Document/i', { timeout: 3000 });
         }
       }
       
@@ -44,6 +49,7 @@ test.describe('Save on Close', () => {
       if (await editor.isVisible()) {
         await editor.click();
         await page.keyboard.type('This is test content that should be saved.');
+        // Wait a bit for onChange to fire
         await page.waitForTimeout(500);
       }
       
@@ -52,11 +58,11 @@ test.describe('Save on Close', () => {
       if (await closeButton.isVisible()) {
         await closeButton.click();
         
-        // Wait for the document to close and list to reload
-        await page.waitForTimeout(2000);
+        // Wait for the document to close by checking workspace UI returns
+        await page.waitForSelector('text=/My Workspace|Workspace/i', { timeout: 5000 });
         
         // Verify the document appears in the workspace list
-        await expect(page.getByText('Test Document')).toBeVisible();
+        await expect(page.getByText('Test Document')).toBeVisible({ timeout: 5000 });
       }
     }
   });
@@ -67,22 +73,26 @@ test.describe('Save on Close', () => {
     
     // Wait for initialization
     await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(2000);
+    
+    // Wait for workspace to be fully loaded
+    await page.waitForSelector('text=/Workspace|My Workspace/i', { timeout: 10000 });
     
     // Create a new document to see the editor with menu and close buttons
     const newDocButton = page.getByRole('button', { name: /New Document/i });
     
     if (await newDocButton.isVisible()) {
       await newDocButton.click();
-      await page.waitForTimeout(1000);
+      
+      // Wait for editor to load
+      await page.waitForSelector('.bn-editor, [role="textbox"]', { timeout: 5000 });
       
       // Check that menu button is visible
       const menuButton = page.getByRole('button', { name: /Toggle menu/i });
-      await expect(menuButton).toBeVisible();
+      await expect(menuButton).toBeVisible({ timeout: 3000 });
       
       // Check that close button is visible
       const closeButton = page.getByRole('button', { name: /Close document/i });
-      await expect(closeButton).toBeVisible();
+      await expect(closeButton).toBeVisible({ timeout: 3000 });
       
       // Verify buttons have proper contrast (check computed styles)
       const menuSvg = menuButton.locator('svg');

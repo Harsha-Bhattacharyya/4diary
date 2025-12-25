@@ -206,6 +206,12 @@ function WorkspaceContent() {
   // Ref to track the latest editor content (for saving on close)
   const latestContentRef = React.useRef<unknown[] | null>(null);
 
+  // Callback to track editor content changes
+  const handleEditorChange = useCallback((content: unknown[]) => {
+    // Track latest content in ref for use when closing
+    latestContentRef.current = content;
+  }, []);
+
   // Persist font preference to localStorage
   const handleFontChange = useCallback((font: EditorFontType) => {
     setEditorFont(font);
@@ -1341,10 +1347,7 @@ function WorkspaceContent() {
               // Render regular BlockEditor for other documents
               <BlockEditor
                 initialContent={currentDocument.content}
-                onChange={(content) => {
-                  // Track latest content in ref for use when closing
-                  latestContentRef.current = content;
-                }}
+                onChange={handleEditorChange}
                 onSave={handleSave}
                 autoSave={true}
                 showToolbar={isEditMode && !currentDocument.readOnly}
