@@ -11,7 +11,7 @@
  * modification, are permitted provided that the conditions in the LICENSE file are met.
  */
 
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useCallback } from "react";
 import SignatureCanvas from "react-signature-canvas";
 import { 
   Eraser, 
@@ -48,12 +48,14 @@ export default function HandwrittenNote({
   className = "",
 }: HandwrittenNoteProps) {
   const canvasRef = useRef<SignatureCanvas>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [penColor, setPenColor] = useState("#4A3728"); // Default leather color
   const [penWidth, setPenWidth] = useState(2);
   const [isEraser, setIsEraser] = useState(false);
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
+  const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600 });
 
   const colors = [
     { name: "Leather", value: "#4A3728" },
@@ -72,12 +74,37 @@ export default function HandwrittenNote({
     { name: "Bold", value: 6 },
   ];
 
-  // Load initial data
+  // Resize canvas when container dimensions change
+  const updateCanvasSize = useCallback(() => {
+    if (containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      // Use the full container dimensions
+      setCanvasSize({
+        width: Math.max(rect.width, 300),
+        height: Math.max(rect.height, 400),
+      });
+    }
+  }, []);
+
+  // Initialize and handle window resize
+  useEffect(() => {
+    updateCanvasSize();
+    window.addEventListener('resize', updateCanvasSize);
+    return () => window.removeEventListener('resize', updateCanvasSize);
+  }, [updateCanvasSize]);
+
+  // Load initial data after canvas is sized
   useEffect(() => {
     if (initialData && canvasRef.current) {
-      canvasRef.current.fromDataURL(initialData);
+      // Small delay to ensure canvas is properly sized before loading data
+      const timer = setTimeout(() => {
+        if (canvasRef.current) {
+          canvasRef.current.fromDataURL(initialData);
+        }
+      }, 100);
+      return () => clearTimeout(timer);
     }
-  }, [initialData]);
+  }, [initialData, canvasSize]);
 
   const handleClear = () => {
     if (!canvasRef.current) return;
@@ -288,15 +315,25 @@ export default function HandwrittenNote({
 
       {/* Canvas */}
       <GlassCard className="flex-1 p-0 overflow-hidden">
-        <div className="w-full h-full min-h-[400px] bg-white/95 rounded-lg">
+        <div 
+          ref={containerRef} 
+          className="w-full bg-white/95 dark:bg-white/90 rounded-lg"
+          style={{ height: 'calc(100vh - 200px)', minHeight: '500px' }}
+        >
           <SignatureCanvas
             ref={canvasRef}
             penColor={isEraser ? "#FFFFFF" : penColor}
             minWidth={penWidth}
             maxWidth={penWidth + 1}
             canvasProps={{
-              className: "w-full h-full cursor-crosshair touch-manipulation",
-              style: { touchAction: "none" },
+              width: canvasSize.width,
+              height: canvasSize.height,
+              className: "cursor-crosshair touch-manipulation",
+              style: { 
+                touchAction: "none",
+                width: '100%',
+                height: '100%',
+              },
             }}
             onBegin={handleBegin}
           />

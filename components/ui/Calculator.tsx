@@ -69,6 +69,12 @@ export default function Calculator({ onClose, onInsert }: CalculatorProps) {
   };
 
   const handleCalculate = () => {
+    // Don't calculate if input is empty
+    if (!input.trim()) {
+      setError("Please enter an expression");
+      return;
+    }
+    
     try {
       setError(null);
       const expandedInput = expandShorthand(input);

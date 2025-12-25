@@ -344,7 +344,8 @@ function WorkspaceContent() {
 
             // Clear the template parameter from URL to prevent re-creation on refresh
             router.replace('/workspace', { scroll: false });
-          } catch {
+          } catch (builtInErr) {
+            console.log("Built-in template not found, trying custom template:", builtInErr);
             // If it fails, try as a custom template from database
             try {
               const templateResponse = await fetch(`/api/templates?userId=${encodeURIComponent(userEmail)}`);
@@ -1019,9 +1020,9 @@ function WorkspaceContent() {
   if (currentDocument) {
     return (
       <>
-        <div className="min-h-screen relative bg-white">
+        <div className="min-h-screen relative bg-white dark:bg-leather-900">
         {/* Top Bar with Menu and Title */}
-        <div className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+        <div className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-leather-800 border-b border-gray-200 dark:border-leather-700 shadow-sm">
           <div className="flex items-center justify-between px-6 py-4">
             {/* Menu Button */}
             <button
@@ -1056,12 +1057,12 @@ function WorkspaceContent() {
               <EditableTitle
                 title={currentDocument.metadata.title}
                 onSave={handleTitleChange}
-                className="text-2xl font-bold text-gray-900 text-center"
+                className="text-2xl font-bold text-gray-900 dark:text-leather-100 text-center"
               />
               <button
                 type="button"
                 onClick={() => handleToggleFavorite(currentDocument.id, !currentDocument.favorite)}
-                className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors flex items-center gap-1"
+                className="px-3 py-1 text-sm bg-gray-100 dark:bg-leather-700 hover:bg-gray-200 dark:hover:bg-leather-600 rounded-lg transition-colors flex items-center gap-1"
                 title={currentDocument.favorite ? "Unstar this note" : "Star this note"}
               >
                 <span className="text-lg">
@@ -1118,30 +1119,30 @@ function WorkspaceContent() {
 
           {/* Dropdown Menu */}
           {dropdownOpen && (
-            <div className="absolute top-full left-0 mt-2 ml-4 bg-white rounded-lg shadow-lg border border-gray-200 py-2 min-w-[200px] fade-in">
+            <div className="absolute top-full left-0 mt-2 ml-4 bg-white dark:bg-leather-800 rounded-lg shadow-lg border border-gray-200 dark:border-leather-700 py-2 min-w-[200px] fade-in">
               <button
                 type="button"
                 onClick={handleCreateDocument}
-                className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+                className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-leather-700 transition-colors dark:text-leather-100"
               >
                 ➕ New Document
               </button>
               <Link href="/templates">
                 <button
                   type="button"
-                  className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors flex items-center gap-2"
+                  className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-leather-700 transition-colors flex items-center gap-2 dark:text-leather-100"
                 >
                   <Icon icon="flat-color-icons:template" width={20} height={20} /> Templates
                 </button>
               </Link>
-              <div className="border-t border-gray-200 my-2"></div>
+              <div className="border-t border-gray-200 dark:border-leather-700 my-2"></div>
               <button
                 type="button"
                 onClick={() => {
                   setShowNoteSettings(true);
                   setDropdownOpen(false);
                 }}
-                className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+                className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-leather-700 transition-colors dark:text-leather-100"
               >
                 ⚙️ Note Settings
               </button>
@@ -1151,7 +1152,7 @@ function WorkspaceContent() {
                   setShowVersionHistory(true);
                   setDropdownOpen(false);
                 }}
-                className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+                className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-leather-700 transition-colors dark:text-leather-100"
               >
                 📚 Version History
               </button>
@@ -1161,7 +1162,7 @@ function WorkspaceContent() {
                   setShowBacklinks(!showBacklinks);
                   setDropdownOpen(false);
                 }}
-                className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+                className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-leather-700 transition-colors dark:text-leather-100"
               >
                 🔗 {showBacklinks ? "Hide" : "Show"} Backlinks
               </button>
@@ -1172,7 +1173,7 @@ function WorkspaceContent() {
                     setShowPlaywriterMode(true);
                     setDropdownOpen(false);
                   }}
-                  className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+                  className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-leather-700 transition-colors dark:text-leather-100"
                 >
                   🎭 Playwriter Mode
                 </button>
@@ -1183,7 +1184,7 @@ function WorkspaceContent() {
                   setShowCalculator(true);
                   setDropdownOpen(false);
                 }}
-                className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+                className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-leather-700 transition-colors dark:text-leather-100"
                 title="Calculator (Ctrl+Shift+C)"
               >
                 🔢 Calculator
@@ -1194,16 +1195,16 @@ function WorkspaceContent() {
                   setShowSearch(true);
                   setDropdownOpen(false);
                 }}
-                className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+                className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-leather-700 transition-colors dark:text-leather-100"
                 title="Search (Ctrl+Shift+F)"
               >
                 🔍 Search Notes
               </button>
-              <div className="border-t border-gray-200 my-2"></div>
+              <div className="border-t border-gray-200 dark:border-leather-700 my-2"></div>
               <button
                 type="button"
                 onClick={handleExportDocument}
-                className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors flex items-center gap-2"
+                className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-leather-700 transition-colors flex items-center gap-2 dark:text-leather-100"
               >
                 <Icon icon="flat-color-icons:export" width={20} height={20} /> Export
               </button>
@@ -1213,7 +1214,7 @@ function WorkspaceContent() {
                   setShowSaveTemplateModal(true);
                   setDropdownOpen(false);
                 }}
-                className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors flex items-center gap-2"
+                className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-leather-700 transition-colors flex items-center gap-2 dark:text-leather-100"
               >
                 <Icon icon="flat-color-icons:template" width={20} height={20} /> Save as Template
               </button>
@@ -1221,7 +1222,7 @@ function WorkspaceContent() {
                 <button
                   type="button"
                   onClick={handleExportWorkspace}
-                  className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors flex items-center gap-2"
+                  className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-leather-700 transition-colors flex items-center gap-2 dark:text-leather-100"
                 >
                   <Icon icon="flat-color-icons:package" width={20} height={20} /> Export All
                 </button>
@@ -1229,24 +1230,24 @@ function WorkspaceContent() {
               <Link href="/settings">
                 <button
                   type="button"
-                  className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors flex items-center gap-2"
+                  className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-leather-700 transition-colors flex items-center gap-2 dark:text-leather-100"
                 >
                   <Icon icon="flat-color-icons:settings" width={20} height={20} /> Settings
                 </button>
               </Link>
-              <div className="border-t border-gray-200 my-2"></div>
+              <div className="border-t border-gray-200 dark:border-leather-700 my-2"></div>
               <button
                 type="button"
                 onClick={() => {
                   setShowDeleteConfirm(true);
                   setDropdownOpen(false);
                 }}
-                className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-600 transition-colors flex items-center gap-2"
+                className="w-full text-left px-4 py-2 hover:bg-red-50 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400 transition-colors flex items-center gap-2"
               >
                 <Icon icon="flat-color-icons:delete-database" width={20} height={20} /> Delete Note
               </button>
-              <div className="border-t border-gray-200 my-2"></div>
-              <div className="px-4 py-2 text-sm text-gray-500 flex items-center gap-2">
+              <div className="border-t border-gray-200 dark:border-leather-700 my-2"></div>
+              <div className="px-4 py-2 text-sm text-gray-500 dark:text-leather-400 flex items-center gap-2">
                 <Icon icon="flat-color-icons:data-encryption" width={16} height={16} /> End-to-end encrypted
               </div>
             </div>
@@ -1400,7 +1401,7 @@ function WorkspaceContent() {
               <button
                 type="button"
                 onClick={() => setIsEditMode(false)}
-                className="px-3 py-1 bg-white hover:bg-gray-100 rounded-lg transition-colors text-sm shadow-md border border-gray-200 pointer-events-auto"
+                className="px-3 py-1 bg-white dark:bg-leather-800 hover:bg-gray-100 dark:hover:bg-leather-700 rounded-lg transition-colors text-sm shadow-md border border-gray-200 dark:border-leather-700 pointer-events-auto dark:text-leather-100"
               >
                 Exit Edit Mode
               </button>
