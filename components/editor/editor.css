@@ -11,10 +11,18 @@
 
 /* Custom styles for BlockNote Editor */
 
+/* Light mode defaults (for :root and .light class) */
 :root {
   --editor-text-color: #000000;
   --editor-hover-bg: rgba(0, 0, 0, 0.1);
   --editor-selected-bg: rgba(0, 0, 0, 0.15);
+}
+
+/* Dark mode overrides */
+.dark {
+  --editor-text-color: #FFFFFF;
+  --editor-hover-bg: rgba(255, 255, 255, 0.1);
+  --editor-selected-bg: rgba(255, 255, 255, 0.15);
 }
 
 /* Make formatting toolbar text black for better visibility */
