@@ -49,8 +49,8 @@ test.describe('Save on Close', () => {
       if (await editor.isVisible()) {
         await editor.click();
         await page.keyboard.type('This is test content that should be saved.');
-        // Wait a bit for onChange to fire
-        await page.waitForTimeout(500);
+        // Give a small moment for the onChange event to fire and update the ref
+        await page.waitForFunction(() => true, { timeout: 200 });
       }
       
       // Click the X button to close the document

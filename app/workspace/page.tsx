@@ -1021,7 +1021,7 @@ function WorkspaceContent() {
 
   const handleCloseDocument = async () => {
     // Save any unsaved changes before closing
-    if (currentDocument && userEmail && latestContentRef.current) {
+    if (currentDocument && userEmail && latestContentRef.current !== null) {
       try {
         await updateDocument({
           id: currentDocument.id,
