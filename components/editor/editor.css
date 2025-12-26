@@ -25,6 +25,21 @@
   --editor-selected-bg: rgba(255, 255, 255, 0.15);
 }
 
+/* Make BlockNote editor backgrounds transparent/inherit from parent container */
+.bn-editor,
+.bn-container,
+.ProseMirror {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+/* Ensure the main BlockNote view inherits background */
+.bn-block-outer,
+.bn-block-content {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
 /* Make formatting toolbar text black for better visibility */
 .bn-formatting-toolbar button,
 .bn-formatting-toolbar select,
