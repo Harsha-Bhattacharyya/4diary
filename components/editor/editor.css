@@ -29,13 +29,13 @@
 .bn-editor,
 .bn-container,
 .ProseMirror {
-  background: transparent !important;
+  background-color: transparent !important;
 }
 
 /* Ensure the main BlockNote view inherits background */
 .bn-block-outer,
 .bn-block-content {
-  background: transparent !important;
+  background-color: transparent !important;
 }
 
 /* Make formatting toolbar text black for better visibility */
