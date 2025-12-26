@@ -399,6 +399,42 @@ test.describe('EditableTitle Component - Advanced Tests', () => {
     }
   });
 
+  test('should update title immediately after save, not on second edit', async ({ page }) => {
+    await page.goto('/workspace');
+    await page.waitForLoadState('networkidle');
+    
+    const newDocButton = page.getByRole('button', { name: /New Document/i });
+    
+    if (await newDocButton.isVisible()) {
+      await newDocButton.click();
+      await page.waitForTimeout(1000);
+      
+      const title = page.getByRole('heading', { name: /Untitled/i }).first();
+      
+      if (await title.isVisible()) {
+        // First edit: change "Untitled" to "Duck"
+        await title.click();
+        
+        const input = page.locator('input[type="text"]').first();
+        
+        if (await input.isVisible()) {
+          await input.fill('Duck');
+          
+          // Click outside to trigger blur/save
+          await page.click('body');
+          await page.waitForTimeout(1000);
+          
+          // CRITICAL: Title should show "Duck" immediately, not "Untitled"
+          await expect(page.getByText('Duck')).toBeVisible();
+          
+          // Verify old title is no longer visible
+          const untitledStillVisible = await page.getByText('Untitled').isVisible();
+          expect(untitledStillVisible).toBe(false);
+        }
+      }
+    }
+  });
+
   test('should respect maxLength attribute (100 characters)', async ({ page }) => {
     await page.goto('/workspace');
     await page.waitForLoadState('networkidle');
