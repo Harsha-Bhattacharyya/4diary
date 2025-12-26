@@ -52,6 +52,8 @@ export default function EditableTitle({ title, onSave, className = "" }: Editabl
       setIsSaving(true);
       try {
         await onSave(trimmedTitle);
+        // Update local state immediately so the UI reflects the change
+        setCurrentTitle(trimmedTitle);
         setIsEditing(false);
       } catch (err) {
         // On error, revert to the original title
